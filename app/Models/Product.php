@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Category;
+use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,19 @@ class Product extends Model
         'pushed_at' => 'datetime',
         'is_active' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($product) {
+            $product->slug = Str::slug($product->title) . '-' . rand(1000, 9999);
+        });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     public function lapak(): BelongsTo
     {

@@ -19,7 +19,7 @@ class ProductController extends Controller
             ->orderBy('pushed_at', 'desc')
             ->paginate(10); // Menggunakan pagination agar tidak berat saat data banyak
 
-        return view('welcome', compact('products'));
+        return view('main', compact('products'));
     }
 
     public function show(Product $product)

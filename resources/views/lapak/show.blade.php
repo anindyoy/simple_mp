@@ -1,59 +1,69 @@
 @extends('layouts.app')
-@section('title', 'Lapak ' . $lapak->shop_name . ' - Jual Beli Cimanglid')
+@section('title', $lapak->shop_name . ' (' . $lapak->products->count() . ' Produk) - Jual Beli Cimanglid')
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="max-w-7xl mx-auto px-4 py-6">
 
-    {{-- HEADER LAPAK --}}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 mb-8">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-gray-900 dark:text-white">
-                    {{ $lapak->shop_name }}
-                </h1>
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 shadow-sm mb-8">
+            <div class="flex items-center gap-4 mb-6">
+                <img
+                    src="{{ $lapak->profile_image_url }}"
+                    class="w-14 h-14 rounded-xl object-cover shadow"
+                    alt="{{ $lapak->shop_name }}" />
 
-                <p class="text-sm text-gray-500 mt-1">
-                    {{ $lapak->address_raw }}
-                </p>
+                <div>
+                    <h4 class="font-bold text-gray-900 text-lg flex items-center gap-1">
+                        <x-heroicon-o-building-storefront class="w-4 h-4 text-indigo-500" />
+                        {{ $lapak->shop_name }}
+                    </h4>
 
-                <div class="flex gap-3 mt-3 text-sm">
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $lapak->whatsapp_number) }}"
-                       target="_blank"
-                       class="px-4 py-2 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600">
-                        WhatsApp
-                    </a>
+                    <p class="text-sm text-gray-500 flex items-center gap-1">
+                        <x-heroicon-o-map-pin class="w-4 h-4 text-red-500" />
+                        {{ $lapak->address_raw }}
+                    </p>
 
-                    @if($lapak->telegram_username)
-                        <a href="https://t.me/{{ $lapak->telegram_username }}"
-                           target="_blank"
-                           class="px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600">
-                            Telegram
-                        </a>
-                    @endif
+                    <p class="text-xs text-gray-400">
+                        Bergabung sejak {{ $lapak->joined_at_label }}
+                    </p>
                 </div>
             </div>
 
-            <div class="text-sm text-gray-400">
-                Bergabung sejak {{ $lapak->created_at->format('d M Y') }}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {{-- WhatsApp --}}
+                @if ($lapak->whatsapp_url)
+                    <a href="{{ $lapak->whatsapp_url }}"
+                        target="_blank"
+                        class="flex justify-center items-center gap-2 px-6 py-3
+                      text-white bg-green-500 hover:bg-green-600
+                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                        <x-fab-whatsapp class="w-5 h-5" />
+                        WhatsApp
+                    </a>
+                @endif
+
+                {{-- Telegram --}}
+                @if ($lapak->telegram_url)
+                    <a href="{{ $lapak->telegram_url }}"
+                        target="_blank"
+                        class="flex justify-center items-center gap-2 px-6 py-3
+                      text-white bg-sky-500 hover:bg-sky-600
+                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                        <x-fab-telegram class="w-5 h-5" />
+                        Telegram
+                    </a>
+                @endif
             </div>
         </div>
-    </div>
 
-    {{-- LIST PRODUK --}}
-    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
-        Produk dari Lapak ini
-    </h2>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
+            Produk dari Lapak ini
+        </h2>
 
-    @if($lapak->products->count())
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            @foreach($lapak->products as $product)
+            @foreach ($lapak->products as $product)
                 <x-product-card :product="$product" />
             @endforeach
         </div>
-    @else
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl text-center text-gray-500">
-            Lapak ini belum memiliki produk 😢
-        </div>
-    @endif
 
-</div>
+    </div>
+
 @endsection

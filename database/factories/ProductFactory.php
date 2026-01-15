@@ -20,7 +20,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'lapak_id' => LapakProfile::factory(),
+            // 'lapak_id' => LapakProfile::factory(),
             'category_id' => Category::factory(),
             'title' => $title = $this->faker->words(3, true),
             'slug' => Str::slug($title) . '-' . rand(100, 999),

@@ -30,7 +30,12 @@
                             {{ strtoupper(substr($product->lapak->shop_name, 0, 1)) }}
                         </div>
                         <div>
-                            <h4 class="font-bold text-gray-900 text-lg">{{ $product->lapak->shop_name }}</h4>
+                            <h4 class="font-bold text-gray-900 text-lg">
+                                <a href="{{ route('lapak.show', $product->lapak_id) }}"
+                                    class="text-[10px] font-semibold text-blue-500 hover:underline">
+                                    {{ $product->lapak->shop_name }}
+                                </a>
+                            </h4>
                             <p class="text-sm text-gray-500 flex items-center gap-1">
                                 <svg class="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>

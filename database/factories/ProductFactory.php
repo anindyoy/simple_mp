@@ -21,7 +21,7 @@ class ProductFactory extends Factory
     {
         return [
             // 'lapak_id' => LapakProfile::factory(),
-            'category_id' => Category::factory(),
+            'category_id' => Category::inRandomOrder()->first()->id ?? Category::factory()->create()->id,
             'title' => $title = $this->faker->words(3, true),
             'slug' => Str::slug($title) . '-' . rand(100, 999),
             'description' => $this->faker->paragraph(3), // Narasi produk

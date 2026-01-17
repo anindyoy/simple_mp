@@ -76,6 +76,16 @@
             <div>
                 <h1 class="text-4xl font-extrabold text-gray-900">{{ $product->title }}</h1>
                 <p class="text-2xl font-bold text-blue-600 mt-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                @if ($product->hasCondition())
+                    <div class="mt-2">
+                        <span
+                            class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+            {{ $product->condition === 'baru' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                            {{ $product->conditionLabel() }}
+                        </span>
+                    </div>
+                @endif
+
                 <div class="mt-6">
                     <h3 class="font-bold text-gray-500 uppercase text-xs">Deskripsi</h3>
                     <p class="text-gray-600 mt-2">{{ $product->description }}</p>

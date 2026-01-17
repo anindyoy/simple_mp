@@ -35,6 +35,20 @@
                     @endforeach
                 </select>
 
+                @php
+                    $condition = request('condition');
+                @endphp
+
+                @if (!$selectedCategory || $categories->firstWhere('id', $selectedCategory)?->supportsCondition())
+                    <select
+                        name="condition"
+                        class="w-full sm:w-1/4 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Semua Kondisi</option>
+                        <option value="baru" @selected($condition === 'baru')>Baru</option>
+                        <option value="seken" @selected($condition === 'seken')>Bekas</option>
+                    </select>
+                @endif
+
                 {{-- Submit --}}
                 <button
                     type="submit"

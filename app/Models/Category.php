@@ -17,4 +17,14 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function supportsCondition(): bool
+    {
+        // contoh kategori barang fisik
+        return in_array($this->id, [
+            2, // Fashion
+            3, // Elektronik
+            4 // Otomotif
+        ]);
+    }
 }

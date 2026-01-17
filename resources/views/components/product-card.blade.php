@@ -39,6 +39,14 @@
             Rp {{ number_format($product->price, 0, ',', '.') }}
         </p>
 
+        @if ($product->hasCondition())
+            <span
+                class="inline-block mb-1 text-[10px] font-bold px-2 py-0.5 rounded-full
+        {{ $product->condition === 'baru' ? 'text-green-700' : 'text-yellow-700' }}">
+                Kondisi {{ $product->conditionLabel() }}
+            </span>
+        @endif
+
         @if ($showLapakName ?? false)
             <div class="flex items-center gap-1 text-sm text-gray-500 font-semibold">
                 <x-heroicon-o-building-storefront class="w-3 h-3 text-gray-400" />

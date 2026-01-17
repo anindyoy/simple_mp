@@ -1,6 +1,176 @@
-mengapa jika gambar produk hanya ada 1, gambarnya tidak muncul di halaman detail produk
+bantu buat attribute kondisi untuk product, nilainya baru, seken, dan null
+buat agar kondisi produk hanya tampil pada beberapa kategori produk
+buatkan filternya juga di halaman main.
+
+<?
+-- simple_mp.products definition
+
+CREATE TABLE `products` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `lapak_id` bigint(20) unsigned NOT NULL,
+  `category_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `price` decimal(12,2) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `pushed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `products_slug_unique` (`slug`),
+  KEY `products_lapak_id_foreign` (`lapak_id`),
+  KEY `products_category_id_foreign` (`category_id`),
+  KEY `products_pushed_at_index` (`pushed_at`),
+  CONSTRAINT `products_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  CONSTRAINT `products_lapak_id_foreign` FOREIGN KEY (`lapak_id`) REFERENCES `lapak_profiles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- simple_mp.categories definition
+
+CREATE TABLE `categories` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `category_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+main.blade:
+@extends('layouts.app')
+@section('title', $meta['title'])
+@section('meta_description', $meta['description'])
+@section('meta_keywords', $meta['keywords'])
+
+@section('og_title', $meta['title'])
+@section('og_description', $meta['description'])
+
+@section('content')
+    <div class="container mx-auto px-4 py-8">
+
+        {{-- Search & Filter --}}
+        <form method="GET" action="{{ route('products.index') }}" class="mb-6">
+            <div class="flex flex-col sm:flex-row gap-3">
+
+                {{-- Search --}}
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Cari produk..."
+                    class="w-full sm:w-1/2 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+
+                {{-- Category Filter --}}
+                <select
+                    name="category"
+                    class="w-full sm:w-1/4 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($categories as $category)
+                        <option
+                            value="{{ $category->id }}"
+                            @selected($selectedCategory == $category->id)>
+                            {{ $category->category_name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                {{-- Submit --}}
+                <button
+                    type="submit"
+                    class="sm:w-auto px-5 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                    Cari
+                </button>
+            </div>
+        </form>
+
+        {{-- Produk --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            @forelse ($products as $product)
+                @include('components.product-card', [
+                    'product' => $product,
+                    'showLapakName' => true,
+                ])
+            @empty
+                <div class="col-span-full text-center text-gray-500 py-10">
+                    Produk tidak ditemukan
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-10">
+            {{ $products->links() }}
+        </div>
+    </div>
+@endsection
 
 <?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+class ProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $search = $request->query('search');
+        $categoryId = $request->query('category');
+
+        $products = Product::with([
+            'lapak',
+            'images' => function ($query) {
+                $query->where('is_primary', true);
+            }
+        ])
+            ->where('is_active', true)
+            ->when($search, function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%');
+            })
+            ->when($categoryId, function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->orderBy('pushed_at', 'desc')
+            ->paginate(16)
+            ->withQueryString(); // penting agar filter tetap saat pagination
+
+        $categories = Category::orderBy('category_name')->get();
+
+        return view('main', [
+            'products' => $products,
+            'categories' => $categories,
+            'search' => $search,
+            'selectedCategory' => $categoryId,
+
+            'meta' => [
+                'title' => 'Jual Beli Cimanglid - Marketplace Warga',
+                'description' => 'Marketplace lokal warga Cimanglid. Temukan makanan, jasa, elektronik, dan kebutuhan harian.',
+                'keywords' => 'jual beli cimanglid, marketplace desa, iklan warga cimanglid',
+            ],
+        ]);
+    }
+
+    public function show(Product $product)
+    {
+        $product->load(['lapak', 'category', 'images']);
+        return view('product-detail', [
+            'product' => $product,
+            'meta' => [
+                'title' => $product->title . ' | Jual Beli Cimanglid',
+                'description' => str()->limit(strip_tags($product->description), 155),
+                'keywords' => implode(', ', [
+                    $product->title,
+                    $product->category?->category_name,
+                    $product->lapak?->nama_lapak,
+                    'jual beli cimanglid'
+                ]),
+                'image' => optional($product->images->first())->image_url,
+            ],
+        ]);
+    }
+}
+
 product-detail.blade:
 @extends('layouts.app')
 @section('title', $meta['title'])
@@ -18,52 +188,63 @@ product-detail.blade:
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
-                {{-- Carousel Foto Produk --}}
-                <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
-                    <!-- Carousel wrapper -->
-                    <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
-                        @foreach ($product->images as $index => $image)
-                            @php
-                                $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
-                            @endphp
+                @if ($product->images->count() === 1)
+                    {{-- Single Image (tanpa carousel) --}}
+                    @php
+                        $image = $product->images->first();
+                        $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
+                    @endphp
 
-                            <div class="hidden duration-700 ease-in-out" data-carousel-item @if ($index === 0) data-carousel-item="active" @endif>
-                                <img src="{{ $imgUrl }}"
-                                    class="block w-full h-full object-contain mx-auto"
-                                    alt="Gambar Produk {{ $product->title }}">
-                            </div>
-                        @endforeach
+                    <div class="w-full h-56 md:h-96 bg-white border rounded-base shadow-sm flex items-center justify-center">
+                        <img
+                            src="{{ $imgUrl }}"
+                            class="max-w-full max-h-full object-contain"
+                            alt="Gambar Produk {{ $product->title }}">
                     </div>
+                @elseif ($product->images->count() > 1)
+                    {{-- Carousel (jika > 1 foto) --}}
+                    <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
+                        <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
+                            @foreach ($product->images as $index => $image)
+                                @php
+                                    $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
+                                @endphp
 
-                    <!-- Slider indicators -->
-                    <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-                        @foreach ($product->images as $i => $img)
-                            <button type="button"
-                                class="w-3 h-3 rounded-base bg-white/50"
-                                aria-current="{{ $i === 0 ? 'true' : 'false' }}"
-                                aria-label="Slide {{ $i + 1 }}"
-                                data-carousel-slide-to="{{ $i }}"></button>
-                        @endforeach
+                                <div
+                                    data-carousel-item="{{ $index === 0 ? 'active' : '' }}"
+                                    class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out">
+                                    <img
+                                        src="{{ $imgUrl }}"
+                                        class="block w-full h-full object-contain mx-auto"
+                                        alt="Gambar Produk {{ $product->title }}">
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Indicators --}}
+                        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+                            @foreach ($product->images as $i => $img)
+                                <button
+                                    type="button"
+                                    class="w-3 h-3 rounded-base bg-white/50"
+                                    data-carousel-slide-to="{{ $i }}"
+                                    aria-label="Slide {{ $i + 1 }}"></button>
+                            @endforeach
+                        </div>
+
+                        {{-- Controls --}}
+                        <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4" data-carousel-prev>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                                ‹
+                            </span>
+                        </button>
+                        <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4" data-carousel-next>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                                ›
+                            </span>
+                        </button>
                     </div>
-
-                    <!-- Slider controls -->
-                    <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30 group-hover:bg-white/50">
-                            <svg class="w-5 h-5 text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span class="sr-only">Previous</span>
-                        </span>
-                    </button>
-                    <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30 group-hover:bg-white/50">
-                            <svg class="w-5 h-5 text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span class="sr-only">Next</span>
-                        </span>
-                    </button>
-                </div>
+                @endif
             </div>
 
             <div>
@@ -126,65 +307,3 @@ product-detail.blade:
         </div>
     </div>
 @endsection
-
-namespace App\Http\Controllers;
-
-class ProductController extends Controller
-{
-    public function index(Request $request)
-    {
-        $search = $request->query('search');
-        $categoryId = $request->query('category');
-
-        $products = Product::with([
-            'lapak',
-            'images' => function ($query) {
-                $query->where('is_primary', true);
-            }
-        ])
-            ->where('is_active', true)
-            ->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-            })
-            ->when($categoryId, function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->orderBy('pushed_at', 'desc')
-            ->paginate(16)
-            ->withQueryString(); // penting agar filter tetap saat pagination
-
-        $categories = Category::orderBy('category_name')->get();
-
-        return view('main', [
-            'products' => $products,
-            'categories' => $categories,
-            'search' => $search,
-            'selectedCategory' => $categoryId,
-
-            'meta' => [
-                'title' => 'Jual Beli Cimanglid - Marketplace Warga',
-                'description' => 'Marketplace lokal warga Cimanglid. Temukan makanan, jasa, elektronik, dan kebutuhan harian.',
-                'keywords' => 'jual beli cimanglid, marketplace desa, iklan warga cimanglid',
-            ],
-        ]);
-    }
-
-    public function show(Product $product)
-    {
-        $product->load(['lapak', 'category', 'images']);
-        return view('product-detail', [
-            'product' => $product,
-            'meta' => [
-                'title' => $product->title . ' | Jual Beli Cimanglid',
-                'description' => str()->limit(strip_tags($product->description), 155),
-                'keywords' => implode(', ', [
-                    $product->title,
-                    $product->category?->category_name,
-                    $product->lapak?->nama_lapak,
-                    'jual beli cimanglid'
-                ]),
-                'image' => optional($product->images->first())->image_url,
-            ],
-        ]);
-    }
-}

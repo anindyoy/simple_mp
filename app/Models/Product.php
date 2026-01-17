@@ -28,6 +28,17 @@ class Product extends Model
         static::creating(function ($product) {
             $product->slug = Str::slug($product->title) . '-' . rand(1000, 9999);
         });
+
+        static::saving(function ($product) {
+            if (
+                $product->category?->supportsCondition()
+                && is_null($product->condition)
+            ) {
+                throw new \InvalidArgumentException(
+                    'Condition wajib diisi untuk kategori ini.'
+                );
+            }
+        });
     }
 
     public function getRouteKeyName()
@@ -54,5 +65,20 @@ class Product extends Model
     public function canBePushed(): bool
     {
         return $this->pushed_at->diffInHours(now()) >= 6;
+    }
+
+    public function hasCondition(): bool
+    {
+        return !is_null($this->condition)
+            && $this->category?->supportsCondition();
+    }
+
+    public function conditionLabel(): ?string
+    {
+        return match ($this->condition) {
+            'baru' => 'Baru',
+            'seken' => 'Bekas',
+            default => null,
+        };
     }
 }

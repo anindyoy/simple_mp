@@ -13,23 +13,19 @@ class ProductController extends Controller
     {
         $search = $request->query('search');
         $categoryId = $request->query('category');
+        $condition = $request->query('condition');
 
         $products = Product::with([
             'lapak',
-            'images' => function ($query) {
-                $query->where('is_primary', true);
-            }
+            'images' => fn($q) => $q->where('is_primary', true),
         ])
             ->where('is_active', true)
-            ->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-            })
-            ->when($categoryId, function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            })
+            ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
+            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($condition, fn($q) => $q->where('condition', $condition))
             ->orderBy('pushed_at', 'desc')
             ->paginate(16)
-            ->withQueryString(); // penting agar filter tetap saat pagination
+            ->withQueryString();
 
         $categories = Category::orderBy('category_name')->get();
 
@@ -38,6 +34,7 @@ class ProductController extends Controller
             'categories' => $categories,
             'search' => $search,
             'selectedCategory' => $categoryId,
+            'selectedCondition' => $condition,
 
             'meta' => [
                 'title' => 'Jual Beli Cimanglid - Marketplace Warga',

@@ -7,59 +7,70 @@
 @section('og_description', $meta['description'])
 @section('og_type', 'product')
 @section('og_image', $meta['image'] ?? asset('images/og-default.jpg'))
-
+1
 @section('title', $product->title . ' - Jual Beli Cimanglid')
 
 @section('content')
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
-                {{-- Carousel Foto Produk --}}
-                <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
-                    <!-- Carousel wrapper -->
-                    <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
-                        @foreach ($product->images as $index => $image)
-                            @php
-                                $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
-                            @endphp
+                @if ($product->images->count() === 1)
+                    {{-- Single Image (tanpa carousel) --}}
+                    @php
+                        $image = $product->images->first();
+                        $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
+                    @endphp
 
-                            <div class="hidden duration-700 ease-in-out" data-carousel-item @if ($index === 0) data-carousel-item="active" @endif>
-                                <img src="{{ $imgUrl }}"
-                                    class="block w-full h-full object-contain mx-auto"
-                                    alt="Gambar Produk {{ $product->title }}">
-                            </div>
-                        @endforeach
+                    <div class="w-full h-56 md:h-96 bg-white border rounded-base shadow-sm flex items-center justify-center">
+                        <img
+                            src="{{ $imgUrl }}"
+                            class="max-w-full max-h-full object-contain"
+                            alt="Gambar Produk {{ $product->title }}">
                     </div>
+                @elseif ($product->images->count() > 1)
+                    {{-- Carousel (jika > 1 foto) --}}
+                    <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
+                        <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
+                            @foreach ($product->images as $index => $image)
+                                @php
+                                    $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
+                                @endphp
 
-                    <!-- Slider indicators -->
-                    <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-                        @foreach ($product->images as $i => $img)
-                            <button type="button"
-                                class="w-3 h-3 rounded-base bg-white/50"
-                                aria-current="{{ $i === 0 ? 'true' : 'false' }}"
-                                aria-label="Slide {{ $i + 1 }}"
-                                data-carousel-slide-to="{{ $i }}"></button>
-                        @endforeach
+                                <div
+                                    data-carousel-item="{{ $index === 0 ? 'active' : '' }}"
+                                    class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out">
+                                    <img
+                                        src="{{ $imgUrl }}"
+                                        class="block w-full h-full object-contain mx-auto"
+                                        alt="Gambar Produk {{ $product->title }}">
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Indicators --}}
+                        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+                            @foreach ($product->images as $i => $img)
+                                <button
+                                    type="button"
+                                    class="w-3 h-3 rounded-base bg-white/50"
+                                    data-carousel-slide-to="{{ $i }}"
+                                    aria-label="Slide {{ $i + 1 }}"></button>
+                            @endforeach
+                        </div>
+
+                        {{-- Controls --}}
+                        <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4" data-carousel-prev>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                                ‹
+                            </span>
+                        </button>
+                        <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4" data-carousel-next>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                                ›
+                            </span>
+                        </button>
                     </div>
-
-                    <!-- Slider controls -->
-                    <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30 group-hover:bg-white/50">
-                            <svg class="w-5 h-5 text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span class="sr-only">Previous</span>
-                        </span>
-                    </button>
-                    <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30 group-hover:bg-white/50">
-                            <svg class="w-5 h-5 text-gray-800 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span class="sr-only">Next</span>
-                        </span>
-                    </button>
-                </div>
+                @endif
             </div>
 
             <div>

@@ -1,4 +1,12 @@
 @extends('layouts.app')
+@section('title', $meta['title'])
+@section('meta_description', $meta['description'])
+@section('meta_keywords', $meta['keywords'])
+
+@section('og_title', $meta['title'])
+@section('og_description', $meta['description'])
+@section('og_type', 'product')
+@section('og_image', $meta['image'] ?? asset('images/og-default.jpg'))
 
 @section('title', $product->title . ' - Jual Beli Cimanglid')
 

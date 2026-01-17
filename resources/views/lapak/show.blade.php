@@ -1,5 +1,13 @@
 @extends('layouts.app')
-@section('title', $lapak->shop_name . ' (' . $lapak->products->count() . ' Produk) - Jual Beli Cimanglid')
+@section('title', $meta['title'])
+@section('meta_description', $meta['description'])
+@section('meta_keywords', $meta['keywords'])
+
+@section('og_title', $meta['title'])
+@section('og_description', $meta['description'])
+@section('og_type', 'profile')
+@section('og_image', $meta['image'] ?? asset('images/og-default.jpg'))
+
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-6">
 

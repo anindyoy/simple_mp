@@ -15,11 +15,11 @@ class ProductController extends Controller
         $categoryId = $request->query('category');
 
         $products = Product::with([
-                'lapak',
-                'images' => function ($query) {
-                    $query->where('is_primary', true);
-                }
-            ])
+            'lapak',
+            'images' => function ($query) {
+                $query->where('is_primary', true);
+            }
+        ])
             ->where('is_active', true)
             ->when($search, function ($query) use ($search) {
                 $query->where('title', 'like', '%' . $search . '%');
@@ -38,12 +38,31 @@ class ProductController extends Controller
             'categories' => $categories,
             'search' => $search,
             'selectedCategory' => $categoryId,
+
+            'meta' => [
+                'title' => 'Jual Beli Cimanglid - Marketplace Warga',
+                'description' => 'Marketplace lokal warga Cimanglid. Temukan makanan, jasa, elektronik, dan kebutuhan harian.',
+                'keywords' => 'jual beli cimanglid, marketplace desa, iklan warga cimanglid',
+            ],
         ]);
     }
 
     public function show(Product $product)
     {
         $product->load(['lapak', 'category', 'images']);
-        return view('product-detail', compact('product'));
+        return view('product-detail', [
+            'product' => $product,
+            'meta' => [
+                'title' => $product->title . ' | Jual Beli Cimanglid',
+                'description' => str()->limit(strip_tags($product->description), 155),
+                'keywords' => implode(', ', [
+                    $product->title,
+                    $product->category?->category_name,
+                    $product->lapak?->nama_lapak,
+                    'jual beli cimanglid'
+                ]),
+                'image' => optional($product->images->first())->image_url,
+            ],
+        ]);
     }
 }

@@ -12,6 +12,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
+use STS\FilamentImpersonate\Actions\Impersonate;
 
 class UsersTable
 {
@@ -101,7 +102,8 @@ class UsersTable
             ])
 
             ->recordActions([
-                EditAction::make(),
+                Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
+                EditAction::make()->hiddenLabel(),
             ])
 
             ->toolbarActions([

@@ -50,7 +50,7 @@
         @if ($showLapakName ?? false)
             <div class="flex items-center gap-1 text-sm text-gray-500 font-semibold">
                 <x-heroicon-o-building-storefront class="w-3 h-3 text-gray-400" />
-                <span>{{ $product->lapak->shop_name }}</span>
+                <span>{{ $product->lapak->name }}</span>
             </div>
         @endif
 

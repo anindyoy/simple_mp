@@ -35,7 +35,7 @@ class LapakProfile extends Model
                 : asset('storage/' . $this->profile_image);
         }
 
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->shop_name);
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 
     public function getJoinedAtLabelAttribute(): string
@@ -61,7 +61,7 @@ class LapakProfile extends Model
         }
 
         $message = 'Halo, saya tertarik dengan produk di lapak *'
-            . $this->shop_name
+            . $this->name
             . '* yang saya lihat di Jual Beli Cimanglid.';
 
         return 'https://wa.me/' . $number . '?text=' . urlencode($message);

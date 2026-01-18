@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('lapak_profiles', function (Blueprint $table) {
             $table->string('profile_image')
                 ->nullable()
-                ->after('shop_name');
+                ->after('name');
         });
     }
 

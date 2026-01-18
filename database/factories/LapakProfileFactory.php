@@ -21,7 +21,7 @@ class LapakProfileFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'shop_name' => $this->faker->company() . " Shop",
+            'name' => $this->faker->company() . " Shop",
             'whatsapp_number' => '628' . $this->faker->numerify('##########'),
             'telegram_username' => $this->faker->userName(),
             'address_raw' => "Desa " . $this->faker->randomElement($lokasiCimanglid) . ", Ciapus, Bogor",

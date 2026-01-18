@@ -96,13 +96,13 @@
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 shadow-sm mt-8">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-inner">
-                            {{ strtoupper(substr($product->lapak->shop_name, 0, 1)) }}
+                            {{ strtoupper(substr($product->lapak->name, 0, 1)) }}
                         </div>
                         <div>
                             <h4 class="font-bold text-gray-900 text-lg">
                                 <a href="{{ route('lapak.show', $product->lapak_id) }}"
                                     class="font-semibold text-blue-500 hover:underline">
-                                    {{ $product->lapak->shop_name }}
+                                    {{ $product->lapak->name }}
                                 </a>
                             </h4>
                             <p class="text-sm text-gray-500 flex items-center gap-1">

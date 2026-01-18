@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lapak_profiles', function (Illuminate\Database\Schema\Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('shop_name', 100);
+            $table->string('name', 100);
             $table->string('whatsapp_number', 20);
             $table->string('telegram_username', 50)->nullable();
             $table->text('address_raw'); // Alamat narasi (Gg. Purnama, dsb)

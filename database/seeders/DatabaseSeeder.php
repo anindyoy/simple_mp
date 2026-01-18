@@ -22,10 +22,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if (!User::whereIsAdmin(true)->exists()) {
+            User::factory()->create([
+                'name' => 'Admin',
+                'email' => 'admin@lapak.com',
+                'password' => bcrypt('password'),
+                'is_admin' => true
+            ]);
+        }
 
         $categories = ['Makanan', 'Fashion', 'Elektronik', 'Otomotif', 'Jasa'];
         foreach ($categories as $cat) {

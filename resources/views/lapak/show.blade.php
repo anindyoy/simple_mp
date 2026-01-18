@@ -16,12 +16,12 @@
                 <img
                     src="{{ $lapak->profile_image_url }}"
                     class="w-14 h-14 rounded-xl object-cover shadow"
-                    alt="{{ $lapak->shop_name }}" />
+                    alt="{{ $lapak->name }}" />
 
                 <div>
                     <h4 class="font-bold text-gray-900 text-lg flex items-center gap-1">
                         <x-heroicon-o-building-storefront class="w-4 h-4 text-indigo-500" />
-                        {{ $lapak->shop_name }}
+                        {{ $lapak->name }}
                     </h4>
 
                     <p class="text-sm text-gray-500 flex items-center gap-1">

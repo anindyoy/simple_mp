@@ -10,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -21,10 +22,19 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $query) => $query->with(['primaryImage', 'lapak', 'category']))
             ->columns([
                 TextColumn::make('id')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                ImageColumn::make('primaryImage.image_url')
+                    ->label('Foto')
+                    ->disk('public')
+                    ->height(48)
+                    ->width(48)
+                    ->square()
+                    ->defaultImageUrl(url('/images/no-image.png')),
 
                 TextColumn::make('title')
                     ->label('Produk')

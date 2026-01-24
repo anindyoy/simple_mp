@@ -15,3 +15,21 @@
 @tailwind utilities;
 
 @plugin "flowbite/plugin";
+
+.modal-backdrop {
+    transition: opacity 300ms ease;
+}
+
+.modal-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.modal-backdrop.hidden .modal-content {
+    transform: scale(.95) translateY(-20px);
+    opacity: 0;
+}

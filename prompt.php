@@ -1,0 +1,1 @@
+pa test --coverage-html "D:/Repo/Test Coverage/simple_mp/" --parallel

@@ -21,10 +21,10 @@ class LapakController extends Controller
         return view('lapak.show', [
             'lapak' => $lapak,
             'meta' => [
-                'title' => $lapak->nama_lapak . ' | Lapak Cimanglid',
-                'description' => 'Lapak ' . $lapak->nama_lapak . ' di marketplace warga Cimanglid. Lihat produk & hubungi penjual langsung.',
-                'keywords' => 'lapak cimanglid, ' . $lapak->nama_lapak . ', jual beli warga',
-                'image' => $lapak->foto_profil,
+                'title' => $lapak->name . ' | Lapak Cimanglid',
+                'description' => 'Lapak ' . $lapak->name . ' di marketplace warga Cimanglid. Lihat produk & hubungi penjual langsung.',
+                'keywords' => 'lapak cimanglid, ' . $lapak->name . ', jual beli warga',
+                'image' => $lapak->profile_image,
             ],
         ]);
     }

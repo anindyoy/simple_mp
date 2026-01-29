@@ -8,6 +8,7 @@ use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
+use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Responses\CustomLogoutResponse;
@@ -26,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panelConfig = $panel
             ->default()
             ->id('admin')
             ->path('admin')
@@ -34,7 +35,6 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            // ->logoutResponse(CustomLogoutResponse::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -44,17 +44,22 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
-            ])
-            ->plugins([
+            ]);
+
+        if (app()->environment('local') && !app()->runningUnitTests() && Schema::hasTable('users')) {
+            $panelConfig->plugins([
                 FilamentDeveloperLoginsPlugin::make()
-                    ->enabled(app()->environment('local'))
+                    ->enabled(true)
                     ->users(
                         collect([
                             'Admin' => User::where('is_admin', true)->pluck('email')->first(),
                             'User' => User::whereHas('lapak')->pluck('email')->first(),
                         ])->filter()->toArray()
                     )
-            ])
+            ]);
+        }
+
+        return $panelConfig
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

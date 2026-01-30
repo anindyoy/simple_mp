@@ -46,7 +46,12 @@ class AdminPanelProvider extends PanelProvider
                 FilamentInfoWidget::class,
             ]);
 
-        if (app()->environment('local') && !app()->runningUnitTests() && Schema::hasTable('users')) {
+        if (
+            app()->environment('local') &&
+            !app()->runningUnitTests() &&
+            Schema::hasTable('users') &&
+            Schema::hasColumn('users', 'is_admin')
+        ) {
             $panelConfig->plugins([
                 FilamentDeveloperLoginsPlugin::make()
                     ->enabled(true)

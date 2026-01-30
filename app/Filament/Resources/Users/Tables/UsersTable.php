@@ -42,6 +42,11 @@ class UsersTable
                         'danger' => fn($state) => $state === null,
                     ]),
 
+                BadgeColumn::make('products_count')
+                    ->label('Jumlah Produk')
+                    ->color(fn($state) => $state > 0 ? 'success' : 'gray')
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('Terdaftar')
                     ->date('d M Y')
@@ -100,12 +105,17 @@ class UsersTable
                             );
                     }),
             ])
-
+            ->modifyQueryUsing(function (Builder $query) {
+                $query->withCount([
+                    'lapak as products_count' => function ($q) {
+                        $q->join('products', 'products.lapak_id', '=', 'lapak_profiles.id');
+                    },
+                ]);
+            })
             ->recordActions([
                 Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
                 EditAction::make()->hiddenLabel(),
             ])
-
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

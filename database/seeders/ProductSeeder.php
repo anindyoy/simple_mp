@@ -20,7 +20,12 @@ class ProductSeeder extends Seeder
 
         Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks) {
             // Tentukan kategori random
-            $product->category_id = $categories->random()->id;
+            $category = $categories->random();
+            $product->category_id = $category->id;
+
+            $product->condition = $category->supportsCondition()
+                ? fake()->randomElement(['baru', 'seken'])
+                : null;
 
             if ($existingLapaks->isNotEmpty() && rand(0, 2) != 0) {
                 $product->lapak_id = $existingLapaks->random()->id;

@@ -38,7 +38,7 @@ class ProductFactory extends Factory
                 : null,
 
             'is_active' => true,
-            'pushed_at' => $this->faker->dateTimeBetween('-24 hours', 'now'),
+            'pushed_at' => $this->faker->dateTimeBetween('-3 days', 'now'),
         ];
     }
 }

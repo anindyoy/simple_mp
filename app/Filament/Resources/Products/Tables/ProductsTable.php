@@ -2,13 +2,17 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use Carbon\Carbon;
+use App\Models\Product;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\DatePicker;
@@ -22,7 +26,6 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->with(['primaryImage', 'lapak', 'category']))
             ->columns([
                 TextColumn::make('id')
                     ->sortable()
@@ -80,10 +83,11 @@ class ProductsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->modifyQueryUsing(
-                fn(Builder $query) => $query->when(
-                    !auth()->user()->is_admin,
-                    fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
-                )
+                fn(Builder $query) => $query->with(['primaryImage', 'lapak', 'category'])
+                    ->when(
+                        !auth()->user()->is_admin,
+                        fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
+                    )
             )
             ->filtersFormColumns(3)
             ->filters([
@@ -150,6 +154,85 @@ class ProductsTable
             ])
 
             ->recordActions([
+                Action::make('push')
+                    ->label('Push')
+                    ->icon('heroicon-o-arrow-up')
+                    ->color('warning')
+
+                    // Disable tombol jika user belum boleh push
+                    ->disabled(function () {
+                        $user = auth()->user();
+
+                        if ($user->is_admin) {
+                            return false;
+                        }
+
+                        $lastPush = Product::where('lapak_id', $user->lapak->id)
+                            ->whereNotNull('pushed_at')
+                            ->max('pushed_at');
+
+                        if (!$lastPush) {
+                            return false;
+                        }
+
+                        return Carbon::parse($lastPush)->addHours(6)->isFuture();
+                    })
+
+                    // Tooltip info
+                    ->tooltip(function () {
+                        $user = auth()->user();
+
+                        $lastPush = Product::where('lapak_id', $user->lapak->id)
+                            ->whereNotNull('pushed_at')
+                            ->max('pushed_at');
+
+                        if (!$lastPush) {
+                            return 'Push produk ke atas';
+                        }
+
+                        $nextPush = Carbon::parse($lastPush)->addHours(6);
+
+                        if ($nextPush->isFuture()) {
+                            return 'Bisa push lagi pada ' . $nextPush->format('d M Y H:i');
+                        }
+
+                        return 'Push produk ke atas';
+                    })
+
+                    ->action(function ($record) {
+                        $user = auth()->user();
+
+                        if (!$user->is_admin) {
+                            $lastPush = Product::where('lapak_id', $user->lapak->id)
+                                ->whereNotNull('pushed_at')
+                                ->max('pushed_at');
+
+                            if (
+                                $lastPush &&
+                                Carbon::parse($lastPush)->addHours(6)->isFuture()
+                            ) {
+                                Notification::make()
+                                    ->title('Belum bisa push')
+                                    ->body('Kamu hanya bisa push produk setiap 6 jam.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+                        }
+
+                        // update pushed_at produk yang dipilih
+                        $record->update([
+                            'pushed_at' => now(),
+                        ]);
+
+                        Notification::make()
+                            ->title('Produk berhasil dipush')
+                            ->body('Produk kamu berhasil disundul ke atas.')
+                            ->success()
+                            ->send();
+                    }),
+
                 EditAction::make(),
             ])
 

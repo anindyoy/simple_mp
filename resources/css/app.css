@@ -1,17 +1,35 @@
 @import 'tailwindcss';
 
+/* Sources (WAJIB di v4) */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Theme tokens */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* Plugin */
 @plugin "flowbite/plugin";
+
+/* Custom styles */
+.modal-backdrop {
+    transition: opacity 300ms ease;
+}
+
+.modal-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.modal-backdrop.hidden .modal-content {
+    transform: scale(.95) translateY(-20px);
+    opacity: 0;
+}

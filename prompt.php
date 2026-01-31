@@ -1,6 +1,6 @@
-bantu buatkan filament resource untuk model LapakProfile dengan schema sebagai berikut
-serta buatkan juga policynya, agar is admin tidak bisa menambah, mengubah, dan menghapus lapak profile.
-dan buat agar user hanya bisa menambah, mengubah, dan menghapus lapak profile yang miliknya
+bantu buatkan filament custom page untuk model LapakProfile, untuk mengedit datanya dengan schema sebagai berikut
+serta buatkan juga policynya, agar is admin tidak bisa mengubah lapak profile.
+dan buat agar user hanya bisa mengubah lapak profile miliknya
 
 -- simple_mp.lapak_profiles definition
 
@@ -104,13 +104,3 @@ class LapakProfile extends Model
         return 'https://t.me/' . $username;
     }
 }
-
-========================
-sesuaikan ProductPolicy agar user hanya bisa melihat, mengubah dan menghapus produk miliknya
-jika skemanya
-
-produk:id, lapak_id,
-lapak_profile:id, user_id
-
-apa yang harus disesuaikan di model produk untuk relasi ke user.
-di model user sudah ada relasi lapak yang mengarah ke model LapakProfile

@@ -92,7 +92,6 @@ class Product extends Model
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
 
-
     // Helper untuk cek apakah sudah boleh push (6 jam)
     public function canBePushed(): bool
     {

@@ -1,246 +1,116 @@
-Buat agar user hanya bisa push produk 6 jam sekali
-push produk akan memperbarui tanggal pushed_at product
+bantu buatkan filament resource untuk model LapakProfile dengan schema sebagai berikut
+serta buatkan juga policynya, agar is admin tidak bisa menambah, mengubah, dan menghapus lapak profile.
+dan buat agar user hanya bisa menambah, mengubah, dan menghapus lapak profile yang miliknya
+
+-- simple_mp.lapak_profiles definition
+
+CREATE TABLE `lapak_profiles` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `profile_image` varchar(255) DEFAULT NULL,
+  `whatsapp_number` varchar(20) NOT NULL,
+  `telegram_username` varchar(50) DEFAULT NULL,
+  `address_raw` text NOT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `lapak_profiles_user_id_foreign` (`user_id`),
+  CONSTRAINT `lapak_profiles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 <?php
 
-namespace App\Filament\Resources\Products\Tables;
+namespace App\Models;
 
-class ProductsTable
+use App\Models\User;
+use App\Models\Product;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class LapakProfile extends Model
 {
-    public static function configure(Table $table): Table
+    use HasFactory;
+    protected $guarded = [];
+
+    public function user(): BelongsTo
     {
-        return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->with(['primaryImage', 'lapak', 'category']))
-            ->columns([
-                TextColumn::make('id')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                ImageColumn::make('primaryImage.image_url')
-                    ->label('Foto')
-                    ->disk('public')
-                    ->height(48)
-                    ->width(48)
-                    ->square()
-                    ->defaultImageUrl(url('/images/no-image.png')),
-
-                TextColumn::make('title')
-                    ->label('Produk')
-                    ->searchable()
-                    ->sortable()
-                    ->wrap(),
-
-                TextColumn::make('lapak.name')
-                    ->label('Lapak')
-                    ->searchable()
-                    ->hidden(!auth()->user()->is_admin)
-                    ->sortable(),
-
-                TextColumn::make('category.category_name')
-                    ->label('Kategori')
-                    ->sortable(),
-
-                TextColumn::make('price')
-                    ->label('Harga')
-                    ->money('IDR', locale: 'id')
-                    ->sortable(),
-
-                BadgeColumn::make('condition')
-                    ->label('Kondisi')
-                    ->colors([
-                        'success' => 'baru',
-                        'warning' => 'seken',
-                    ])
-                    ->formatStateUsing(fn($state) => ucfirst($state)),
-
-                ToggleColumn::make('is_active')
-                    ->label('Aktif'),
-
-                TextColumn::make('pushed_at')
-                    ->label('Disundul')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
-
-                TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->date('d M Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->modifyQueryUsing(
-                fn(Builder $query) => $query->when(
-                    !auth()->user()->is_admin,
-                    fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
-                )
-            )
-            ->filtersFormColumns(3)
-            ->filters([
-                SelectFilter::make('category_id')
-                    ->label('Kategori')
-                    ->relationship('category', 'category_name'),
-
-                SelectFilter::make('lapak_id')
-                    ->label('Lapak')
-                    ->hidden(!auth()->user()->is_admin)
-                    ->relationship('lapak', 'name'),
-
-                SelectFilter::make('condition')
-                    ->label('Kondisi')
-                    ->options([
-                        'baru' => 'Baru',
-                        'seken' => 'Seken',
-                    ]),
-
-                TernaryFilter::make('is_active')
-                    ->label('Status Aktif'),
-
-                Filter::make('price_range')
-                    ->label('Rentang Harga')
-                    ->form([
-                        \Filament\Forms\Components\TextInput::make('min_price')
-                            ->numeric()
-                            ->label('Harga Min'),
-                        \Filament\Forms\Components\TextInput::make('max_price')
-                            ->numeric()
-                            ->label('Harga Max'),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query
-                            ->when(
-                                $data['min_price'],
-                                fn($q) => $q->where('price', '>=', $data['min_price'])
-                            )
-                            ->when(
-                                $data['max_price'],
-                                fn($q) => $q->where('price', '<=', $data['max_price'])
-                            );
-                    }),
-
-                Filter::make('pushed_at')
-                    ->label('Tanggal Sundul')
-                    ->form([
-                        \Filament\Forms\Components\DatePicker::make('from')
-                            ->label('Dari tanggal'),
-                        \Filament\Forms\Components\DatePicker::make('until')
-                            ->label('Sampai tanggal'),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query
-                            ->when(
-                                $data['from'],
-                                fn($q) => $q->whereDate('pushed_at', '>=', $data['from'])
-                            )
-                            ->when(
-                                $data['until'],
-                                fn($q) => $q->whereDate('pushed_at', '<=', $data['until'])
-                            );
-                    }),
-            ])
-
-            ->recordActions([
-                EditAction::make(),
-            ])
-
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return $this->belongsTo(User::class);
     }
-}
 
-<?php
-
-namespace App\Filament\Resources\Products\Pages;
-class EditProduct extends EditRecord
-{
-    protected static string $resource = ProductResource::class;
-
-    protected function getHeaderActions(): array
+    public function products(): HasMany
     {
-        return [
-            DeleteAction::make(),
-        ];
+        return $this->hasMany(Product::class, 'lapak_id');
     }
-}
 
+    protected $appends = ['profile_image_url'];
 
-================================================
-
-<?
-scripts.blade
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('countdownPush', (targetTime) => ({
-            label: '',
-            timer: null,
-
-            start() {
-                this.tick()
-                this.timer = setInterval(() => this.tick(), 1000)
-            },
-
-            tick() {
-                const now = Date.now()
-                const diff = targetTime - now
-
-                if (diff <= 0) {
-                    this.label = 'Push dimulai'
-                    clearInterval(this.timer)
-                    return
-                }
-
-                const h = Math.floor(diff / 1000 / 60 / 60)
-                const m = Math.floor((diff / 1000 / 60) % 60)
-                const s = Math.floor((diff / 1000) % 60)
-
-                this.label = `Push dalam ${h}j ${m}m ${s}d`
-            },
-        }))
-    })
-</script>
-
-boot pada AppServiceProvider
-public function boot(): void
-{
-    FilamentView::registerRenderHook(
-        PanelsRenderHook::HEAD_END,
-        fn() => view('filament.topbar.scripts')->render()
-    );
-
-    FilamentView::registerRenderHook(
-        PanelsRenderHook::GLOBAL_SEARCH_AFTER,
-        function (): string {
-            $user = Auth::user();
-
-            $html = view('filament.topbar.home-button')->render();
-
-            if ($user && ! $user->is_admin) {
-                $pushAt = Carbon::today()
-                    ->setTime(21, 0)
-                    ->timestamp * 1000;
-
-                $html .= view('filament.topbar.push-countdown', [
-                    'pushAt' => $pushAt,
-                ])->render();
-            }
-
-            return $html;
+    public function getProfileImageUrlAttribute(): string
+    {
+        if ($this->profile_image) {
+            return Str::startsWith($this->profile_image, ['http://', 'https://'])
+                ? $this->profile_image
+                : asset('storage/' . $this->profile_image);
         }
-    );
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+    }
+
+    public function getJoinedAtLabelAttribute(): string
+    {
+        return $this->created_at
+            ? $this->created_at->translatedFormat('d F Y')
+            : '-';
+    }
+
+    // =========================
+    // WHATSAPP
+    // =========================
+    public function getWhatsappUrlAttribute(): ?string
+    {
+        if (!$this->whatsapp_number) {
+            return null;
+        }
+
+        $number = preg_replace('/[^0-9]/', '', $this->whatsapp_number);
+
+        if (str_starts_with($number, '08')) {
+            $number = '628' . substr($number, 2);
+        }
+
+        $message = 'Halo, saya tertarik dengan produk di lapak *'
+            . $this->name
+            . '* yang saya lihat di Jual Beli Cimanglid.';
+
+        return 'https://wa.me/' . $number . '?text=' . urlencode($message);
+    }
+
+    // =========================
+    // TELEGRAM
+    // =========================
+    public function getTelegramUrlAttribute(): ?string
+    {
+        if (!$this->telegram_username) {
+            return null;
+        }
+
+        $username = ltrim($this->telegram_username, '@');
+
+        return 'https://t.me/' . $username;
+    }
 }
 
-push-countdown.blade:
-<div
-    x-data="countdownPush({{ $pushAt }})"
-    x-init="start()"
-    class="fi-topbar-item flex items-center gap-2 px-3 py-1 rounded-lg
-           bg-warning-50 text-warning-700 text-xs font-semibold"
->
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 6v6l4 2" />
-    </svg>
+========================
+sesuaikan ProductPolicy agar user hanya bisa melihat, mengubah dan menghapus produk miliknya
+jika skemanya
 
-    <span x-text="label"></span>
-</div>
+produk:id, lapak_id,
+lapak_profile:id, user_id
+
+apa yang harus disesuaikan di model produk untuk relasi ke user.
+di model user sudah ada relasi lapak yang mengarah ke model LapakProfile

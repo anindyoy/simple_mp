@@ -58,13 +58,12 @@ class ProductPolicy
             : 'Push produk ke atas';
     }
 
-
     /**
      * Boleh lihat detail produk
      */
     public function view(User $user, Product $product): bool
     {
-        return true;
+        return $product->lapak?->user_id === $user->id;
     }
 
     /**
@@ -80,7 +79,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return ! $user->is_admin;
+        return $product->lapak?->user_id === $user->id;
     }
 
     /**
@@ -88,7 +87,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): bool
     {
-        return ! $user->is_admin;
+        return $product->lapak?->user_id === $user->id;
     }
 
     /**

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Product;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
+use App\Policies\ProductPolicy;
 use Filament\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
@@ -73,7 +74,7 @@ class ProductsTable
 
                 TextColumn::make('pushed_at')
                     ->label('Disundul')
-                    ->dateTime('d M Y H:i')
+                    ->since()
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -89,6 +90,7 @@ class ProductsTable
                         fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
                     )
             )
+            ->defaultSort('pushed_at', 'desc')
             ->filtersFormColumns(3)
             ->filters([
                 SelectFilter::make('category_id')
@@ -159,76 +161,27 @@ class ProductsTable
                     ->icon('heroicon-o-arrow-up')
                     ->color('warning')
 
-                    // Disable tombol jika user belum boleh push
-                    ->disabled(function () {
-                        $user = auth()->user();
+                    ->disabled(fn() => ! ProductPolicy::canPush())
 
-                        if ($user->is_admin) {
-                            return false;
-                        }
-
-                        $lastPush = Product::where('lapak_id', $user->lapak->id)
-                            ->whereNotNull('pushed_at')
-                            ->max('pushed_at');
-
-                        if (!$lastPush) {
-                            return false;
-                        }
-
-                        return Carbon::parse($lastPush)->addHours(6)->isFuture();
-                    })
-
-                    // Tooltip info
-                    ->tooltip(function () {
-                        $user = auth()->user();
-
-                        $lastPush = Product::where('lapak_id', $user->lapak->id)
-                            ->whereNotNull('pushed_at')
-                            ->max('pushed_at');
-
-                        if (!$lastPush) {
-                            return 'Push produk ke atas';
-                        }
-
-                        $nextPush = Carbon::parse($lastPush)->addHours(6);
-
-                        if ($nextPush->isFuture()) {
-                            return 'Bisa push lagi pada ' . $nextPush->format('d M Y H:i');
-                        }
-
-                        return 'Push produk ke atas';
-                    })
+                    ->tooltip(fn() => ProductPolicy::pushTooltip())
 
                     ->action(function ($record) {
-                        $user = auth()->user();
+                        if (! ProductPolicy::canPush()) {
+                            Notification::make()
+                                ->title('Belum bisa push')
+                                ->body('Kamu hanya bisa push produk setiap 6 jam.')
+                                ->danger()
+                                ->send();
 
-                        if (!$user->is_admin) {
-                            $lastPush = Product::where('lapak_id', $user->lapak->id)
-                                ->whereNotNull('pushed_at')
-                                ->max('pushed_at');
-
-                            if (
-                                $lastPush &&
-                                Carbon::parse($lastPush)->addHours(6)->isFuture()
-                            ) {
-                                Notification::make()
-                                    ->title('Belum bisa push')
-                                    ->body('Kamu hanya bisa push produk setiap 6 jam.')
-                                    ->danger()
-                                    ->send();
-
-                                return;
-                            }
+                            return;
                         }
 
-                        // update pushed_at produk yang dipilih
                         $record->update([
                             'pushed_at' => now(),
                         ]);
 
                         Notification::make()
                             ->title('Produk berhasil dipush')
-                            ->body('Produk kamu berhasil disundul ke atas.')
                             ->success()
                             ->send();
                     }),

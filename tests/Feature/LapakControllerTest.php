@@ -1,12 +1,9 @@
 <?php
 
-use App\Models\LapakProfile;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Category;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
+use App\Models\LapakProfile;
+use App\Models\ProductImage;
 
 beforeEach(function () {
     $this->lapak = LapakProfile::factory()->create([
@@ -33,16 +30,14 @@ test('dapat memuat data lapak dengan benar', function () {
 test('hanya menampilkan produk yang aktif', function () {
     // Produk aktif
     $productAktif = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => true,
-        'pushed_at' => now(),
     ]);
 
     // Produk tidak aktif
     $productTidakAktif = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => false,
-        'pushed_at' => now(),
     ]);
 
     $response = $this->get(route('lapak.show', $this->lapak));
@@ -55,19 +50,19 @@ test('hanya menampilkan produk yang aktif', function () {
 
 test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
     $product1 = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now()->subDays(2),
     ]);
 
     $product2 = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now()->subDay(),
     ]);
 
     $product3 = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now(),
     ]);
@@ -84,7 +79,7 @@ test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
 
 test('memuat relasi images dari produk', function () {
     $product = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'is_active' => true,
     ]);
 
@@ -104,7 +99,7 @@ test('memuat relasi category dari produk', function () {
     $category = Category::factory()->create();
 
     $product = Product::factory()->create([
-        'lapak_profile_id' => $this->lapak->id,
+        'lapak_id' => $this->lapak->id,
         'category_id' => $category->id,
         'is_active' => true,
     ]);

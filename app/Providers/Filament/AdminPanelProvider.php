@@ -7,6 +7,7 @@ use App\Models\User;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
@@ -31,7 +32,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->maxContentWidth('full')
             ->login()
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn() => view('filament.topbar.scripts')
+            )
             ->colors([
                 'primary' => Color::Amber,
             ])

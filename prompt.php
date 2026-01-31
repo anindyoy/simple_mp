@@ -167,265 +167,80 @@ class EditProduct extends EditRecord
 
 ================================================
 
-bantu atasi error ini
+<?
+scripts.blade
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('countdownPush', (targetTime) => ({
+            label: '',
+            timer: null,
 
-PS C:\Repo\simple_mp> pa db:seed ProductSeeder
+            start() {
+                this.tick()
+                this.timer = setInterval(() => this.tick(), 1000)
+            },
 
+            tick() {
+                const now = Date.now()
+                const diff = targetTime - now
 
-   INFO  Seeding database.
+                if (diff <= 0) {
+                    this.label = 'Push dimulai'
+                    clearInterval(this.timer)
+                    return
+                }
 
+                const h = Math.floor(diff / 1000 / 60 / 60)
+                const m = Math.floor((diff / 1000 / 60) % 60)
+                const s = Math.floor((diff / 1000) % 60)
 
-   InvalidArgumentException
+                this.label = `Push dalam ${h}j ${m}m ${s}d`
+            },
+        }))
+    })
+</script>
 
-  Condition wajib diisi untuk kategori ini.
-
-  at app\Models\Product.php:44
-     40▕             if (
-     41▕                 $product->category?->supportsCondition()
-     42▕                 && is_null($product->condition)
-     43▕             ) {
-  ➜  44▕                 throw new \InvalidArgumentException(
-     45▕                     'Condition wajib diisi untuk kategori ini.'
-     46▕                 );
-     47▕             }
-     48▕         });
-
-  1   vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:488
-      App\Models\Product::{closure:App\Models\Product::boot():39}(Object(App\Models\Product))
-
-  2   vendor\laravel\framework\src\Illuminate\Events\Dispatcher.php:315
-      Illuminate\Events\Dispatcher::{closure:Illuminate\Events\Dispatcher::makeListener():483}("eloquent.saving: App\Models\Product")
-
-<?php
-
-namespace Database\Seeders;
-
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\LapakProfile;
-use App\Models\ProductImage;
-use Illuminate\Database\Seeder;
-
-class ProductSeeder extends Seeder
+boot pada AppServiceProvider
+public function boot(): void
 {
-    /**
-     * Jalankan seeder produk
-     */
-    public function run(): void
-    {
-        $categories = Category::all();
-        $existingLapaks = LapakProfile::all();
+    FilamentView::registerRenderHook(
+        PanelsRenderHook::HEAD_END,
+        fn() => view('filament.topbar.scripts')->render()
+    );
 
-        Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks) {
-            // Tentukan kategori random
-            $product->category_id = $categories->random()->id;
+    FilamentView::registerRenderHook(
+        PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+        function (): string {
+            $user = Auth::user();
 
-            if ($existingLapaks->isNotEmpty() && rand(0, 2) != 0) {
-                $product->lapak_id = $existingLapaks->random()->id;
-            } else {
-                $product->lapak_id = LapakProfile::factory()->create()->id;
+            $html = view('filament.topbar.home-button')->render();
+
+            if ($user && ! $user->is_admin) {
+                $pushAt = Carbon::today()
+                    ->setTime(21, 0)
+                    ->timestamp * 1000;
+
+                $html .= view('filament.topbar.push-countdown', [
+                    'pushAt' => $pushAt,
+                ])->render();
             }
 
-            // Simpan produk ke DB
-            $product->save();
-
-            // Buat 1-3 gambar untuk produk ini
-            ProductImage::factory(rand(1, 3))->create([
-                'product_id' => $product->id,
-            ]);
-        });
-    }
+            return $html;
+        }
+    );
 }
 
-<?php
+push-countdown.blade:
+<div
+    x-data="countdownPush({{ $pushAt }})"
+    x-init="start()"
+    class="fi-topbar-item flex items-center gap-2 px-3 py-1 rounded-lg
+           bg-warning-50 text-warning-700 text-xs font-semibold"
+>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6v6l4 2" />
+    </svg>
 
-namespace Database\Factories;
-
-use App\Models\Category;
-use Illuminate\Support\Str;
-use App\Models\LapakProfile;
-use Illuminate\Database\Eloquent\Factories\Factory;
-
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
- */
-class ProductFactory extends Factory
-{
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
-    {
-        // Ambil atau buat kategori
-        $category = Category::inRandomOrder()->first()
-            ?? Category::factory()->create();
-
-        return [
-            'category_id' => $category->id,
-
-            'title' => $title = $this->faker->words(3, true),
-            'slug' => Str::slug($title) . '-' . rand(100, 999),
-
-            'description' => $this->faker->paragraph(3),
-            'price' => $this->faker->numberBetween(10_000, 2_000_000),
-
-            // 👉 logic kondisi produk
-            'condition' => $category->supportsCondition()
-                ? $this->faker->randomElement(['baru', 'seken'])
-                : null,
-
-            'is_active' => true,
-            'pushed_at' => $this->faker->dateTimeBetween('-3 days', 'now'),
-        ];
-    }
-}
-
-<?php
-
-namespace App\Models;
-
-use App\Models\Category;
-use Illuminate\Support\Str;
-use App\Models\LapakProfile;
-use App\Models\ProductImage;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class Product extends Model
-{
-    use HasFactory;
-    protected $guarded = [];
-
-    // Mengubah string pushed_at menjadi objek Carbon (Waktu) secara otomatis
-    protected $casts = [
-        'pushed_at' => 'datetime',
-        'is_active' => 'boolean',
-    ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        /**
-         * Generate slug saat create
-         */
-        static::creating(function ($product) {
-            $product->slug = Str::slug($product->title) . '-' . rand(1000, 9999);
-        });
-
-        /**
-         * Validasi condition berdasarkan kategori
-         */
-        static::saving(function ($product) {
-            if (
-                $product->category?->supportsCondition()
-                && is_null($product->condition)
-            ) {
-                throw new \InvalidArgumentException(
-                    'Condition wajib diisi untuk kategori ini.'
-                );
-            }
-        });
-
-        /**
-         * Pastikan hanya 1 gambar primary per produk
-         * Dieksekusi SETELAH product tersimpan
-         */
-        static::saved(function ($product) {
-            // Ambil 1 gambar primary (yang paling akhir diupdate)
-            $primaryImage = $product->images()
-                ->where('is_primary', true)
-                ->orderByDesc('updated_at')
-                ->first();
-
-            if ($primaryImage) {
-                // Set gambar lain menjadi non-primary
-                $product->images()
-                    ->where('id', '!=', $primaryImage->id)
-                    ->update(['is_primary' => false]);
-            }
-        });
-    }
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-
-    public function lapak(): BelongsTo
-    {
-        return $this->belongsTo(LapakProfile::class, 'lapak_id');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function images(): HasMany
-    {
-        return $this->hasMany(ProductImage::class);
-    }
-
-    public function primaryImage()
-    {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
-    }
-
-
-    // Helper untuk cek apakah sudah boleh push (6 jam)
-    public function canBePushed(): bool
-    {
-        return $this->pushed_at->diffInHours(now()) >= 6;
-    }
-
-    public function hasCondition(): bool
-    {
-        return !is_null($this->condition)
-            && $this->category?->supportsCondition();
-    }
-
-    public function conditionLabel(): ?string
-    {
-        return match ($this->condition) {
-            'baru' => 'Baru',
-            'seken' => 'Bekas',
-            default => null,
-        };
-    }
-}
-
-<?php
-
-namespace App\Models;
-
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class Category extends Model
-{
-    use HasFactory;
-    protected $fillable = ['category_name'];
-    public $timestamps = false;
-
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    public function supportsCondition(): bool
-    {
-        // contoh kategori barang fisik
-        return in_array($this->id, [
-            2, // Fashion
-            3, // Elektronik
-            4 // Otomotif
-        ]);
-    }
-}
+    <span x-text="label"></span>
+</div>

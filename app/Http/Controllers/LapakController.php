@@ -9,6 +9,14 @@ class LapakController extends Controller
 {
     public function show(LapakProfile $lapak)
     {
+        $hasReported = false;
+
+        if (auth()->check()) {
+            $hasReported = $lapak->reports()
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
+
         $lapak->load([
             'products' => function ($query) {
                 $query->where('is_active', true)
@@ -20,6 +28,7 @@ class LapakController extends Controller
 
         return view('lapak.show', [
             'lapak' => $lapak,
+            'hasReported' => $hasReported,
             'meta' => [
                 'title' => $lapak->name . ' | Lapak Cimanglid',
                 'description' => 'Lapak ' . $lapak->name . ' di marketplace warga Cimanglid. Lihat produk & hubungi penjual langsung.',

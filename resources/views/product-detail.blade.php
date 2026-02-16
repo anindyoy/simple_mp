@@ -138,6 +138,26 @@
                             @endif
                         </div>
                     </div>
+
+                    <div class="mt-6">
+                        @if ($hasReported)
+                            <span class="text-sm text-gray-400 cursor-not-allowed">
+                                Anda sudah melaporkan ini
+                            </span>
+                        @else
+                            <button
+                                onclick="document.getElementById('reportProductModal').classList.remove('hidden')"
+                                class="text-sm text-red-500 hover:underline">
+                                Laporkan Produk
+                            </button>
+                        @endif
+                    </div>
+
+                    @include('partials.report-modal', [
+                        'type' => 'product',
+                        'id' => $product->id,
+                        'title' => $product->title,
+                    ])
                 </div>
             </div>
         </div>

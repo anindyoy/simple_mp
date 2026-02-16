@@ -47,8 +47,18 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load(['lapak', 'category', 'images']);
+
+        $hasReported = false;
+
+        if (auth()->check()) {
+            $hasReported = $product->reports()
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
+
         return view('product-detail', [
             'product' => $product,
+            'hasReported' => $hasReported,
             'meta' => [
                 'title' => $product->title . ' | Jual Beli Cimanglid',
                 'description' => str()->limit(strip_tags($product->description), 155),

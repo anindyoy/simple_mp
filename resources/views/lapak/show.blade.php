@@ -60,6 +60,26 @@
                     </a>
                 @endif
             </div>
+
+            <div class="mt-4">
+                @if ($hasReported)
+                    <span class="text-sm text-gray-400 cursor-not-allowed">
+                        Anda sudah melaporkan ini
+                    </span>
+                @else
+                    <button
+                        onclick="document.getElementById('reportLapakModal').classList.remove('hidden')"
+                        class="text-sm text-red-500 hover:underline">
+                        Laporkan Toko
+                    </button>
+                @endif
+            </div>
+
+            @include('partials.report-modal', [
+                'type' => 'lapak',
+                'id' => $lapak->id,
+                'title' => $lapak->name,
+            ])
         </div>
 
         <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">

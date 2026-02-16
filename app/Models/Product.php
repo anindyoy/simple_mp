@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Report;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
@@ -85,6 +86,11 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 
     public function primaryImage()

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Report;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,11 @@ class LapakProfile extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'lapak_id');
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 
     protected $appends = ['profile_image_url'];

@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use App\Models\LapakProfile as ModelLapakProfile;
+use Filament\Forms\Components\Card;
 
 class LapakProfile extends Page implements Forms\Contracts\HasForms
 {
@@ -66,26 +67,28 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
                 ->imagePreviewHeight('150')
                 ->maxSize(2048),
 
-            TextInput::make('whatsapp_number')
-                ->label('Nomor WhatsApp')
-                ->required(),
+            Grid::make(2)->schema([
+                TextInput::make('whatsapp_number')
+                    ->label('Nomor WhatsApp')
+                    ->required(),
 
-            TextInput::make('telegram_username')
-                ->label('Username Telegram')
-                ->prefix('@'),
+                TextInput::make('telegram_username')
+                    ->label('Username Telegram')
+                    ->prefix('@'),
+            ]),
 
             Textarea::make('address_raw')
                 ->label('Alamat')
                 ->required()
                 ->rows(3),
 
-            Grid::make(2)->schema([
-                TextInput::make('latitude')
-                    ->numeric(),
+            // Grid::make(2)->schema([
+            //     TextInput::make('latitude')
+            //         ->numeric(),
 
-                TextInput::make('longitude')
-                    ->numeric(),
-            ]),
+            //     TextInput::make('longitude')
+            //         ->numeric(),
+            // ]),
         ];
     }
 

@@ -31,10 +31,10 @@
 
 
 <script>
-    console.log('🔥 countdown script loaded')
+    // console.log('🔥 countdown script loaded')
 
     document.addEventListener('alpine:init', () => {
-        console.log('🔥 alpine:init fired')
+        // console.log('🔥 alpine:init fired')
 
         Alpine.data('countdownPush', (targetTime) => ({
             label: 'init...',

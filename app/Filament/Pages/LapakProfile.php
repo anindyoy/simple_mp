@@ -5,14 +5,16 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Filament\Schemas\Components\Grid;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Concerns\InteractsWithForms;
 use App\Models\LapakProfile as ModelLapakProfile;
-use Filament\Forms\Components\Card;
 
 class LapakProfile extends Page implements Forms\Contracts\HasForms
 {
@@ -24,6 +26,7 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
     protected string $view = 'filament.pages.lapak-profile';
 
     public ?ModelLapakProfile $lapak = null;
+    public ?array $data = [];
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -49,52 +52,50 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
             403
         );
 
-        $this->form->fill($this->lapak->toArray());
+        $this->form->fill($this->lapak->attributesToArray());
     }
 
-    protected function getFormSchema(): array
+    public function form(Schema $schema): Schema
     {
-        return [
-            TextInput::make('name')
-                ->label('Nama Lapak')
-                ->required()
-                ->maxLength(100),
+        return $schema
+            ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('name')
+                        ->label('Nama Lapak')
+                        ->required()
+                        ->maxLength(100),
 
-            FileUpload::make('profile_image')
-                ->label('Foto Lapak')
-                ->image()
-                ->directory('lapak-profiles')
-                ->imagePreviewHeight('150')
-                ->maxSize(2048),
+                    Textarea::make('address_raw')
+                        ->label('Alamat')
+                        ->required(),
 
-            Grid::make(2)->schema([
-                TextInput::make('whatsapp_number')
-                    ->label('Nomor WhatsApp')
-                    ->required(),
+                    TextInput::make('whatsapp_number')
+                        ->label('Nomor WhatsApp')
+                        ->required(),
 
-                TextInput::make('telegram_username')
-                    ->label('Username Telegram')
-                    ->prefix('@'),
-            ]),
+                    TextInput::make('telegram_username')
+                        ->label('Username Telegram')
+                        ->prefix('@'),
 
-            Textarea::make('address_raw')
-                ->label('Alamat')
-                ->required()
-                ->rows(3),
+                    FileUpload::make('profile_image')
+                        ->label('Foto Lapak')
+                        ->image()
+                        ->disk('public')
+                        ->directory('lapak-profiles')
+                        ->imagePreviewHeight('150')
+                        ->maxSize(2048),
+                ]),
 
-            // Grid::make(2)->schema([
-            //     TextInput::make('latitude')
-            //         ->numeric(),
+                // Grid::make(2)->schema([
+                //     TextInput::make('latitude')
+                //         ->numeric(),
 
-            //     TextInput::make('longitude')
-            //         ->numeric(),
-            // ]),
-        ];
-    }
-
-    protected function getFormModel(): ModelLapakProfile
-    {
-        return $this->lapak;
+                //     TextInput::make('longitude')
+                //         ->numeric(),
+                // ]),
+            ])
+            ->model($this->lapak)
+            ->statePath('data');
     }
 
     public function save(): void

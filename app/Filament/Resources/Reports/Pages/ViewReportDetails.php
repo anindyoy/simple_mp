@@ -3,11 +3,9 @@
 namespace App\Filament\Resources\Reports\Pages;
 
 use App\Models\Report;
-use Filament\Actions\EditAction;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Schema;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\FontWeight;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\Reports\ReportResource;
@@ -33,9 +31,9 @@ class ViewReportDetails extends Page
             ->get();
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->record($this->target)
             ->schema([
 

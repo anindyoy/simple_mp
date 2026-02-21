@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Products\Tables;
 
 use Carbon\Carbon;
-use App\Models\Product;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
+use App\Models\ProductModeration;
 use App\Policies\ProductPolicy;
 use Filament\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
@@ -16,7 +16,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
@@ -70,7 +69,31 @@ class ProductsTable
                     ->formatStateUsing(fn($state) => ucfirst($state)),
 
                 ToggleColumn::make('is_active')
-                    ->label('Aktif'),
+                    ->label('Aktif')
+                    ->disabled(fn () => ! auth()->user()->is_admin),
+
+                TextColumn::make('latestDeactivation.reason')
+                    ->label('Sebab Nonaktif')
+                    ->state(fn ($record) => $record->latestDeactivation?->reason)
+                    ->placeholder('-')
+                    ->wrap(),
+
+                TextColumn::make('latestReactivationRequest.status')
+                    ->label('Aktivasi Ulang')
+                    ->state(fn ($record) => $record->latestReactivationRequest?->status)
+                    ->badge()
+                    ->color(fn (?string $state) => match ($state) {
+                        ProductModeration::STATUS_PENDING => 'warning',
+                        ProductModeration::STATUS_APPROVED => 'success',
+                        ProductModeration::STATUS_REJECTED => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
+                        ProductModeration::STATUS_APPROVED => 'Disetujui',
+                        ProductModeration::STATUS_REJECTED => 'Ditolak',
+                        default => '-',
+                    }),
 
                 TextColumn::make('pushed_at')
                     ->label('Disundul')
@@ -84,7 +107,14 @@ class ProductsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->modifyQueryUsing(
-                fn(Builder $query) => $query->with(['primaryImage', 'lapak', 'category'])
+                fn(Builder $query) => $query->with([
+                    'primaryImage',
+                    'lapak',
+                    'category',
+                    'latestDeactivation',
+                    'latestReactivationRequest',
+                    'pendingReactivationRequest',
+                ])
                     ->when(
                         !auth()->user()->is_admin,
                         fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
@@ -111,6 +141,48 @@ class ProductsTable
 
                 TernaryFilter::make('is_active')
                     ->label('Status Aktif'),
+
+                Filter::make('pending_reactivation')
+                    ->label('Menunggu Moderasi Aktivasi')
+                    ->visible(fn () => auth()->user()->is_admin)
+                    ->query(fn (Builder $query) => $query->whereHas(
+                        'moderations',
+                        fn (Builder $moderationQuery) => $moderationQuery
+                            ->where('type', ProductModeration::TYPE_REACTIVATION)
+                            ->where('status', ProductModeration::STATUS_PENDING)
+                    )),
+
+                SelectFilter::make('latest_reactivation_status')
+                    ->label('Status Aktivasi Terakhir')
+                    ->visible(fn () => auth()->user()->is_admin)
+                    ->options([
+                        ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
+                        ProductModeration::STATUS_APPROVED => 'Disetujui',
+                        ProductModeration::STATUS_REJECTED => 'Ditolak',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $status = $data['value'] ?? null;
+
+                        if (! $status) {
+                            return $query;
+                        }
+
+                        return $query->whereHas(
+                            'latestReactivationRequest',
+                            fn (Builder $reactivationQuery) => $reactivationQuery
+                                ->where('status', $status)
+                        );
+                    }),
+
+                Filter::make('has_rejected_reactivation_history')
+                    ->label('Pernah Ditolak Aktivasi')
+                    ->visible(fn () => auth()->user()->is_admin)
+                    ->query(fn (Builder $query) => $query->whereHas(
+                        'moderations',
+                        fn (Builder $moderationQuery) => $moderationQuery
+                            ->where('type', ProductModeration::TYPE_REACTIVATION)
+                            ->where('status', ProductModeration::STATUS_REJECTED)
+                    )),
 
                 Filter::make('price_range')
                     ->label('Rentang Harga')
@@ -187,6 +259,122 @@ class ProductsTable
                     }),
 
                 EditAction::make(),
+
+                Action::make('requestReactivation')
+                    ->label('Ajukan Aktif Kembali')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->visible(fn ($record) => ! auth()->user()->is_admin && ! $record->is_active)
+                    ->disabled(fn ($record) => (bool) $record->pendingReactivationRequest)
+                    ->tooltip(fn ($record) => $record->pendingReactivationRequest
+                        ? 'Pengajuan sebelumnya masih menunggu moderasi admin.'
+                        : 'Ajukan moderasi untuk mengaktifkan kembali produk.')
+                    ->schema([
+                        TextInput::make('reason')
+                            ->label('Alasan Pengajuan')
+                            ->required()
+                            ->maxLength(255)
+                            ->default('Produk sudah diperbaiki dan siap ditinjau ulang.'),
+                    ])
+                    ->action(function ($record, array $data) {
+                        if ($record->pendingReactivationRequest) {
+                            Notification::make()
+                                ->title('Masih ada pengajuan aktif')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        ProductModeration::create([
+                            'product_id' => $record->id,
+                            'type' => ProductModeration::TYPE_REACTIVATION,
+                            'status' => ProductModeration::STATUS_PENDING,
+                            'reason' => 'permohonan_aktivasi_ulang',
+                            'description' => $data['reason'],
+                            'requested_by_user_id' => auth()->id(),
+                        ]);
+
+                        Notification::make()
+                            ->title('Pengajuan aktivasi ulang dikirim')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('approveReactivation')
+                    ->label('Setujui Aktivasi')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => auth()->user()->is_admin && (bool) $record->pendingReactivationRequest)
+                    ->action(function ($record) {
+                        $pendingRequest = $record->moderations()
+                            ->where('type', ProductModeration::TYPE_REACTIVATION)
+                            ->where('status', ProductModeration::STATUS_PENDING)
+                            ->latest()
+                            ->first();
+
+                        if (! $pendingRequest) {
+                            Notification::make()
+                                ->title('Tidak ada pengajuan pending')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        $pendingRequest->update([
+                            'status' => ProductModeration::STATUS_APPROVED,
+                            'reviewed_by_user_id' => auth()->id(),
+                            'reviewed_at' => now(),
+                        ]);
+
+                        $record->update(['is_active' => true]);
+
+                        Notification::make()
+                            ->title('Produk diaktifkan kembali')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('rejectReactivation')
+                    ->label('Tolak Aktivasi')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => auth()->user()->is_admin && (bool) $record->pendingReactivationRequest)
+                    ->schema([
+                        TextInput::make('reason')
+                            ->label('Alasan Penolakan')
+                            ->required()
+                            ->maxLength(255),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $pendingRequest = $record->moderations()
+                            ->where('type', ProductModeration::TYPE_REACTIVATION)
+                            ->where('status', ProductModeration::STATUS_PENDING)
+                            ->latest()
+                            ->first();
+
+                        if (! $pendingRequest) {
+                            Notification::make()
+                                ->title('Tidak ada pengajuan pending')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        $pendingRequest->update([
+                            'status' => ProductModeration::STATUS_REJECTED,
+                            'description' => $data['reason'],
+                            'reviewed_by_user_id' => auth()->id(),
+                            'reviewed_at' => now(),
+                        ]);
+
+                        Notification::make()
+                            ->title('Pengajuan aktivasi ditolak')
+                            ->success()
+                            ->send();
+                    }),
             ])
 
             ->toolbarActions([

@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Models\Report;
 use App\Models\Category;
+use App\Models\ProductModeration;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -86,6 +88,34 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function moderations(): HasMany
+    {
+        return $this->hasMany(ProductModeration::class);
+    }
+
+    public function latestDeactivation(): HasOne
+    {
+        return $this->hasOne(ProductModeration::class)
+            ->where('type', ProductModeration::TYPE_DEACTIVATION)
+            ->where('status', ProductModeration::STATUS_APPROVED)
+            ->latestOfMany();
+    }
+
+    public function latestReactivationRequest(): HasOne
+    {
+        return $this->hasOne(ProductModeration::class)
+            ->where('type', ProductModeration::TYPE_REACTIVATION)
+            ->latestOfMany();
+    }
+
+    public function pendingReactivationRequest(): HasOne
+    {
+        return $this->hasOne(ProductModeration::class)
+            ->where('type', ProductModeration::TYPE_REACTIVATION)
+            ->where('status', ProductModeration::STATUS_PENDING)
+            ->latestOfMany();
     }
 
     public function reports()

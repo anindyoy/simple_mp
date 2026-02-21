@@ -61,6 +61,7 @@ class ProductForm
 
                         Forms\Components\Toggle::make('is_active')
                             ->label('Aktifkan Produk')
+                            ->disabled(fn ($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
                             ->default(true),
                     ])
                     ->columns(2),

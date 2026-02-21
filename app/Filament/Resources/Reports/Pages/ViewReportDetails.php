@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\ProductModeration;
 use Filament\Resources\Pages\Page;
+use App\Filament\Resources\Products\ProductResource;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -79,6 +80,22 @@ class ViewReportDetails extends Page
                     $this->target->update([
                         'is_active' => false,
                     ]);
+
+                    $owner = $this->target->lapak?->user;
+
+                    if ($owner) {
+                        Notification::make()
+                            ->title('Produk dinonaktifkan admin')
+                            ->body('Produk "' . $this->target->title . '" dinonaktifkan. Sebab: ' . $data['reason'])
+                            ->actions([
+                                Action::make('lihatProduk')
+                                    ->label('Lihat Produk')
+                                    ->button()
+                                    ->url(ProductResource::getUrl('edit', ['record' => $this->target])),
+                            ])
+                            ->danger()
+                            ->sendToDatabase($owner);
+                    }
 
                     Report::query()
                         ->where('reportable_type', Product::class)

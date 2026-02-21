@@ -12,7 +12,6 @@ use Filament\Widgets\AccountWidget;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
-use App\Http\Responses\CustomLogoutResponse;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -34,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->maxContentWidth('full')
             ->login()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('15s')
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn() => view('filament.topbar.scripts')

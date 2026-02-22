@@ -76,8 +76,7 @@ class ReportResource extends Resource
                 'reportable_type',
                 'reportable_id',
                 DB::raw('COUNT(*) as total_reports'),
-                DB::raw("SUM(status = 'pending') as total_pending"),
-                DB::raw("SUM(status = 'reviewed') as total_reviewed"),
+                DB::raw('MAX(created_at) as last_reported_at'),
             ])
             ->groupBy('reportable_type', 'reportable_id');
     }

@@ -7,6 +7,7 @@ use App\Models\Product;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Illuminate\Support\HtmlString;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -22,7 +23,6 @@ class ReportsTable
     {
         return $table
             ->columns([
-
                 TextColumn::make('reportable_type')
                     ->label('Tipe')
                     ->formatStateUsing(
@@ -32,11 +32,48 @@ class ReportsTable
 
                 TextColumn::make('reportable_id')
                     ->label('Target')
+
                     ->formatStateUsing(function ($record) {
                         $model = $record->reportable_type;
                         $target = $model::find($record->reportable_id);
 
                         return $target?->title ?? $target?->name ?? '-';
+                    })
+
+                    ->description(function ($record) {
+
+                        $isActive = null;
+
+                        if ($record->reportable_type === \App\Models\Product::class) {
+                            $isActive = $record->product_status;
+                        }
+
+                        if ($record->reportable_type === \App\Models\LapakProfile::class) {
+                            $isActive = $record->lapak_status;
+                        }
+
+                        if (is_null($isActive)) {
+                            return null;
+                        }
+
+                        $label = $isActive ? 'Aktif' : 'Nonaktif';
+
+                        $style = $isActive
+                            ? "background:#dcfce7;color:#166534;"
+                            : "background:#fee2e2;color:#991b1b;";
+
+                        return new HtmlString(
+                            "<span style='
+                                display:inline-block;
+                                padding:2px 8px;
+                                font-size:12px;
+                                font-weight:500;
+                                border-radius:6px;
+                                {$style}
+                            '>
+                                {$label}
+                            </span>"
+                        );
                     }),
 
                 TextColumn::make('total_reports')

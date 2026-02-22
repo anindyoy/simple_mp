@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Reports;
 use BackedEnum;
 use ValueError;
 use App\Models\Report;
+use App\Models\Product;
 use Filament\Tables\Table;
+use App\Models\LapakProfile;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
@@ -72,13 +74,35 @@ class ReportResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->from('reports')
+
+            // JOIN PRODUCT
+            ->leftJoin('products', function ($join) {
+                $join->on('products.id', '=', 'reports.reportable_id')
+                    ->where('reports.reportable_type', Product::class);
+            })
+
+            // JOIN LAPAK
+            ->leftJoin('lapak_profiles', function ($join) {
+                $join->on('lapak_profiles.id', '=', 'reports.reportable_id')
+                    ->where('reports.reportable_type', LapakProfile::class);
+            })
+
             ->select([
-                'reportable_type',
-                'reportable_id',
-                DB::raw('COUNT(*) as total_reports'),
-                DB::raw('MAX(created_at) as last_reported_at'),
+                'reports.reportable_type',
+                'reports.reportable_id',
+
+                DB::raw('COUNT(reports.id) as total_reports'),
+                DB::raw('MAX(reports.created_at) as last_reported_at'),
+
+                DB::raw('MAX(products.is_active) as product_status'),
+                DB::raw('MAX(lapak_profiles.is_active) as lapak_status'),
             ])
-            ->groupBy('reportable_type', 'reportable_id');
+
+            ->groupBy(
+                'reports.reportable_type',
+                'reports.reportable_id'
+            );
     }
 
     public static function getPages(): array

@@ -11,6 +11,7 @@ use Illuminate\Support\HtmlString;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,27 +31,21 @@ class ReportsTable
                         str_contains($state, 'Product') ? 'Produk' : 'Lapak'
                     ),
 
-                TextColumn::make('reportable_id')
+                TextColumn::make('target')
                     ->label('Target')
-
-                    ->formatStateUsing(function ($record) {
-                        $model = $record->reportable_type;
-                        $target = $model::find($record->reportable_id);
-
-                        return $target?->title ?? $target?->name ?? '-';
-                    })
-
-                    ->description(function ($record) {
-
-                        $isActive = null;
+                    ->state(function ($record) {
 
                         if ($record->reportable_type === \App\Models\Product::class) {
-                            $isActive = $record->product_status;
+                            return $record->product_title;
                         }
 
-                        if ($record->reportable_type === \App\Models\LapakProfile::class) {
-                            $isActive = $record->lapak_status;
-                        }
+                        return $record->lapak_name;
+                    })
+                    ->description(function ($record) {
+
+                        $isActive = $record->reportable_type === \App\Models\Product::class
+                            ? $record->product_status
+                            : $record->lapak_status;
 
                         if (is_null($isActive)) {
                             return null;
@@ -64,18 +59,48 @@ class ReportsTable
 
                         return new HtmlString(
                             "<span style='
-                                display:inline-block;
-                                padding:2px 8px;
-                                font-size:12px;
-                                font-weight:500;
-                                border-radius:6px;
-                                {$style}
-                            '>
-                                {$label}
-                            </span>"
+                display:inline-block;
+                padding:2px 8px;
+                font-size:12px;
+                font-weight:500;
+                border-radius:6px;
+                {$style}
+            '>{$label}</span>"
                         );
                     }),
 
+                TextColumn::make('pemilik')
+                    ->label('Pemilik')
+                    ->state(function ($record) {
+
+                        if ($record->reportable_type === \App\Models\Product::class) {
+                            return $record->product_owner_name;
+                        }
+
+                        return $record->direct_owner_name;
+                    })
+                    ->weight(FontWeight::SemiBold)
+
+                    ->description(function ($record) {
+
+                        // ❌ Jika target adalah Lapak, jangan tampilkan nama toko
+                        if ($record->reportable_type === \App\Models\LapakProfile::class) {
+                            return null;
+                        }
+
+                        // ✔ Jika target Produk, tampilkan nama toko
+                        $namaToko = $record->product_lapak_name;
+
+                        if (! $namaToko) {
+                            return null;
+                        }
+
+                        return new HtmlString(
+                            "<span style='font-size:12px;color:#6b7280;'>
+                Toko: {$namaToko}
+            </span>"
+                        );
+                    }),
                 TextColumn::make('total_reports')
                     ->label('Total Report')
                     ->badge()

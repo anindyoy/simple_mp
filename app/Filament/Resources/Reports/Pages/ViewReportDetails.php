@@ -2,22 +2,22 @@
 
 namespace App\Filament\Resources\Reports\Pages;
 
-use App\Models\Product;
 use App\Models\Report;
+use App\Models\Product;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\ProductModeration;
 use Filament\Resources\Pages\Page;
-use App\Filament\Resources\Products\ProductResource;
+use Illuminate\Support\Collection;
+use Filament\Support\Enums\FontWeight;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Support\Enums\FontWeight;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Illuminate\Support\Collection;
 use App\Filament\Resources\Reports\ReportResource;
 use Filament\Infolists\Components\RepeatableEntry;
+use App\Filament\Resources\Products\ProductResource;
 
 class ViewReportDetails extends Page
 {
@@ -31,7 +31,11 @@ class ViewReportDetails extends Page
     {
         $model = base64_decode($type);
 
-        $this->target = $model::findOrFail($id);
+        if ($model === \App\Models\Product::class) {
+            $this->target = $model::with(['lapak.user'])->findOrFail($id);
+        } else {
+            $this->target = $model::with(['user'])->findOrFail($id);
+        }
 
         $this->reports = Report::where('reportable_type', $model)
             ->where('reportable_id', $id)
@@ -46,14 +50,14 @@ class ViewReportDetails extends Page
                 ->label('Nonaktifkan Produk')
                 ->icon('heroicon-o-no-symbol')
                 ->color('danger')
-                ->visible(fn (): bool => $this->target instanceof Product)
-                ->disabled(fn (): bool => ! ($this->target instanceof Product) || ! $this->target->is_active)
+                ->visible(fn(): bool => $this->target instanceof Product)
+                ->disabled(fn(): bool => ! ($this->target instanceof Product) || ! $this->target->is_active)
                 ->schema([
                     TextInput::make('reason')
                         ->label('Sebab Penonaktifan')
                         ->required()
                         ->maxLength(255)
-                        ->default(fn (): ?string => $this->reports->first()?->reason),
+                        ->default(fn(): ?string => $this->reports->first()?->reason),
                     Textarea::make('description')
                         ->label('Penjelasan untuk Pemilik Produk')
                         ->rows(4)
@@ -124,19 +128,48 @@ class ViewReportDetails extends Page
 
                 Section::make('Informasi Target')
                     ->schema([
+
                         TextEntry::make('name')
                             ->label('Nama')
-                            ->state(fn() => $this->target->title ?? $this->target->name)
+                            ->state(
+                                fn() =>
+                                $this->target->title ?? $this->target->name
+                            )
                             ->weight(FontWeight::Bold),
 
                         TextEntry::make('type')
                             ->label('Tipe')
                             ->state(
                                 fn() =>
-                                str_contains(get_class($this->target), 'Product')
+                                $this->target instanceof \App\Models\Product
                                     ? 'Produk'
                                     : 'Lapak'
                             ),
+
+                        // 🔹 Nama Toko (hanya jika produk)
+                        TextEntry::make('nama_toko')
+                            ->label('Nama Toko')
+                            ->visible(
+                                fn() =>
+                                $this->target instanceof \App\Models\Product
+                            )
+                            ->state(
+                                fn() =>
+                                $this->target->lapak?->name
+                            ),
+
+                        // 🔹 Nama Pemilik Lapak (selalu tampil)
+                        TextEntry::make('nama_pemilik')
+                            ->label('Pemilik Lapak')
+                            ->state(function () {
+
+                                if ($this->target instanceof \App\Models\Product) {
+                                    return $this->target->lapak?->user?->name;
+                                }
+
+                                return $this->target->user?->name;
+                            }),
+
                     ])
                     ->columns(2),
 

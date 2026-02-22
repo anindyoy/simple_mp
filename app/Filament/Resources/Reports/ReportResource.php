@@ -82,10 +82,24 @@ class ReportResource extends Resource
                     ->where('reports.reportable_type', Product::class);
             })
 
-            // JOIN LAPAK
-            ->leftJoin('lapak_profiles', function ($join) {
-                $join->on('lapak_profiles.id', '=', 'reports.reportable_id')
+            // JOIN LAPAK (langsung)
+            ->leftJoin('lapak_profiles as direct_lapak', function ($join) {
+                $join->on('direct_lapak.id', '=', 'reports.reportable_id')
                     ->where('reports.reportable_type', LapakProfile::class);
+            })
+
+            // JOIN LAPAK dari PRODUCT
+            ->leftJoin('lapak_profiles as product_lapak', function ($join) {
+                $join->on('product_lapak.id', '=', 'products.lapak_id');
+            })
+
+            // JOIN USER (pemilik lapak)
+            ->leftJoin('users as direct_owner', function ($join) {
+                $join->on('direct_owner.id', '=', 'direct_lapak.user_id');
+            })
+
+            ->leftJoin('users as product_owner', function ($join) {
+                $join->on('product_owner.id', '=', 'product_lapak.user_id');
             })
 
             ->select([
@@ -95,8 +109,16 @@ class ReportResource extends Resource
                 DB::raw('COUNT(reports.id) as total_reports'),
                 DB::raw('MAX(reports.created_at) as last_reported_at'),
 
+                DB::raw('MAX(products.title) as product_title'),
+                DB::raw('MAX(direct_lapak.name) as lapak_name'),
+
+                DB::raw('MAX(product_lapak.name) as product_lapak_name'),
+
+                DB::raw('MAX(direct_owner.name) as direct_owner_name'),
+                DB::raw('MAX(product_owner.name) as product_owner_name'),
+
                 DB::raw('MAX(products.is_active) as product_status'),
-                DB::raw('MAX(lapak_profiles.is_active) as lapak_status'),
+                DB::raw('MAX(direct_lapak.is_active) as lapak_status'),
             ])
 
             ->groupBy(

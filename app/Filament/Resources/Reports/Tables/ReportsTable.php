@@ -59,13 +59,13 @@ class ReportsTable
 
                         return new HtmlString(
                             "<span style='
-                display:inline-block;
-                padding:2px 8px;
-                font-size:12px;
-                font-weight:500;
-                border-radius:6px;
-                {$style}
-            '>{$label}</span>"
+                                display:inline-block;
+                                padding:2px 8px;
+                                font-size:12px;
+                                font-weight:500;
+                                border-radius:6px;
+                                {$style}
+                            '>{$label}</span>"
                         );
                     }),
 
@@ -97,10 +97,11 @@ class ReportsTable
 
                         return new HtmlString(
                             "<span style='font-size:12px;color:#6b7280;'>
-                Toko: {$namaToko}
-            </span>"
+                                Toko: {$namaToko}
+                            </span>"
                         );
                     }),
+
                 TextColumn::make('total_reports')
                     ->label('Total Report')
                     ->badge()

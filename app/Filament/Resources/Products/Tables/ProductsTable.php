@@ -16,7 +16,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,6 +44,7 @@ class ProductsTable
                     ->label('Produk')
                     ->searchable()
                     ->sortable()
+                    ->description(fn($record) => $record->condition ? 'Kondisi: ' . ucfirst($record->condition) : null)
                     ->state(function ($record): array {
                         $lines = [$record->title];
 
@@ -74,14 +74,6 @@ class ProductsTable
                     ->label('Harga')
                     ->money('IDR', locale: 'id')
                     ->sortable(),
-
-                BadgeColumn::make('condition')
-                    ->label('Kondisi')
-                    ->colors([
-                        'success' => 'baru',
-                        'warning' => 'seken',
-                    ])
-                    ->formatStateUsing(fn($state) => ucfirst($state)),
 
                 ToggleColumn::make('is_active')
                     ->label('Aktif')

@@ -8,6 +8,8 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Filament\Resources\Products\Pages\CreateProduct;
@@ -28,6 +30,37 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return ProductsTable::configure($table);
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return (int) $record->lapak?->user_id === (int) auth()->id();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return (int) $record->lapak?->user_id === (int) auth()->id();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return (int) $record->lapak?->user_id === (int) auth()->id();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($user->is_admin) {
+            return $query;
+        }
+
+        return $query->whereHas('lapak', fn(Builder $lapakQuery) => $lapakQuery->where('user_id', $user->id));
     }
 
     public static function getRelations(): array

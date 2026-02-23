@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Models\Category;
 use Filament\Forms;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -21,10 +21,10 @@ class ProductForm
                             ->relationship(
                                 'lapak',
                                 'name',
-                                modifyQueryUsing: fn (Builder $query) =>
-                                    $query->where('user_id', auth()->id())
+                                modifyQueryUsing: fn(Builder $query) =>
+                                $query->where('user_id', auth()->id())
                             )
-                            ->default(fn () => auth()->user()?->lapak?->id)
+                            ->default(fn() => auth()->user()?->lapak?->id)
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -57,36 +57,30 @@ class ProductForm
                                 'baru' => 'Baru',
                                 'seken' => 'Seken',
                             ])
+                            ->visible(
+                                fn($get) => ($get('category_id') && Category::find($get('category_id'))?->supportsCondition()) || false
+                            )
                             ->required(),
 
                         Forms\Components\Toggle::make('is_active')
                             ->label('Aktifkan Produk')
-                            ->disabled(fn ($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
+                            ->disabled(fn($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
                             ->default(true),
                     ])
                     ->columns(2),
 
                 Section::make('Gambar Produk')
-                    ->description('Pilih satu gambar sebagai gambar utama')
+                    ->description('Gambar pertama akan digunakan sebagai gambar utama')
                     ->schema([
-                        Repeater::make('images')
-                            ->relationship()
-                            ->schema([
-                                Forms\Components\FileUpload::make('image_url')
-                                    ->label('Gambar')
-                                    ->image()
-                                    ->imageEditor()
-                                    ->directory('products')
-                                    ->required(),
-
-                                Forms\Components\Toggle::make('is_primary')
-                                    ->label('Gambar Utama')
-                                    ->helperText('Hanya satu gambar utama'),
-                            ])
-                            ->minItems(1)
-                            ->maxItems(5)
-                            ->columns(2)
-                            ->defaultItems(1),
+                        Forms\Components\FileUpload::make('uploaded_images')
+                            ->label('Gambar')
+                            ->image()
+                            ->imageEditor()
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(5)
+                            ->directory('products')
+                            ->required(),
                     ]),
             ])
             ->columns(1);

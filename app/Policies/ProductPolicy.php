@@ -8,6 +8,11 @@ use App\Models\Product;
 
 class ProductPolicy
 {
+    private function ownsProduct(User $user, Product $product): bool
+    {
+        return (int) $product->lapak?->user_id === (int) $user->id;
+    }
+
     /**
      * Boleh lihat daftar produk
      */
@@ -63,7 +68,7 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): bool
     {
-        return $product->lapak?->user_id === $user->id;
+        return $this->ownsProduct($user, $product);
     }
 
     /**
@@ -79,7 +84,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return $product->lapak?->user_id === $user->id;
+        return $this->ownsProduct($user, $product);
     }
 
     /**
@@ -87,7 +92,17 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): bool
     {
-        return $product->lapak?->user_id === $user->id;
+        return $this->ownsProduct($user, $product);
+    }
+
+    public function restore(User $user, Product $product): bool
+    {
+        return $this->ownsProduct($user, $product);
+    }
+
+    public function forceDelete(User $user, Product $product): bool
+    {
+        return $this->ownsProduct($user, $product);
     }
 
     /**

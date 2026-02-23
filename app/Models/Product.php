@@ -51,21 +51,23 @@ class Product extends Model
         });
 
         /**
-         * Pastikan hanya 1 gambar primary per produk
+         * Pastikan gambar pertama menjadi gambar utama
          * Dieksekusi SETELAH product tersimpan
          */
         static::saved(function ($product) {
-            // Ambil 1 gambar primary (yang paling akhir diupdate)
             $primaryImage = $product->images()
-                ->where('is_primary', true)
-                ->orderByDesc('updated_at')
+                ->orderBy('id')
                 ->first();
 
             if ($primaryImage) {
-                // Set gambar lain menjadi non-primary
                 $product->images()
-                    ->where('id', '!=', $primaryImage->id)
-                    ->update(['is_primary' => false]);
+                    ->update([
+                        'is_primary' => false,
+                    ]);
+
+                $primaryImage->update([
+                    'is_primary' => true,
+                ]);
             }
         });
     }

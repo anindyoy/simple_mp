@@ -5,6 +5,9 @@ namespace App\Filament\Resources\Products\Pages;
 use App\Filament\Resources\Products\ProductResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class EditProduct extends EditRecord
 {
@@ -43,6 +46,26 @@ class EditProduct extends EditRecord
                 ])
                 ->all()
         );
+
+        $this->optimizeUploadedImages();
+    }
+
+    protected function optimizeUploadedImages(): void
+    {
+        foreach ($this->uploadedImages as $imageUrl) {
+            if (! Storage::disk('public')->exists($imageUrl)) {
+                continue;
+            }
+
+            try {
+                ImageOptimizer::optimize(Storage::disk('public')->path($imageUrl));
+            } catch (\Throwable $exception) {
+                Log::warning('Image optimization skipped.', [
+                    'path' => $imageUrl,
+                    'message' => $exception->getMessage(),
+                ]);
+            }
+        }
     }
 
     protected function getHeaderActions(): array

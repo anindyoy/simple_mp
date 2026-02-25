@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Report;
 use App\Models\Product;
 use Illuminate\Support\Str;
+use App\Models\ProductModeration;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -85,5 +86,27 @@ class LapakProfile extends Model
         $username = ltrim($this->telegram_username, '@');
 
         return 'https://t.me/' . $username;
+    }
+
+    public function moderations()
+    {
+        return $this->hasMany(ProductModeration::class, 'lapak_profile_id');
+    }
+
+    public function latestDeactivation()
+    {
+        return $this->moderations()
+            ->where('type', ProductModeration::TYPE_DEACTIVATION)
+            ->latest()
+            ->first();
+    }
+
+    public function pendingReactivationRequest()
+    {
+        return $this->moderations()
+            ->where('type', ProductModeration::TYPE_REACTIVATION)
+            ->where('status', ProductModeration::STATUS_PENDING)
+            ->latest()
+            ->first();
     }
 }

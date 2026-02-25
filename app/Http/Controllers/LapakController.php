@@ -20,6 +20,9 @@ class LapakController extends Controller
         $lapak->load([
             'products' => function ($query) {
                 $query->where('is_active', true)
+                    ->whereHas('lapak', function ($lapakQuery) {
+                        $lapakQuery->where('is_active', true);
+                    })
                     ->orderBy('pushed_at', 'desc');
             },
             'products.images',

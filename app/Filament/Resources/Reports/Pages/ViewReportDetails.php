@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Reports\Pages;
 
 use App\Models\Report;
 use App\Models\Product;
+use App\Models\LapakProfile;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\ProductModeration;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use App\Services\ProductModerationService;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\Reports\ReportResource;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -50,8 +52,7 @@ class ViewReportDetails extends Page
                 ->label('Nonaktifkan Produk')
                 ->icon('heroicon-o-no-symbol')
                 ->color('danger')
-                ->visible(fn(): bool => $this->target instanceof Product)
-                ->disabled(fn(): bool => ! ($this->target instanceof Product) || ! $this->target->is_active)
+                ->disabled(fn(): bool => ! $this->target?->is_active)
                 ->schema([
                     TextInput::make('reason')
                         ->label('Sebab Penonaktifan')
@@ -63,59 +64,56 @@ class ViewReportDetails extends Page
                         ->rows(4)
                         ->nullable(),
                 ])
-                ->action(function (array $data): void {
-                    if (! ($this->target instanceof Product)) {
-                        return;
-                    }
+                ->action(function (array $data, ProductModerationService $service): void {
 
                     $latestReport = $this->reports->first();
 
-                    ProductModeration::create([
-                        'product_id' => $this->target->id,
-                        'report_id' => $latestReport?->id,
-                        'type' => ProductModeration::TYPE_DEACTIVATION,
-                        'status' => ProductModeration::STATUS_APPROVED,
-                        'reason' => $data['reason'],
-                        'description' => $data['description'] ?? null,
-                        'reviewed_by_user_id' => auth()->id(),
-                        'reviewed_at' => now(),
-                    ]);
+                    try {
 
-                    $this->target->update([
-                        'is_active' => false,
-                    ]);
+                        $service->deactivateTarget(
+                            $this->target,
+                            auth()->user(),
+                            $data['reason'],
+                            $data['description'] ?? null,
+                            $latestReport
+                        );
 
-                    $owner = $this->target->lapak?->user;
+                        // tentukan owner tergantung tipe
+                        $owner = match (true) {
+                            $this->target instanceof Product =>
+                            $this->target->lapak?->user,
 
-                    if ($owner) {
+                            $this->target instanceof LapakProfile =>
+                            $this->target->user,
+
+                            default => null,
+                        };
+
+                        if ($owner) {
+                            Notification::make()
+                                ->title('Dinonaktifkan oleh admin')
+                                ->body(
+                                    ($this->target instanceof Product
+                                        ? 'Produk "' . $this->target->title . '"'
+                                        : 'Lapak "' . $this->target->name . '"')
+                                        . ' dinonaktifkan. Sebab: ' . $data['reason']
+                                )
+                                ->danger()
+                                ->sendToDatabase($owner);
+                        }
+
                         Notification::make()
-                            ->title('Produk dinonaktifkan admin')
-                            ->body('Produk "' . $this->target->title . '" dinonaktifkan. Sebab: ' . $data['reason'])
-                            ->actions([
-                                Action::make('lihatProduk')
-                                    ->label('Lihat Produk')
-                                    ->button()
-                                    ->url(ProductResource::getUrl('edit', ['record' => $this->target])),
-                            ])
+                            ->title('Berhasil dinonaktifkan')
+                            ->success()
+                            ->send();
+                    } catch (\Throwable $e) {
+                        \Log::error('Error deactivating target: ' . $e->getMessage());
+                        Notification::make()
+                            ->title('Terjadi kesalahan')
+                            ->body($e->getMessage())
                             ->danger()
-                            ->sendToDatabase($owner);
+                            ->send();
                     }
-
-                    Report::query()
-                        ->where('reportable_type', Product::class)
-                        ->where('reportable_id', $this->target->id)
-                        ->where('status', 'pending')
-                        ->update(['status' => 'reviewed']);
-
-                    $this->reports = Report::where('reportable_type', Product::class)
-                        ->where('reportable_id', $this->target->id)
-                        ->latest()
-                        ->get();
-
-                    Notification::make()
-                        ->title('Produk berhasil dinonaktifkan')
-                        ->success()
-                        ->send();
                 }),
         ];
     }

@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->maxContentWidth('full')
             ->login()
+            ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling('15s')
             ->renderHook(

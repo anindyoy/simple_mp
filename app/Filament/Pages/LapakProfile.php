@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Pages\Page;
+use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Filament\Schemas\Components\Grid;
@@ -12,7 +13,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Concerns\InteractsWithForms;
 use App\Models\LapakProfile as ModelLapakProfile;
 
@@ -55,10 +58,84 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
         $this->form->fill($this->lapak->attributesToArray());
     }
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('requestReactivation')
+                ->label('Ajukan Aktivasi Ulang')
+                ->icon('heroicon-o-arrow-path')
+                ->color('warning')
+                ->visible(
+                    fn() =>
+                    ! $this->lapak->is_active
+                )
+                ->disabled(
+                    fn() =>
+                    (bool) $this->lapak->pendingReactivationRequest()
+                )
+                ->schema([
+                    TextInput::make('reason')
+                        ->label('Alasan Pengajuan')
+                        ->required()
+                        ->maxLength(255),
+                ])
+                ->action(function (array $data, \App\Services\ProductModerationService $service) {
+
+                    try {
+
+                        $service->requestReactivation(
+                            $this->lapak,
+                            auth()->user(),
+                            $data['reason']
+                        );
+
+                        Notification::make()
+                            ->title('Pengajuan aktivasi ulang dikirim')
+                            ->success()
+                            ->send();
+                    } catch (\DomainException $e) {
+
+                        Notification::make()
+                            ->title($e->getMessage())
+                            ->warning()
+                            ->send();
+                    }
+                }),
+        ];
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
+                Section::make('Status Moderasi')
+                    ->visible(
+                        fn() =>
+                        $this->lapak
+                            && ! $this->lapak->is_active
+                            && $this->lapak->latestDeactivation()
+                    )
+                    ->schema([
+                        Placeholder::make('status')
+                            ->label('Status')
+                            ->content('Lapak Anda dinonaktifkan oleh admin.'),
+
+                        Placeholder::make('reason')
+                            ->label('Alasan')
+                            ->content(
+                                fn() =>
+                                optional($this->lapak->latestDeactivation())->reason
+                            ),
+
+                        Placeholder::make('reactivation_status')
+                            ->label('Status Aktivasi Ulang')
+                            ->visible(
+                                fn() =>
+                                $this->lapak->pendingReactivationRequest()
+                            )
+                            ->content('Pengajuan aktivasi ulang sedang menunggu moderasi.'),
+                    ]),
+
                 Grid::make(2)->schema([
                     TextInput::make('name')
                         ->label('Nama Lapak')
@@ -85,14 +162,6 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
                         ->imagePreviewHeight('150')
                         ->maxSize(2048),
                 ]),
-
-                // Grid::make(2)->schema([
-                //     TextInput::make('latitude')
-                //         ->numeric(),
-
-                //     TextInput::make('longitude')
-                //         ->numeric(),
-                // ]),
             ])
             ->model($this->lapak)
             ->statePath('data');

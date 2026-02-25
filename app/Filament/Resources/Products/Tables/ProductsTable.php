@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
-use Carbon\Carbon;
-use App\Models\User;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use App\Policies\ProductPolicy;
@@ -21,7 +19,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
-use App\Filament\Resources\Products\ProductResource;
 
 class ProductsTable
 {
@@ -52,13 +49,13 @@ class ProductsTable
                         $reason = $record->latestDeactivation?->reason;
 
                         if ((! $record->is_active) && $reason) {
-                            $lines[] = 'Sebab nonaktif: ' . $reason;
+                            $lines[] = 'Dinonaktifkan, sebab: ' . $reason;
                         }
 
                         return $lines;
                     })
                     ->listWithLineBreaks()
-                    ->color(fn($state): ?string => str_starts_with((string) $state, 'Sebab nonaktif:') ? 'danger' : null)
+                    ->color(fn($state): ?string => str_starts_with((string) $state, 'Dinonaktifkan, sebab:') ? 'danger' : null)
                     ->wrap(),
 
                 TextColumn::make('lapak.name')
@@ -79,7 +76,9 @@ class ProductsTable
 
                 ToggleColumn::make('is_active')
                     ->label('Aktif')
-                    ->disabled(fn() => ! auth()->user()->is_admin),
+                    ->disabled(
+                        fn($record) => auth()->user()->is_admin || $record->latestDeactivation?->reason !== 'Produk tidak sesuai ketentuan'
+                    ),
 
                 TextColumn::make('latestReactivationRequest.status')
                     ->label('Aktivasi Ulang')

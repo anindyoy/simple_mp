@@ -2,14 +2,13 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
-use App\Models\ProductModeration;
-use App\Filament\Resources\Products\ProductResource;
 use App\Policies\ProductPolicy;
 use Filament\Actions\EditAction;
+use App\Models\ProductModeration;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -20,7 +19,9 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
+use App\Filament\Resources\Products\ProductResource;
 
 class ProductsTable
 {
@@ -57,14 +58,15 @@ class ProductsTable
                         return $lines;
                     })
                     ->listWithLineBreaks()
-                    ->color(fn ($state): ?string => str_starts_with((string) $state, 'Sebab nonaktif:') ? 'danger' : null)
+                    ->color(fn($state): ?string => str_starts_with((string) $state, 'Sebab nonaktif:') ? 'danger' : null)
                     ->wrap(),
 
                 TextColumn::make('lapak.name')
                     ->label('Lapak')
                     ->searchable()
                     ->hidden(!auth()->user()->is_admin)
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn($record) => $record->lapak?->user ? 'Pemilik: ' . $record->lapak->user->name : null),
 
                 TextColumn::make('category.category_name')
                     ->label('Kategori')
@@ -237,6 +239,7 @@ class ProductsTable
                     ->color('warning')
 
                     ->disabled(fn() => ! ProductPolicy::canPush())
+                    ->hidden(fn() => auth()->user()->is_admin)
 
                     ->tooltip(fn() => ProductPolicy::pushTooltip())
 
@@ -279,53 +282,26 @@ class ProductsTable
                             ->maxLength(255)
                             ->default('Produk sudah diperbaiki dan siap ditinjau ulang.'),
                     ])
-                    ->action(function ($record, array $data) {
-                        if ($record->pendingReactivationRequest) {
+                    ->action(function ($record, array $data, ProductModerationService $service) {
+
+                        try {
+                            $service->requestReactivation(
+                                $record,
+                                auth()->user(),
+                                $data['reason']
+                            );
+
                             Notification::make()
-                                ->title('Masih ada pengajuan aktif')
+                                ->title('Pengajuan aktivasi ulang dikirim')
+                                ->success()
+                                ->send();
+                        } catch (\DomainException $e) {
+
+                            Notification::make()
+                                ->title($e->getMessage())
                                 ->warning()
                                 ->send();
-
-                            return;
                         }
-
-                        ProductModeration::create([
-                            'product_id' => $record->id,
-                            'type' => ProductModeration::TYPE_REACTIVATION,
-                            'status' => ProductModeration::STATUS_PENDING,
-                            'reason' => 'permohonan_aktivasi_ulang',
-                            'description' => $data['reason'],
-                            'requested_by_user_id' => auth()->id(),
-                        ]);
-
-                        $admins = User::query()
-                            ->where('is_admin', true)
-                            ->whereKeyNot(auth()->id())
-                            ->get();
-
-                        if ($admins->isNotEmpty()) {
-                            Notification::make()
-                                ->title('Pengajuan aktivasi ulang baru')
-                                ->body('Produk "' . $record->title . '" diajukan untuk diaktifkan kembali.')
-                                ->actions([
-                                    Action::make('lihatProduk')
-                                        ->label('Lihat Produk')
-                                        ->button()
-                                        ->url(ProductResource::getUrl('index', [
-                                            'tableFilters' => [
-                                                'pending_reactivation' => ['isActive' => true],
-                                                'latest_reactivation_status' => ['value' => ProductModeration::STATUS_PENDING],
-                                            ],
-                                        ])),
-                                ])
-                                ->warning()
-                                ->sendToDatabase($admins);
-                        }
-
-                        Notification::make()
-                            ->title('Pengajuan aktivasi ulang dikirim')
-                            ->success()
-                            ->send();
                     }),
 
                 Action::make('approveReactivation')
@@ -333,50 +309,25 @@ class ProductsTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn($record) => auth()->user()->is_admin && (bool) $record->pendingReactivationRequest)
-                    ->action(function ($record) {
-                        $pendingRequest = $record->moderations()
-                            ->where('type', ProductModeration::TYPE_REACTIVATION)
-                            ->where('status', ProductModeration::STATUS_PENDING)
-                            ->latest()
-                            ->first();
+                    ->action(function ($record, ProductModerationService $service) {
 
-                        if (! $pendingRequest) {
+                        try {
+                            $service->approveReactivation(
+                                $record,
+                                auth()->user()
+                            );
+
                             Notification::make()
-                                ->title('Tidak ada pengajuan pending')
+                                ->title('Produk diaktifkan kembali')
+                                ->success()
+                                ->send();
+                        } catch (\DomainException $e) {
+
+                            Notification::make()
+                                ->title($e->getMessage())
                                 ->warning()
                                 ->send();
-
-                            return;
                         }
-
-                        $pendingRequest->update([
-                            'status' => ProductModeration::STATUS_APPROVED,
-                            'reviewed_by_user_id' => auth()->id(),
-                            'reviewed_at' => now(),
-                        ]);
-
-                        $record->update(['is_active' => true]);
-
-                        $owner = $record->lapak?->user;
-
-                        if ($owner) {
-                            Notification::make()
-                                ->title('Aktivasi ulang disetujui')
-                                ->body('Produk "' . $record->title . '" sudah aktif kembali.')
-                                ->actions([
-                                    Action::make('editProduk')
-                                        ->label('Lihat Produk')
-                                        ->button()
-                                        ->url(ProductResource::getUrl('edit', ['record' => $record])),
-                                ])
-                                ->success()
-                                ->sendToDatabase($owner);
-                        }
-
-                        Notification::make()
-                            ->title('Produk diaktifkan kembali')
-                            ->success()
-                            ->send();
                     }),
 
                 Action::make('rejectReactivation')
@@ -390,49 +341,26 @@ class ProductsTable
                             ->required()
                             ->maxLength(255),
                     ])
-                    ->action(function ($record, array $data) {
-                        $pendingRequest = $record->moderations()
-                            ->where('type', ProductModeration::TYPE_REACTIVATION)
-                            ->where('status', ProductModeration::STATUS_PENDING)
-                            ->latest()
-                            ->first();
+                    ->action(function ($record, array $data, ProductModerationService $service) {
 
-                        if (! $pendingRequest) {
+                        try {
+                            $service->rejectReactivation(
+                                $record,
+                                auth()->user(),
+                                $data['reason']
+                            );
+
                             Notification::make()
-                                ->title('Tidak ada pengajuan pending')
+                                ->title('Pengajuan aktivasi ditolak')
+                                ->success()
+                                ->send();
+                        } catch (\DomainException $e) {
+
+                            Notification::make()
+                                ->title($e->getMessage())
                                 ->warning()
                                 ->send();
-
-                            return;
                         }
-
-                        $pendingRequest->update([
-                            'status' => ProductModeration::STATUS_REJECTED,
-                            'description' => $data['reason'],
-                            'reviewed_by_user_id' => auth()->id(),
-                            'reviewed_at' => now(),
-                        ]);
-
-                        $owner = $record->lapak?->user;
-
-                        if ($owner) {
-                            Notification::make()
-                                ->title('Aktivasi ulang ditolak')
-                                ->body('Produk "' . $record->title . '" belum bisa diaktifkan. Alasan: ' . $data['reason'])
-                                ->actions([
-                                    Action::make('perbaikiProduk')
-                                        ->label('Perbaiki Produk')
-                                        ->button()
-                                        ->url(ProductResource::getUrl('edit', ['record' => $record])),
-                                ])
-                                ->danger()
-                                ->sendToDatabase($owner);
-                        }
-
-                        Notification::make()
-                            ->title('Pengajuan aktivasi ditolak')
-                            ->success()
-                            ->send();
                     }),
             ])
 

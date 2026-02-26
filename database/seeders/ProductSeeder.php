@@ -18,6 +18,7 @@ class ProductSeeder extends Seeder
         $categories = Category::all();
         $existingLapaks = LapakProfile::all();
 
+        $this->command->info('Membuat 50 produk dan gambar terkait...');
         Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks) {
             // Tentukan kategori random
             $category = $categories->random();

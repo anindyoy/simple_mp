@@ -7,7 +7,7 @@
 @section('og_description', $meta['description'])
 @section('og_type', 'product')
 @section('og_image', $meta['image'] ?? asset('images/og-default.jpg'))
-1
+
 @section('title', $product->title . ' - Jual Beli Cimanglid')
 
 @section('content')
@@ -100,7 +100,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-gray-900 text-lg">
-                                <a href="{{ route('lapak.show', $product->lapak_id) }}"
+                                <a href="{{ route('lapak.show', $product->lapak) }}"
                                     class="font-semibold text-blue-500 hover:underline">
                                     {{ $product->lapak->name }}
                                 </a>

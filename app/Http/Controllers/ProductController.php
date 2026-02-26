@@ -19,6 +19,9 @@ class ProductController extends Controller
             'lapak',
             'images' => fn($q) => $q->where('is_primary', true),
         ])
+            ->whereHas('lapak', function ($lapakQuery) {
+                $lapakQuery->where('is_active', true);
+            })
             ->where('is_active', true)
             ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
             ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
@@ -47,6 +50,10 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load(['lapak', 'category', 'images']);
+
+        if (! $product->is_active || ! $product->lapak?->is_active) {
+            abort(404);
+        }
 
         $hasReported = false;
 

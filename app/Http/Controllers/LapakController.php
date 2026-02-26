@@ -9,6 +9,9 @@ class LapakController extends Controller
 {
     public function show(LapakProfile $lapak)
     {
+        if (! $lapak->is_active) {
+            abort(404);
+        }
         $hasReported = false;
 
         if (auth()->check()) {
@@ -20,9 +23,6 @@ class LapakController extends Controller
         $lapak->load([
             'products' => function ($query) {
                 $query->where('is_active', true)
-                    ->whereHas('lapak', function ($lapakQuery) {
-                        $lapakQuery->where('is_active', true);
-                    })
                     ->orderBy('pushed_at', 'desc');
             },
             'products.images',

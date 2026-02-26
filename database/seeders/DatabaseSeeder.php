@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         if (!User::whereIsAdmin(true)->exists()) {
+            $this->command->info('Membuat user admin default...');
             User::factory()->create([
                 'name' => 'Admin',
                 'email' => 'admin@lapak.com',
@@ -33,13 +34,21 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $categories = ['Makanan', 'Fashion', 'Elektronik', 'Otomotif', 'Jasa'];
-        foreach ($categories as $cat) {
-            Category::create(['category_name' => $cat]);
+        if (!Category::exists()) {
+            $this->command->info('Membuat kategori produk...');
+            $categories = ['Makanan', 'Fashion', 'Elektronik', 'Otomotif', 'Jasa'];
+            foreach ($categories as $cat) {
+                Category::create(['category_name' => $cat]);
+            }
         }
 
+        $this->command->info('Membuat lapak...');
         LapakProfile::factory()->count(10)->create();
+
+        $this->command->info('Membuat produk...');
         $this->call([ProductSeeder::class]);
+
+        $this->command->info('Membuat laporan...');
         Report::factory()->count(20)->create();
     }
 }

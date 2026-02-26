@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\LapakProfile;
 use Illuminate\Support\Str;
+use App\Models\LapakProfile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -47,13 +47,12 @@ class LapakProfileFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'name' => $this->faker->company() . " Shop",
+            'name' => $name = $this->faker->company() . " Shop",
+            'slug' => Str::slug($name) . '-' . Str::random(5),
             'profile_image' => 'lapak-profiles/' . $profileImage,
             'whatsapp_number' => '628' . $this->faker->numerify('##########'),
             'telegram_username' => $this->faker->userName(),
             'address_raw' => "Desa " . $this->faker->randomElement($lokasiCimanglid) . ", Ciapus, Bogor",
-            'latitude' => -6.650000, // Koordinat sekitar Ciapus/Cimanglid
-            'longitude' => 106.770000,
         ];
     }
 }

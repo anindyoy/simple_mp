@@ -1,8 +1,13 @@
-<div class="max-w-sm bg-white border border-gray-200 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col group hover:border-blue-400 transition-all duration-300">
-    <div class="relative overflow-hidden rounded-t-2xl">
-        {{-- Logika Gambar: Cek apakah URL eksternal atau lokal --}}
+<div class="relative group max-w-sm bg-white border border-gray-200 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col hover:border-blue-400 transition-all duration-300 cursor-pointer">
+
+    {{-- Overlay link untuk seluruh card --}}
+    <a href="{{ route('product.show', $product->slug) }}"
+       class="absolute inset-0 z-10"></a>
+
+    <div class="relative overflow-hidden rounded-t-2xl z-0">
         @php
-            $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+            $primaryImage = $product->images->first();
+            // dd($primaryImage);
             $imageUrl = $primaryImage
                 ? (Str::startsWith($primaryImage->image_url, ['http://', 'https://'])
                     ? $primaryImage->image_url
@@ -10,13 +15,10 @@
                 : 'https://flowbite.com/docs/images/products/apple-watch.png';
         @endphp
 
-        <a href="{{ route('product.show', $product->slug) }}">
-            <img class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                src="{{ $imageUrl }}"
-                alt="{{ $product->title }}" />
-        </a>
+        <img class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
+             src="{{ $imageUrl }}"
+             alt="{{ $product->title }}" />
 
-        {{-- Badge Sundul (Aktif jika di-push dalam 6 jam terakhir) --}}
         @if ($product->pushed_at->diffInHours(now()) < 6)
             <span class="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg">
                 SUNDUL
@@ -28,21 +30,18 @@
         </span>
     </div>
 
-    <div class="p-4 flex-grow flex flex-col">
-        <a href="{{ route('product.show', $product->slug) }}">
-            <h5 class="text-sm font-bold tracking-tight text-gray-900 dark:text-white line-clamp-2 mb-1 group-hover:text-blue-600 transition-colors">
-                {{ $product->title }}
-            </h5>
-        </a>
+    <div class="p-4 flex-grow flex flex-col relative z-0">
+        <h5 class="text-sm font-bold tracking-tight text-gray-900 dark:text-white line-clamp-2 mb-1 group-hover:text-blue-600 transition-colors">
+            {{ $product->title }}
+        </h5>
 
         <p class="text-lg font-black text-blue-700 dark:text-blue-400 mb-1">
             Rp {{ number_format($product->price, 0, ',', '.') }}
         </p>
 
         @if ($product->hasCondition())
-            <span
-                class="inline-block mb-1 text-[10px] font-bold px-2 py-0.5 rounded-full
-        {{ $product->condition === 'baru' ? 'text-green-700' : 'text-yellow-700' }}">
+            <span class="inline-block mb-1 text-[10px] font-bold px-2 py-0.5 rounded-full
+                {{ $product->condition === 'baru' ? 'text-green-700' : 'text-yellow-700' }}">
                 Kondisi {{ $product->conditionLabel() }}
             </span>
         @endif
@@ -50,21 +49,20 @@
         @if ($showLapakName ?? false)
             <div class="flex items-center gap-1 text-sm text-gray-500 font-semibold">
                 <x-heroicon-o-building-storefront class="w-3 h-3 text-gray-400" />
-                <span>{{ $product->lapak->name }}</span>
+
+                {{-- Link lapak harus lebih tinggi dari overlay --}}
+                <a href="{{ route('lapak.show', $product->lapak) }}"
+                   class="relative z-20 hover:underline text-blue-600">
+                    {{ $product->lapak->name }}
+                </a>
             </div>
         @endif
 
         <div class="mt-auto pt-3 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-[10px] text-gray-400">
-            <div class="flex items-center gap-1">
-                <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+            <div>
                 {{ $product->pushed_at->diffForHumans() }}
             </div>
-            <div class="flex items-center gap-1 font-semibold text-gray-600">
-                <svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                </svg>
+            <div class="font-semibold text-gray-600">
                 {{ Str::limit($product->lapak->address_raw, 12) }}
             </div>
         </div>

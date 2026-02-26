@@ -17,6 +17,38 @@ class LapakProfile extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::creating(function ($lapak) {
+            dd('creating triggered');
+            $lapak->slug = static::generateUniqueSlug($lapak->name);
+        });
+
+        static::updating(function ($lapak) {
+            if ($lapak->isDirty('name')) {
+                $lapak->slug = static::generateUniqueSlug($lapak->name);
+            }
+        });
+    }
+
+    protected static function generateUniqueSlug($name)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count++;
+        }
+
+        return $slug;
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

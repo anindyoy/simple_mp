@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Report;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Database\Seeders\ProductSeeder;
 use Illuminate\Support\Facades\Storage;
 
 class CekQueryCommand extends Command
@@ -28,6 +29,8 @@ class CekQueryCommand extends Command
      */
     public function handle()
     {
-        Report::factory()->count(20)->create();
+        // Report::factory()->count(20)->create();
+        // $this->call(new ProductSeeder(6));
+        $this->call(new ProductSeeder(3, 'updatePushed'));
     }
 }

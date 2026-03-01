@@ -99,7 +99,7 @@ class ProductsTable
                     }),
 
                 TextColumn::make('pushed_at')
-                    ->label('Disundul')
+                    ->label('Diangkat')
                     ->since()
                     ->sortable(),
 
@@ -211,7 +211,7 @@ class ProductsTable
                     }),
 
                 Filter::make('pushed_at')
-                    ->label('Tanggal Sundul')
+                    ->label('Waktu Diangkat')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('from')
                             ->label('Dari tanggal'),
@@ -233,7 +233,7 @@ class ProductsTable
 
             ->recordActions([
                 Action::make('push')
-                    ->label('Push')
+                    ->label('Angkat')
                     ->icon('heroicon-o-arrow-up')
                     ->color('warning')
 

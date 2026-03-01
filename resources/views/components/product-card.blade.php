@@ -1,13 +1,13 @@
-<div class="relative group max-w-sm bg-white border border-gray-200 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col hover:border-blue-400 transition-all duration-300 cursor-pointer">
+<div
+    class="relative group max-w-sm bg-white border border-gray-200 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col hover:border-blue-400 transition-all duration-300 cursor-pointer">
 
     {{-- Overlay link untuk seluruh card --}}
     <a href="{{ route('product.show', $product->slug) }}"
-       class="absolute inset-0 z-10"></a>
+        class="absolute inset-0 z-10"></a>
 
     <div class="relative overflow-hidden rounded-t-2xl z-0">
         @php
             $primaryImage = $product->images->first();
-            // dd($primaryImage);
             $imageUrl = $primaryImage
                 ? (Str::startsWith($primaryImage->image_url, ['http://', 'https://'])
                     ? $primaryImage->image_url
@@ -16,12 +16,21 @@
         @endphp
 
         <img class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
-             src="{{ $imageUrl }}"
-             alt="{{ $product->title }}" />
+            src="{{ $imageUrl }}"
+            alt="{{ $product->title }}" />
 
-        @if ($product->pushed_at->diffInHours(now()) < 6)
+        @php
+            $isNew = $product->created_at->diffInHours(now()) < 8;
+            $isLifted = $product->pushed_at->diffInHours(now()) < 8;
+        @endphp
+
+        @if ($isNew)
+            <span class="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg">
+                BARU
+            </span>
+        @elseif ($isLifted)
             <span class="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg">
-                SUNDUL
+                BARU DIANGKAT
             </span>
         @endif
 
@@ -52,7 +61,7 @@
 
                 {{-- Link lapak harus lebih tinggi dari overlay --}}
                 <a href="{{ route('lapak.show', $product->lapak) }}"
-                   class="relative z-20 hover:underline text-blue-600">
+                    class="relative z-20 hover:underline text-blue-600">
                     {{ $product->lapak->name }}
                 </a>
             </div>
@@ -60,10 +69,17 @@
 
         <div class="mt-auto pt-3 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-[10px] text-gray-400">
             <div>
-                {{ $product->pushed_at->diffForHumans() }}
+                @if ($product->pushed_at?->equalTo($product->created_at))
+                    <span class="text-gray-500">Dibuat</span>
+                @else
+                    <span class="text-emerald-600 font-medium">Diangkat</span>
+                @endif
+
+                {{ $product->pushed_at?->diffForHumans() }}
             </div>
+
             <div class="font-semibold text-gray-600">
-                {{ Str::limit($product->lapak->address_raw, 12) }}
+                {{ \Illuminate\Support\Str::limit($product->lapak->address_raw, 12) }}
             </div>
         </div>
     </div>

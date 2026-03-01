@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 class PublicAuthController extends Controller
 {
@@ -45,8 +46,26 @@ class PublicAuthController extends Controller
             'name'                  => ['required', 'string', 'max:255'],
             'email'                 => ['required', 'email', 'unique:users,email'],
             'password'              => ['required', 'min:6', 'confirmed'],
+            'cf-turnstile-response' => ['required'],
         ]);
 
+        // 🔐 Verifikasi Turnstile ke Cloudflare
+        $verify = Http::asForm()->post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            [
+                'secret'   => config('services.turnstile.secret_key'),
+                'response' => $data['cf-turnstile-response'],
+                'remoteip' => $request->ip(),
+            ]
+        );
+
+        if (! $verify->json('success')) {
+            return back()
+                ->withErrors(['captcha' => 'Verifikasi captcha gagal.'])
+                ->withInput();
+        }
+
+        // ✅ Lanjut jika captcha valid
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],

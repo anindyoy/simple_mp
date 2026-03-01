@@ -36,6 +36,14 @@
 
             @unless ($isLogin)
                 <x-input label="Konfirmasi Password" name="password_confirmation" type="password" autocomplete="new-password" />
+                <div class="mt-4 flex justify-center">
+                    <div id="turnstile-register"></div>
+                </div>
+                @error('captcha')
+                    <div class="text-sm text-red-500 mt-2">
+                        {{ $message }}
+                    </div>
+                @enderror
             @endunless
 
             <button class="w-full bg-blue-600 text-white py-2 rounded-lg">

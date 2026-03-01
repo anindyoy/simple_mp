@@ -34,6 +34,27 @@
     @include('partials.footer')
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+    <script>
+        let turnstileWidgetId = null;
+
+        function renderTurnstile() {
+            if (turnstileWidgetId !== null) return;
+
+            turnstileWidgetId = turnstile.render('#turnstile-register', {
+                sitekey: '{{ config('services.turnstile.site_key') }}',
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('[data-modal-target="registerModal"]')) {
+                setTimeout(() => {
+                    renderTurnstile();
+                }, 300);
+            }
+        });
+    </script>
 </body>
 
 </html>

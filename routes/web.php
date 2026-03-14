@@ -9,9 +9,16 @@ use App\Http\Controllers\Auth\PublicAuthController;
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/lapak/{lapak}', [LapakController::class, 'show'])->name('lapak.show');
+Route::get('/email/verify', [PublicAuthController::class, 'showVerificationNotice'])->name('verification.notice');
 
 Route::post('/login', [PublicAuthController::class, 'login'])->name('login.public');
 Route::post('/logout', [PublicAuthController::class, 'logout'])->name('logout.public');
 Route::post('/register', [PublicAuthController::class, 'register'])->name('register.public');
+Route::post('/email/verification-notification', [PublicAuthController::class, 'resendVerificationEmail'])
+    ->middleware('throttle:6,1')
+    ->name('verification.send');
+Route::get('/email/verify/{user}/{hash}', [PublicAuthController::class, 'verifyEmail'])
+	->middleware(['signed', 'throttle:6,1'])
+	->name('verification.verify');
 
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');

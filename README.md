@@ -21,6 +21,22 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Verifikasi Email
+
+Project ini mewajibkan verifikasi email sebelum user bisa login ke area member.
+
+Alur yang digunakan:
+- Setelah register berhasil, user diarahkan ke halaman konfirmasi verifikasi email.
+- Sistem mengirim link verifikasi ke email user.
+- User harus klik link verifikasi sebelum bisa login.
+- Jika email belum masuk, user bisa kirim ulang dari halaman verifikasi.
+
+Konfigurasi yang perlu diperhatikan:
+- Pastikan `APP_URL` sesuai domain aplikasi agar link verifikasi valid.
+- Untuk development cepat, `MAIL_MAILER=log` akan menulis email ke log Laravel.
+- Untuk pengiriman email nyata, gunakan SMTP melalui variabel `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, dan `MAIL_FROM_ADDRESS`.
+- Contoh konfigurasi SMTP sudah disediakan di `.env.example`.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.

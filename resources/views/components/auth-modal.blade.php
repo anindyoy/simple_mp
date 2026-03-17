@@ -28,20 +28,6 @@
                 class="space-y-4">
                 @csrf
 
-                @if ($isLogin && $unverifiedEmail)
-                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
-                        <p>Akun ini belum terverifikasi. Silakan cek email Anda terlebih dahulu sebelum login.</p>
-                        <form method="POST" action="{{ route('verification.send') }}">
-                            @csrf
-                            <input type="hidden" name="email" value="{{ $unverifiedEmail }}">
-
-                            <button type="submit" class="underline text-amber-800">
-                                Kirim ulang email verifikasi
-                            </button>
-                        </form>
-                    </div>
-                @endif
-
                 @unless ($isLogin)
                     <x-input label="Nama Lengkap" name="name" autocomplete="name" />
                 @endunless

@@ -42,6 +42,9 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        $this->command->info('Membuat user non admin...');
+        User::factory(10)->create();
+
         $this->command->info('Membuat lapak...');
         LapakProfile::factory()->count(10)->create();
 

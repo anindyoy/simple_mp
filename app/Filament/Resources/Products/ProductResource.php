@@ -19,8 +19,8 @@ use App\Filament\Resources\Products\Tables\ProductsTable;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    protected static ?string $navigationLabel = 'Produk';
-    protected static ?string $title = 'Produk';
+    // protected static ?string $navigationLabel = 'Produk';
+    protected static ?string $modelLabel = 'Produk';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

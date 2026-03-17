@@ -81,8 +81,8 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
                 ->visible(
                     fn() =>
                     $this->lapak
-                    && $this->lapak->exists
-                    && ! $this->lapak->is_active
+                        && $this->lapak->exists
+                        && ! $this->lapak->is_active
                 )
                 ->disabled(
                     fn() =>
@@ -156,7 +156,15 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
                     TextInput::make('name')
                         ->label('Nama Lapak')
                         ->required()
-                        ->maxLength(100),
+                        ->maxLength(100)
+                        ->helperText(function () {
+                            if($this->lapak && $this->lapak->exists) {
+                                return '';
+                            }
+
+                            $suggestions = $this->getLapakNameSuggestions();
+                            return 'Contoh: ' . implode(', ', $suggestions);
+                        }),
 
                     Textarea::make('address_raw')
                         ->label('Alamat')
@@ -207,5 +215,23 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
             ->title($message)
             ->success()
             ->send();
+    }
+
+    protected function getFirstName(): string
+    {
+        return explode(' ', auth()->user()->name)[0];
+    }
+
+    protected function getLapakNameSuggestions(): array
+    {
+        $name = $this->getFirstName();
+
+        return [
+            "Toko {$name}",
+            "Lapak {$name}",
+            "Warung {$name}",
+            "{$name} Store",
+            "{$name} Mart",
+        ];
     }
 }

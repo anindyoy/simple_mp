@@ -17,8 +17,7 @@ Route::post('/register', [PublicAuthController::class, 'register'])->name('regis
 Route::post('/email/verification-notification', [PublicAuthController::class, 'resendVerificationEmail'])
     ->middleware('throttle:6,1')
     ->name('verification.send');
-Route::get('/email/verify/{user}/{hash}', [PublicAuthController::class, 'verifyEmail'])
-	->middleware(['signed', 'throttle:6,1'])
-	->name('verification.verify');
-
+Route::get('/email/verify/{id}/{hash}', [PublicAuthController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');

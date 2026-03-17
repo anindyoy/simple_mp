@@ -37,24 +37,21 @@ class PublicAuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            if (! $request->user()->hasVerifiedEmail()) {
+            $user = $request->user();
+
+            if (! $user->hasVerifiedEmail()) {
                 Auth::logout();
 
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-
                 return back()->withErrors([
-                    'email' => 'Akun belum terverifikasi. Silakan cek email Anda dan lakukan verifikasi sebelum login.',
-                    'password' => 'Akun belum terverifikasi. Silakan cek email Anda dan lakukan verifikasi sebelum login.',
+                    'email' => 'Akun belum terverifikasi. Silakan cek email Anda.',
                 ])->with([
                     'open_auth_modal' => 'login',
-                    'unverified_email' => $request->input('email'),
+                    'unverified_email' => $user->email,
                 ])->withInput($request->only('email'));
             }
 
             $request->session()->regenerate();
 
-            // Redirect ke member area (Filament)
             return redirect('/admin');
         }
 
@@ -80,7 +77,9 @@ class PublicAuthController extends Controller
             'name'                  => ['required', 'string', 'max:255'],
             'email'                 => ['required', 'email:rfc,dns', 'regex:/^[^@\s]+@[^@\s]+\.[^@\s]+$/', 'unique:users,email'],
             'password'              => ['required', 'min:8', 'confirmed'],
-            'cf-turnstile-response' => ['required'],
+            'cf-turnstile-response' => [
+                app()->environment('local') ? 'nullable' : 'required'
+            ],
         ], [
             'name.required'                  => 'Nama lengkap wajib diisi.',
             'name.string'                    => 'Nama lengkap harus berupa teks.',
@@ -95,20 +94,22 @@ class PublicAuthController extends Controller
             'cf-turnstile-response.required' => 'Captcha wajib diisi.',
         ]);
 
-        // 🔐 Verifikasi Turnstile ke Cloudflare
-        $verify = Http::asForm()->post(
-            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-            [
-                'secret'   => config('services.turnstile.secret_key'),
-                'response' => $data['cf-turnstile-response'],
-                'remoteip' => $request->ip(),
-            ]
-        );
+        if (! app()->environment('local')) {
+            // 🔐 Verifikasi Turnstile ke Cloudflare
+            $verify = Http::asForm()->post(
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                [
+                    'secret'   => config('services.turnstile.secret_key'),
+                    'response' => $data['cf-turnstile-response'],
+                    'remoteip' => $request->ip(),
+                ]
+            );
 
-        if (! $verify->json('success')) {
-            return back()
-                ->withErrors(['captcha' => 'Verifikasi captcha gagal.'])
-                ->withInput();
+            if (! $verify->json('success')) {
+                return back()
+                    ->withErrors(['cf-turnstile-response' => 'Verifikasi captcha gagal.'])
+                    ->withInput();
+            }
         }
 
         // ✅ Lanjut jika captcha valid
@@ -120,8 +121,8 @@ class PublicAuthController extends Controller
 
         event(new Registered($user));
 
-        return redirect()->route('verification.notice', ['email' => $user->email])
-            ->with('success', 'Pendaftaran berhasil. Kami telah mengirim email verifikasi ke alamat email Anda.');
+        return redirect('/')
+            ->with('success', 'Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun sebelum login.');
     }
 
     public function resendVerificationEmail(Request $request)
@@ -151,8 +152,9 @@ class PublicAuthController extends Controller
         return back()->with('success', 'Email verifikasi berhasil dikirim ulang. Silakan cek inbox atau folder spam Anda.');
     }
 
-    public function verifyEmail(Request $request, User $user)
+    public function verifyEmail(Request $request, $id)
     {
+        $user = User::findOrFail($id);
         if (! hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
             abort(403);
         }

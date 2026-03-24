@@ -1,10 +1,16 @@
 <nav class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
 
-        {{-- Brand --}}
-        <a href="/" class="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
-            Jual Beli <span class="text-orange-500">Cimanglid</span>
-        </a>
+        <div class="flex items-center gap-6">
+            {{-- Brand --}}
+            <a href="/" class="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
+                Jual Beli <span class="text-orange-500">Cimanglid</span>
+            </a>
+
+            <a href="{{ route('rules.index') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
+                Peraturan
+            </a>
+        </div>
 
         {{-- Actions --}}
         <div class="flex items-center gap-2">

@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LapakController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserRulesController;
 use App\Http\Controllers\Auth\PublicAuthController;
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
+Route::get('/peraturan-pengguna', [UserRulesController::class, 'index'])->name('rules.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/lapak/{lapak}', [LapakController::class, 'show'])->name('lapak.show');
 Route::get('/email/verify', [PublicAuthController::class, 'showVerificationNotice'])->name('verification.notice');

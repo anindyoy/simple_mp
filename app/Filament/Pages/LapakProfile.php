@@ -25,11 +25,17 @@ class LapakProfile extends Page implements HasForms
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationLabel = 'Lapak Saya';
-    protected static ?string $title = 'Edit Lapak Profile';
     protected string $view = 'filament.pages.lapak-profile';
 
     public ?ModelLapakProfile $lapak = null;
     public ?array $data = [];
+
+    public function getTitle(): string
+    {
+        return (is_null($this->lapak) || !$this->lapak->exists)
+            ? 'Buat Lapak Profile'
+            : 'Edit Lapak Profile';
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -48,14 +54,21 @@ class LapakProfile extends Page implements HasForms
     {
         $user = Auth::user();
 
-        $this->lapak = ModelLapakProfile::where('user_id', $user->id)->firstOrFail();
+        // Cek apakah user sudah memiliki lapak
+        $this->lapak = ModelLapakProfile::where('user_id', $user->id)->first();
 
-        abort_unless(
-            $user->can('update', $this->lapak),
-            403
-        );
+        // Jika belum ada, buat instance baru untuk create form
+        if (!$this->lapak) {
+            $this->lapak = new ModelLapakProfile(['user_id' => $user->id]);
+        } else {
+            // Jika ada, check permission untuk update
+            abort_unless(
+                $user->can('update', $this->lapak),
+                403
+            );
 
-        $this->form->fill($this->lapak->attributesToArray());
+            $this->form->fill($this->lapak->attributesToArray());
+        }
     }
 
     protected function getHeaderActions(): array
@@ -67,7 +80,9 @@ class LapakProfile extends Page implements HasForms
                 ->color('warning')
                 ->visible(
                     fn() =>
-                    ! $this->lapak->is_active
+                    $this->lapak
+                        && $this->lapak->exists
+                        && ! $this->lapak->is_active
                 )
                 ->disabled(
                     fn() =>
@@ -112,6 +127,7 @@ class LapakProfile extends Page implements HasForms
                     ->visible(
                         fn() =>
                         $this->lapak
+                            && $this->lapak->exists
                             && ! $this->lapak->is_active
                             && $this->lapak->latestDeactivation()
                     )
@@ -140,7 +156,15 @@ class LapakProfile extends Page implements HasForms
                     TextInput::make('name')
                         ->label('Nama Lapak')
                         ->required()
-                        ->maxLength(100),
+                        ->maxLength(100)
+                        ->helperText(function () {
+                            if($this->lapak && $this->lapak->exists) {
+                                return '';
+                            }
+
+                            $suggestions = $this->getLapakNameSuggestions();
+                            return 'Contoh: ' . implode(', ', $suggestions);
+                        }),
 
                     Textarea::make('address_raw')
                         ->label('Alamat')
@@ -187,16 +211,45 @@ class LapakProfile extends Page implements HasForms
 
     public function save(): void
     {
-        abort_unless(
-            auth()->user()->can('update', $this->lapak),
-            403
-        );
+        $user = auth()->user();
 
-        $this->lapak->update($this->form->getState());
+        // Jika lapak sudah ada, cek permission untuk update
+        if ($this->lapak->exists) {
+            abort_unless(
+                $user->can('update', $this->lapak),
+                403
+            );
+
+            $this->lapak->update($this->form->getState());
+            $message = 'Lapak berhasil diperbarui';
+        } else {
+            // Jika lapak belum ada, create baru
+            $this->lapak->fill($this->form->getState());
+            $this->lapak->save();
+            $message = 'Lapak berhasil dibuat';
+        }
 
         Notification::make()
-            ->title('Lapak berhasil diperbarui')
+            ->title($message)
             ->success()
             ->send();
+    }
+
+    protected function getFirstName(): string
+    {
+        return explode(' ', auth()->user()->name)[0];
+    }
+
+    protected function getLapakNameSuggestions(): array
+    {
+        $name = $this->getFirstName();
+
+        return [
+            "Toko {$name}",
+            "Lapak {$name}",
+            "Warung {$name}",
+            "{$name} Store",
+            "{$name} Mart",
+        ];
     }
 }

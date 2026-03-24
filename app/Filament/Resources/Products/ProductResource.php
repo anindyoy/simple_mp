@@ -19,6 +19,8 @@ use App\Filament\Resources\Products\Tables\ProductsTable;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+    // protected static ?string $navigationLabel = 'Produk';
+    protected static ?string $modelLabel = 'Produk';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
@@ -61,13 +63,6 @@ class ProductResource extends Resource
         }
 
         return $query->whereHas('lapak', fn(Builder $lapakQuery) => $lapakQuery->where('user_id', $user->id));
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

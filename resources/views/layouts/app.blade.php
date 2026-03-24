@@ -10,7 +10,6 @@
     @include('partials.meta')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css">
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -33,7 +32,6 @@
 
     @include('partials.footer')
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
     <script>

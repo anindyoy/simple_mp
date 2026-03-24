@@ -245,8 +245,8 @@ class ProductsTable
                     ->action(function ($record) {
                         if (! ProductPolicy::canPush()) {
                             Notification::make()
-                                ->title('Belum bisa push')
-                                ->body('Kamu hanya bisa push produk setiap 6 jam.')
+                                ->title('Belum bisa angkat')
+                                ->body(ProductPolicy::blockedPushMessage())
                                 ->danger()
                                 ->send();
 
@@ -258,7 +258,7 @@ class ProductsTable
                         ]);
 
                         Notification::make()
-                            ->title('Produk berhasil dipush')
+                            ->title('Produk berhasil diangkat')
                             ->success()
                             ->send();
                     }),

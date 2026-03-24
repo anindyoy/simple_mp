@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use Filament\Panel;
 use App\Models\User;
+use App\Filament\Widgets\PushCountdownWidget;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
@@ -52,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                PushCountdownWidget::class,
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ]);

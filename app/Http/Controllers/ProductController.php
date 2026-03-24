@@ -63,9 +63,22 @@ class ProductController extends Controller
                 ->exists();
         }
 
+        $otherProductsInLapak = Product::with([
+            'lapak',
+            'category',
+            'images' => fn($q) => $q->where('is_primary', true),
+        ])
+            ->where('lapak_id', $product->lapak_id)
+            ->where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->orderBy('pushed_at', 'desc')
+            ->limit(8)
+            ->get();
+
         return view('product-detail', [
             'product' => $product,
             'hasReported' => $hasReported,
+            'otherProductsInLapak' => $otherProductsInLapak,
             'meta' => [
                 'title' => $product->title . ' | Jual Beli Cimanglid',
                 'description' => str()->limit(strip_tags($product->description), 155),

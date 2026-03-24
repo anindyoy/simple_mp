@@ -174,5 +174,28 @@
                 </div>
             </div>
         </div>
+
+        <section class="mt-12">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Produk Lainnya di Lapak Ini</h2>
+                <a href="{{ route('lapak.show', $product->lapak) }}" class="text-sm font-semibold text-blue-600 hover:underline">
+                    Lihat Semua
+                </a>
+            </div>
+
+            @if ($otherProductsInLapak->isNotEmpty())
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    @foreach ($otherProductsInLapak as $otherProduct)
+                        @include('components.product-card', [
+                            'product' => $otherProduct,
+                        ])
+                    @endforeach
+                </div>
+            @else
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
+                    Belum ada produk lain di lapak ini.
+                </div>
+            @endif
+        </section>
     </div>
 @endsection

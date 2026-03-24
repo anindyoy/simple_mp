@@ -17,6 +17,10 @@ class LapakProfile extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'external_links' => 'array',
+    ];
+
     protected static function booted()
     {
         static::creating(function ($lapak) {

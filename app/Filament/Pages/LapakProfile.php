@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use BackedEnum;
-use Filament\Forms;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
@@ -12,6 +11,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\FileUpload;
@@ -19,9 +19,9 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Concerns\InteractsWithForms;
 use App\Models\LapakProfile as ModelLapakProfile;
 
-class LapakProfile extends Page implements Forms\Contracts\HasForms
+class LapakProfile extends Page implements HasForms
 {
-    use Forms\Concerns\InteractsWithForms;
+    use InteractsWithForms;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationLabel = 'Lapak Saya';
@@ -153,6 +153,24 @@ class LapakProfile extends Page implements Forms\Contracts\HasForms
                     TextInput::make('telegram_username')
                         ->label('Username Telegram')
                         ->prefix('@'),
+
+                    Repeater::make('external_links')
+                        ->label('Link External Toko')
+                        ->schema([
+                            TextInput::make('label')
+                                ->label('Label')
+                                ->required()
+                                ->maxLength(100),
+                            TextInput::make('link')
+                                ->label('Link')
+                                ->required()
+                                ->url()
+                                ->maxLength(2048),
+                        ])
+                        ->columns(2)
+                        ->default([])
+                        ->reorderable(false)
+                        ->addActionLabel('Tambah Link'),
 
                     FileUpload::make('profile_image')
                         ->label('Foto Lapak')

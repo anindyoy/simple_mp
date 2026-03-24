@@ -59,6 +59,19 @@
                         Telegram
                     </a>
                 @endif
+
+                @if (! empty($externalLinks))
+                    @foreach ($externalLinks as $externalLink)
+                        <a href="{{ $externalLink['link'] }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex justify-center items-center gap-2 px-6 py-3
+                          text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200
+                          font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                            {{ $externalLink['label'] }}
+                        </a>
+                    @endforeach
+                @endif
             </div>
 
             <div class="mt-4">

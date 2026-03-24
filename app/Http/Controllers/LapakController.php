@@ -12,6 +12,23 @@ class LapakController extends Controller
         if (! $lapak->is_active) {
             abort(404);
         }
+
+        $externalLinks = collect($lapak->external_links ?? [])
+            ->filter(function ($item) {
+                return is_array($item)
+                    && filled($item['label'] ?? null)
+                    && filled($item['link'] ?? null)
+                    && filter_var($item['link'], FILTER_VALIDATE_URL);
+            })
+            ->map(function (array $item): array {
+                return [
+                    'label' => trim($item['label']),
+                    'link' => $item['link'],
+                ];
+            })
+            ->values()
+            ->all();
+
         $hasReported = false;
 
         if (auth()->check()) {
@@ -31,6 +48,7 @@ class LapakController extends Controller
 
         return view('lapak.show', [
             'lapak' => $lapak,
+            'externalLinks' => $externalLinks,
             'hasReported' => $hasReported,
             'meta' => [
                 'title' => $lapak->name . ' | Lapak Cimanglid',

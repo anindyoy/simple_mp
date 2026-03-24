@@ -12,7 +12,7 @@
                 ? (Str::startsWith($primaryImage->image_url, ['http://', 'https://'])
                     ? $primaryImage->image_url
                     : asset('storage/' . $primaryImage->image_url))
-                : 'https://flowbite.com/docs/images/products/apple-watch.png';
+                : asset('img/default-lapak-image.png');
         @endphp
 
         <img class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -20,7 +20,7 @@
             alt="{{ $product->title }}" />
 
         @php
-            $isNew = $product->created_at->diffInHours(now()) < 8;
+            $isNew = $product->created_at->diffInHours(now()) < 24;
             $isLifted = $product->pushed_at->diffInHours(now()) < 8;
         @endphp
 
@@ -45,7 +45,7 @@
         </h5>
 
         <p class="text-lg font-black text-blue-700 dark:text-blue-400 mb-1">
-            Rp {{ number_format($product->price, 0, ',', '.') }}
+            Rp {{ number_format($product->price) }}
         </p>
 
         @if ($product->hasCondition())

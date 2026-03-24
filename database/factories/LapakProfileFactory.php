@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Support\Str;
-use App\Models\LapakProfile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,6 +20,23 @@ class LapakProfileFactory extends Factory
     public function definition(): array
     {
         $lokasiCimanglid = ['Gg. Purnama', 'Sukamantri', 'Jl. Puspa', 'Tamansari', 'Pasir Eurih', 'Kavling Cimanglid'];
+        $externalLinkTemplates = [
+            ['label' => 'Tokopedia', 'link' => 'https://www.tokopedia.com/' . Str::slug($this->faker->userName())],
+            ['label' => 'Shopee', 'link' => 'https://shopee.co.id/' . Str::slug($this->faker->userName())],
+            ['label' => 'Instagram', 'link' => 'https://instagram.com/' . Str::slug($this->faker->userName())],
+            ['label' => 'Website Toko', 'link' => $this->faker->url()],
+        ];
+
+        $externalLinks = collect($this->faker->randomElements(
+            $externalLinkTemplates,
+            $this->faker->numberBetween(1, 3)
+        ))
+            ->map(fn(array $item): array => [
+                'label' => $item['label'],
+                'link' => $item['link'],
+            ])
+            ->values()
+            ->all();
 
         Storage::disk('public')->makeDirectory('lapak-profiles');
         $profileImage = $this->faker->image(
@@ -52,6 +68,7 @@ class LapakProfileFactory extends Factory
             'profile_image' => 'lapak-profiles/' . $profileImage,
             'whatsapp_number' => '628' . $this->faker->numerify('##########'),
             'telegram_username' => $this->faker->userName(),
+            'external_links' => $externalLinks,
             'address_raw' => "Desa " . $this->faker->randomElement($lokasiCimanglid) . ", Ciapus, Bogor",
         ];
     }

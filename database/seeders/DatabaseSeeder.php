@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\Setting;
 use App\Models\Category;
 use App\Models\LapakProfile;
+use App\Models\TokenPurchase;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -61,6 +62,21 @@ class DatabaseSeeder extends Seeder
             ['value' => '10']
         );
 
+        Setting::updateOrCreate(
+            ['key' => 'token_price'],
+            ['value' => '2000']
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'min_tokens_for_normal_price'],
+            ['value' => '5']
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'token_purchase_whatsapp'],
+            ['value' => '62812345678']
+        );
+
         $this->command->info('Membuat user non admin...');
         User::factory(10)->create();
 
@@ -72,5 +88,27 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Membuat laporan...');
         Report::factory()->count(20)->create();
+
+        $this->command->info('Membuat riwayat pembelian token...');
+        TokenPurchase::factory()->count(30)->create();
+
+        $this->command->info('Membuat pembelian token yang dikonfirmasi...');
+        $this->createConfirmedTokenPurchases();
+    }
+
+    /**
+     * Create confirmed token purchases and add tokens to users
+     */
+    private function createConfirmedTokenPurchases(): void
+    {
+        User::all()->each(function (User $user) {
+            TokenPurchase::factory()
+                ->count(2)
+                ->confirmed()
+                ->create(['user_id' => $user->id])
+                ->each(function (TokenPurchase $purchase) {
+                    $purchase->user->addTokens($purchase->quantity);
+                });
+        });
     }
 }

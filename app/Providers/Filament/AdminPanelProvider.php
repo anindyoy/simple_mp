@@ -4,7 +4,6 @@ namespace App\Providers\Filament;
 
 use Filament\Panel;
 use App\Models\User;
-use App\Filament\Widgets\PushCountdownWidget;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
@@ -13,6 +12,7 @@ use Filament\Widgets\AccountWidget;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
+use App\Filament\Widgets\PushCountdownWidget;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use App\Http\Middleware\EnsureLapakProfileExists;

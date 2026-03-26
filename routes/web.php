@@ -5,6 +5,7 @@ use App\Http\Controllers\LapakController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserRulesController;
+use App\Http\Controllers\UserTokenController;
 use App\Http\Controllers\Auth\PublicAuthController;
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
@@ -23,3 +24,17 @@ Route::get('/email/verify/{id}/{hash}', [PublicAuthController::class, 'verifyEma
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');
+
+// Token purchase routes (requires authentication)
+Route::middleware('auth')->group(function () {
+    Route::controller(UserTokenController::class)->group(function () {
+        // Token purchase
+        Route::get('/tokens/purchase', 'showPurchase')->name('tokens.purchase');
+        Route::post('/tokens/purchase', 'storePurchase')->name('tokens.store-purchase');
+        Route::get('/tokens/purchase/{tokenPurchase}', 'showPurchaseDetails')->name('tokens.show-purchase');
+        Route::post('/tokens/purchase/{tokenPurchase}/proof', 'uploadProof')->name('tokens.upload-proof');
+
+        // History
+        Route::get('/tokens/history', 'history')->name('tokens.history');
+    });
+});

@@ -52,6 +52,44 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasOne(LapakProfile::class);
     }
 
+    /**
+     * Get all token purchases for this user
+     */
+    public function tokenPurchases()
+    {
+        return $this->hasMany(TokenPurchase::class);
+    }
+
+    /**
+     * Get confirmed token purchases history
+     */
+    public function confirmedTokenPurchases()
+    {
+        return $this->tokenPurchases()
+            ->where('status', 'confirmed')
+            ->orderBy('confirmed_at', 'desc');
+    }
+
+    /**
+     * Add tokens to user balance
+     */
+    public function addTokens(int $quantity): void
+    {
+        $this->increment('push_tokens', $quantity);
+    }
+
+    /**
+     * Deduct tokens from user balance
+     */
+    public function deductTokens(int $quantity): bool
+    {
+        if ($this->push_tokens >= $quantity) {
+            $this->decrement('push_tokens', $quantity);
+            return true;
+        }
+        return false;
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->hasVerifiedEmail();

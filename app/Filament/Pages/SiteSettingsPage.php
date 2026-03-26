@@ -14,6 +14,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Components\Repeater;
 
 class SiteSettingsPage extends Page implements HasForms
 {
@@ -56,6 +57,10 @@ class SiteSettingsPage extends Page implements HasForms
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
             'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
             'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
+            'token_price' => Setting::getIntValue('token_price', 2000),
+            'min_tokens_for_normal_price' => Setting::getIntValue('min_tokens_for_normal_price', 5),
+            'token_purchase_whatsapp' => Setting::getValue('token_purchase_whatsapp', ''),
+            'token_bank_accounts' => $this->getBankAccounts(),
             'rules_content' => Setting::getValue('user_rules_content', ''),
             'external_link_labels' => implode("\n", $this->getExternalLinkLabels()),
         ]);
@@ -123,10 +128,68 @@ class SiteSettingsPage extends Page implements HasForms
                             ->helperText('Nilai token angkat produk awal saat user mendaftar.'),
                     ]),
 
+                Section::make('Konfigurasi Pembelian Token')
+                    ->collapsible()
+                    ->collapsed()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('token_price')
+                            ->label('Harga Per Token')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(2000)
+                            ->suffix('IDR')
+                            ->helperText('Harga standar per token dalam Rupiah.'),
+
+                        TextInput::make('min_tokens_for_normal_price')
+                            ->label('Minimum Token untuk Harga Normal')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(5)
+                            ->helperText('Minimum pembelian token untuk mendapat harga normal (tanpa diskon).'),
+
+                        TextInput::make('token_purchase_whatsapp')
+                            ->label('Nomor WhatsApp Konfirmasi')
+                            ->required()
+                            ->tel()
+                            ->placeholder('+62812345678')
+                            ->helperText('Nomor WhatsApp untuk konfirmasi pembayaran pembelian token.')
+                            ->columnSpanFull(),
+
+                        Repeater::make('token_bank_accounts')
+                            ->label('Rekening Bank Tujuan')
+                            ->helperText('Daftar rekening bank untuk menerima pembayaran pembelian token.')
+                            ->schema([
+                                TextInput::make('bank_name')
+                                    ->label('Nama Bank')
+                                    ->required()
+                                    ->placeholder('BCA, Mandiri, BNI, dsb')
+                                    ->maxLength(100),
+
+                                TextInput::make('account_number')
+                                    ->label('Nomor Rekening')
+                                    ->required()
+                                    ->maxLength(50),
+
+                                TextInput::make('account_holder')
+                                    ->label('Nama Pemilik Rekening')
+                                    ->required()
+                                    ->maxLength(100),
+                            ])
+                            ->columns(3)
+                            ->collapsible()
+                            ->collapsed()
+                            ->columnSpanFull()
+                            ->minItems(1)
+                            ->orderable()
+                            ->reorderable(),
+                    ]),
+
                 Section::make('Konten Peraturan Pengguna')
                     ->collapsible()
                     ->collapsed()
-                    ->description('Konten ini akan ditampilkan pada halaman khusus peraturan pengguna di website publik.')
                     ->schema([
                         RichEditor::make('rules_content')
                             ->label('Isi Peraturan')
@@ -173,7 +236,22 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_region', $data['site_region'] ?? '');
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
         Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));
+        Setting::setValue('token_price', (string) max(0, (int) ($data['token_price'] ?? 2000)));
+        Setting::setValue('min_tokens_for_normal_price', (string) max(1, (int) ($data['min_tokens_for_normal_price'] ?? 5)));
+        Setting::setValue('token_purchase_whatsapp', $data['token_purchase_whatsapp'] ?? '');
         Setting::setValue('user_rules_content', $data['rules_content'] ?? '');
+
+        // Save bank accounts
+        $bankAccounts = collect($data['token_bank_accounts'] ?? [])
+            ->filter()
+            ->unique('account_number')
+            ->values()
+            ->all();
+
+        Setting::setValue(
+            'token_bank_accounts',
+            json_encode($bankAccounts, JSON_UNESCAPED_UNICODE)
+        );
 
         $labels = collect(preg_split('/\r\n|\r|\n/', (string) ($data['external_link_labels'] ?? '')))
             ->map(fn(string $label): string => trim($label))
@@ -215,6 +293,24 @@ class SiteSettingsPage extends Page implements HasForms
             ->all();
 
         return $labels !== [] ? $labels : $default;
+    }
+
+    protected function getBankAccounts(): array
+    {
+        $stored = Setting::getValue('token_bank_accounts');
+        if (blank($stored)) {
+            return [];
+        }
+
+        $decoded = json_decode($stored, true);
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        return collect($decoded)
+            ->filter(fn($account) => is_array($account) && isset($account['bank_name'], $account['account_number'], $account['account_holder']))
+            ->values()
+            ->all();
     }
 
     protected function getFormActions(): array

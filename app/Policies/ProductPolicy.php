@@ -9,6 +9,7 @@ use App\Models\Product;
 class ProductPolicy
 {
     private const PUSH_COOLDOWN_HOURS = 6;
+    private const PUSH_TOKEN_COST = 1;
 
     private function ownsProduct(User $user, Product $product): bool
     {
@@ -80,7 +81,11 @@ class ProductPolicy
     public static function blockedPushMessage(): string
     {
         if (self::canPush()) {
-            return 'Produk sudah bisa diangkat sekarang.';
+            return 'Produk sudah bisa diangkat sekarang. Token tersisa: ' . self::currentPushTokens() . '.';
+        }
+
+        if (! self::hasSufficientPushToken()) {
+            return 'Token tidak cukup untuk mengangkat produk. Kamu butuh ' . self::PUSH_TOKEN_COST . ' token (sisa: ' . self::currentPushTokens() . ').';
         }
 
         return 'Kamu bisa mengangkat produk lagi dalam ' . self::formattedRemainingPushCooldown() . '.';
@@ -115,13 +120,18 @@ class ProductPolicy
             return false; // admin tidak boleh push
         }
 
-        return self::remainingPushCooldownSeconds() === 0;
+        return self::hasSufficientPushToken()
+            && self::remainingPushCooldownSeconds() === 0;
     }
 
     public static function pushTooltip(): string
     {
         if (self::canPush()) {
-            return 'Angkat produk ke urutan teratas';
+            return 'Angkat produk ke urutan teratas (token tersisa: ' . self::currentPushTokens() . ')';
+        }
+
+        if (! self::hasSufficientPushToken()) {
+            return 'Token tidak cukup untuk mengangkat produk (butuh ' . self::PUSH_TOKEN_COST . ').';
         }
 
         $formattedNextPushAt = self::formattedNextPushAt();
@@ -131,6 +141,22 @@ class ProductPolicy
         }
 
         return 'Bisa angkat lagi pada ' . $formattedNextPushAt;
+    }
+
+    public static function currentPushTokens(): int
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return 0;
+        }
+
+        return max(0, (int) ($user->push_tokens ?? 0));
+    }
+
+    public static function hasSufficientPushToken(): bool
+    {
+        return self::currentPushTokens() >= self::PUSH_TOKEN_COST;
     }
 
     /**

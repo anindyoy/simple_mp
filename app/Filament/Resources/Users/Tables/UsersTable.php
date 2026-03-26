@@ -3,13 +3,15 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Tables\Table;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
 use STS\FilamentImpersonate\Actions\Impersonate;
@@ -45,6 +47,12 @@ class UsersTable
                 BadgeColumn::make('products_count')
                     ->label('Jumlah Produk')
                     ->color(fn($state) => $state > 0 ? 'success' : 'gray')
+                    ->sortable(),
+
+                TextColumn::make('push_tokens')
+                    ->label('Token Push')
+                    ->badge()
+                    ->color(fn(int $state) => $state > 0 ? 'success' : 'danger')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -114,6 +122,51 @@ class UsersTable
             })
             ->recordActions([
                 Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
+
+                Action::make('addPushToken')
+                    ->label('Tambah Token')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success')
+                    ->schema([
+                        TextInput::make('amount')
+                            ->label('Jumlah Token')
+                            ->numeric()
+                            ->minValue(1)
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data): void {
+                        $record->increment('push_tokens', (int) $data['amount']);
+
+                        Notification::make()
+                            ->title('Token berhasil ditambahkan')
+                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('setPushToken')
+                    ->label('Atur Token')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('warning')
+                    ->schema([
+                        TextInput::make('amount')
+                            ->label('Saldo Token Baru')
+                            ->numeric()
+                            ->minValue(0)
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data): void {
+                        $record->update([
+                            'push_tokens' => (int) $data['amount'],
+                        ]);
+
+                        Notification::make()
+                            ->title('Saldo token diperbarui')
+                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->success()
+                            ->send();
+                    }),
+
                 EditAction::make()->hiddenLabel(),
             ])
             ->toolbarActions([

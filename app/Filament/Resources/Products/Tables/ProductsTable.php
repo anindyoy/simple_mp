@@ -17,6 +17,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
 
@@ -235,7 +237,7 @@ class ProductsTable
                 Action::make('push')
                     ->label('Angkat')
                     ->icon('heroicon-o-arrow-up')
-                    ->color('warning')
+                    ->color('success')
 
                     ->disabled(fn() => ! ProductPolicy::canPush())
                     ->hidden(fn() => auth()->user()->is_admin)
@@ -253,12 +255,49 @@ class ProductsTable
                             return;
                         }
 
-                        $record->update([
-                            'pushed_at' => now(),
-                        ]);
+                        $userId = auth()->id();
+                        $canPush = true;
+                        $blockedMessage = null;
+
+                        DB::transaction(function () use ($record, $userId, &$canPush, &$blockedMessage) {
+                            $user = User::query()->lockForUpdate()->find($userId);
+
+                            if (! $user || $user->is_admin || (int) $user->push_tokens < 1) {
+                                $canPush = false;
+                                $blockedMessage = 'Token tidak cukup untuk mengangkat produk.';
+
+                                return;
+                            }
+
+                            if (ProductPolicy::remainingPushCooldownSeconds() > 0) {
+                                $canPush = false;
+                                $blockedMessage = ProductPolicy::blockedPushMessage();
+
+                                return;
+                            }
+
+                            $record->update([
+                                'pushed_at' => now(),
+                            ]);
+
+                            $user->decrement('push_tokens', 1);
+                        });
+
+                        if (! $canPush) {
+                            Notification::make()
+                                ->title('Belum bisa angkat')
+                                ->body($blockedMessage ?? ProductPolicy::blockedPushMessage())
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        $remainingTokens = (int) auth()->user()->fresh()->push_tokens;
 
                         Notification::make()
                             ->title('Produk berhasil diangkat')
+                            ->body('Token tersisa: ' . $remainingTokens)
                             ->success()
                             ->send();
                     }),

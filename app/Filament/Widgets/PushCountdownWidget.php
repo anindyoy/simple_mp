@@ -19,6 +19,7 @@ class PushCountdownWidget extends Widget
     protected function getViewData(): array
     {
         return [
+            'pushTokens' => ProductPolicy::currentPushTokens(),
             'nextPushAtLabel' => ProductPolicy::formattedNextPushAt(),
             'remainingSeconds' => ProductPolicy::remainingPushCooldownSeconds(),
         ];

@@ -158,7 +158,7 @@ class LapakProfile extends Page implements HasForms
                         ->required()
                         ->maxLength(100)
                         ->helperText(function () {
-                            if($this->lapak && $this->lapak->exists) {
+                            if ($this->lapak && $this->lapak->exists) {
                                 return '';
                             }
 
@@ -172,10 +172,20 @@ class LapakProfile extends Page implements HasForms
 
                     TextInput::make('whatsapp_number')
                         ->label('Nomor WhatsApp')
+                        ->unique(
+                            table: ModelLapakProfile::class,
+                            column: 'whatsapp_number',
+                            ignoreRecord: true
+                        )
                         ->required(),
 
                     TextInput::make('telegram_username')
                         ->label('Username Telegram')
+                        ->unique(
+                            table: ModelLapakProfile::class,
+                            column: 'telegram_username',
+                            ignoreRecord: true
+                        )
                         ->prefix('@'),
 
                     Repeater::make('external_links')

@@ -43,6 +43,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'push_tokens' => 'integer',
         ];
     }
 

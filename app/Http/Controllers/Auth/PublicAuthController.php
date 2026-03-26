@@ -116,6 +116,7 @@ class PublicAuthController extends Controller
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
+            'push_tokens' => 10,
             'password' => Hash::make($data['password']),
         ]);
 

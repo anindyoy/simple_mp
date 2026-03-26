@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Textarea;
+use App\Models\Setting;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Repeater;
 use Filament\Notifications\Notification;
@@ -191,10 +193,11 @@ class LapakProfile extends Page implements HasForms
                     Repeater::make('external_links')
                         ->label('Link External Toko')
                         ->schema([
-                            TextInput::make('label')
-                                ->label('Label')
+                            Select::make('label')
+                                ->label('Jenis Link')
+                                ->options($this->getExternalLinkLabelOptions())
                                 ->required()
-                                ->maxLength(100),
+                                ->searchable(),
                             TextInput::make('link')
                                 ->label('Link')
                                 ->required()
@@ -261,5 +264,31 @@ class LapakProfile extends Page implements HasForms
             "{$name} Store",
             "{$name} Mart",
         ];
+    }
+
+    protected function getExternalLinkLabelOptions(): array
+    {
+        $default = ['Website', 'Shopee', 'Tokopedia', 'Tiktok', 'Instagram', 'Facebook'];
+
+        $stored = Setting::getValue('lapak_external_link_labels');
+        $decoded = is_string($stored) ? json_decode($stored, true) : null;
+
+        $labels = is_array($decoded)
+            ? collect($decoded)
+                ->map(fn($label): string => trim((string) $label))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all()
+            : $default;
+
+        if ($labels === []) {
+            $labels = $default;
+        }
+
+        return collect($labels)
+            ->sort(fn(string $left, string $right): int => strcasecmp($left, $right))
+            ->mapWithKeys(fn(string $label): array => [$label => $label])
+            ->all();
     }
 }

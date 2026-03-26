@@ -6,7 +6,7 @@
 
         <div style="margin-top: 1.5rem;">
             <x-filament::button type="submit">
-                Simpan Peraturan
+                Simpan Pengaturan
             </x-filament::button>
         </div>
     </form>

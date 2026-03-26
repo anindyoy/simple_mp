@@ -4,13 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Report;
-use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Category;
 use App\Models\LapakProfile;
-use App\Models\ProductImage;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
-use Database\Factories\ReportFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
@@ -41,6 +39,17 @@ class DatabaseSeeder extends Seeder
                 Category::create(['category_name' => $cat]);
             }
         }
+
+        $this->command->info('Membuat setting default...');
+        Setting::updateOrCreate(
+            ['key' => 'lapak_external_link_labels'],
+            Setting::factory()->externalLinkLabels()->make()->toArray()
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'user_rules_content'],
+            Setting::factory()->userRulesContent()->make()->toArray()
+        );
 
         $this->command->info('Membuat user non admin...');
         User::factory(10)->create();

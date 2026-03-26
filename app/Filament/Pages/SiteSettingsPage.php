@@ -7,8 +7,10 @@ use UnitEnum;
 use App\Models\Setting;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
@@ -19,9 +21,9 @@ class SiteSettingsPage extends Page implements HasForms
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationLabel = 'Pengaturan Site';
+    protected static ?string $navigationLabel = 'Pengaturan Aplikasi';
 
-    protected static ?string $title = 'Pengaturan Site';
+    protected static ?string $title = 'Pengaturan Aplikasi';
 
     protected static ?string $slug = 'settings/site';
 
@@ -35,16 +37,25 @@ class SiteSettingsPage extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return (bool) auth()->user()?->is_admin;
+        return auth()->user()?->is_admin === true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->is_admin === true;
     }
 
     public function mount(): void
     {
+        abort_unless(auth()->user()?->is_admin === true, 403);
+
         $this->form->fill([
             'site_title' => Setting::getValue('site_title', 'Lapak Online Warga'),
             'site_description' => Setting::getValue('site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'),
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
+            'rules_content' => Setting::getValue('user_rules_content', ''),
+            'external_link_labels' => implode("\n", $this->getExternalLinkLabels()),
         ]);
     }
 
@@ -52,31 +63,78 @@ class SiteSettingsPage extends Page implements HasForms
     {
         return $schema
             ->schema([
-                TextInput::make('site_title')
-                    ->label('Judul Site')
-                    ->required()
-                    ->maxLength(255)
-                    ->helperText('Judul yang tampil di browser tab dan sebagai tagline di halaman utama.'),
+                Section::make('Informasi Site')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        TextInput::make('site_title')
+                            ->label('Judul Site')
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText('Judul yang tampil di browser tab dan sebagai tagline di halaman utama.'),
 
-                Textarea::make('site_description')
-                    ->label('Deskripsi Site')
-                    ->required()
-                    ->rows(4)
-                    ->maxLength(500)
-                    ->helperText('Deskripsi singkat site untuk SEO, maks 160 karakter ideal.'),
+                        TextInput::make('site_region')
+                            ->label('Nama Wilayah / Kampung')
+                            ->required()
+                            ->maxLength(100)
+                            ->helperText('Nama daerah/kampung untuk identitas site, misal: Cimanglid, Jakarta, Bandung.'),
+                    ]),
 
-                Textarea::make('site_keywords')
-                    ->label('Keywords Site')
-                    ->required()
-                    ->rows(3)
-                    ->maxLength(500)
-                    ->helperText('Kata kunci utama, pisahkan dengan koma.'),
+                Section::make('SEO Site')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        Textarea::make('site_description')
+                            ->label('Deskripsi Site')
+                            ->required()
+                            ->rows(4)
+                            ->maxLength(500)
+                            ->helperText('Deskripsi singkat site untuk SEO, maks 160 karakter ideal.'),
 
-                TextInput::make('site_region')
-                    ->label('Nama Wilayah / Kampung')
-                    ->required()
-                    ->maxLength(100)
-                    ->helperText('Nama daerah/kampung untuk identitas site, misal: Cimanglid, Jakarta, Bandung.'),
+                        Textarea::make('site_keywords')
+                            ->label('Keywords Site')
+                            ->required()
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->helperText('Kata kunci utama, pisahkan dengan koma.'),
+                    ]),
+
+                Section::make('Konten Peraturan Pengguna')
+                    ->collapsible()
+                    ->collapsed()
+                    ->description('Konten ini akan ditampilkan pada halaman khusus peraturan pengguna di website publik.')
+                    ->schema([
+                        RichEditor::make('rules_content')
+                            ->label('Isi Peraturan')
+                            ->required()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'strike',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                                'h2',
+                                'h3',
+                                'blockquote',
+                                'undo',
+                                'redo',
+                                'link',
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Label Link External Lapak')
+                    ->collapsible()
+                    ->collapsed()
+                    ->description('Atur daftar label yang bisa dipilih user pada link external lapak. Satu label per baris.')
+                    ->schema([
+                        Textarea::make('external_link_labels')
+                            ->label('Daftar Label')
+                            ->required()
+                            ->rows(6)
+                            ->helperText('Default: Website, Shopee, Tokopedia, Tiktok, Instagram, Facebook'),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -89,11 +147,48 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_description', $data['site_description'] ?? '');
         Setting::setValue('site_keywords', $data['site_keywords'] ?? '');
         Setting::setValue('site_region', $data['site_region'] ?? '');
+        Setting::setValue('user_rules_content', $data['rules_content'] ?? '');
+
+        $labels = collect(preg_split('/\r\n|\r|\n/', (string) ($data['external_link_labels'] ?? '')))
+            ->map(fn(string $label): string => trim($label))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        Setting::setValue(
+            'lapak_external_link_labels',
+            json_encode($labels, JSON_UNESCAPED_UNICODE)
+        );
 
         Notification::make()
-            ->title('Pengaturan Site disimpan')
+            ->title('Pengaturan aplikasi disimpan')
             ->success()
             ->send();
+    }
+
+    protected function getExternalLinkLabels(): array
+    {
+        $default = ['Website', 'Shopee', 'Tokopedia', 'Tiktok', 'Instagram', 'Facebook'];
+
+        $stored = Setting::getValue('lapak_external_link_labels');
+        if (blank($stored)) {
+            return $default;
+        }
+
+        $decoded = json_decode($stored, true);
+        if (! is_array($decoded)) {
+            return $default;
+        }
+
+        $labels = collect($decoded)
+            ->map(fn($label): string => trim((string) $label))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        return $labels !== [] ? $labels : $default;
     }
 
     protected function getFormActions(): array

@@ -113,10 +113,12 @@ class PublicAuthController extends Controller
         }
 
         // ✅ Lanjut jika captcha valid
+        $appConfig = config('app');
+
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'push_tokens' => 10,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'push_tokens' => (int) ($appConfig['initial_push_tokens'] ?? 10),
             'password' => Hash::make($data['password']),
         ]);
 

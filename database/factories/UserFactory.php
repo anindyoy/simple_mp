@@ -23,12 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $maxTokens = (int) (config('app.initial_push_tokens') ?? 10);
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'push_tokens' => random_int(0, 10),
+            'push_tokens' => random_int(0, $maxTokens),
             'remember_token' => Str::random(10),
         ];
     }

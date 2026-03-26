@@ -123,4 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'weekly_minimum_push_tokens' => (int) env('WEEKLY_MINIMUM_PUSH_TOKENS', 3),
+    'initial_push_tokens' => (int) env('INITIAL_PUSH_TOKENS', 10),
+
 ];

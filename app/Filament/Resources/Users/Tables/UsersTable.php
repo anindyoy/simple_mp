@@ -50,7 +50,7 @@ class UsersTable
                     ->sortable(),
 
                 TextColumn::make('push_tokens')
-                    ->label('Token Push')
+                    ->label('Token Angkat Produk')
                     ->badge()
                     ->color(fn(int $state) => $state > 0 ? 'success' : 'danger')
                     ->sortable(),
@@ -124,12 +124,12 @@ class UsersTable
                 Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
 
                 Action::make('addPushToken')
-                    ->label('Tambah Token')
+                    ->label('Tambah Token Angkat Produk')
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
                     ->schema([
                         TextInput::make('amount')
-                            ->label('Jumlah Token')
+                            ->label('Jumlah Token Angkat Produk')
                             ->numeric()
                             ->minValue(1)
                             ->required(),
@@ -138,19 +138,19 @@ class UsersTable
                         $record->increment('push_tokens', (int) $data['amount']);
 
                         Notification::make()
-                            ->title('Token berhasil ditambahkan')
-                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->title('Token angkat produk berhasil ditambahkan')
+                            ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
                             ->success()
                             ->send();
                     }),
 
                 Action::make('setPushToken')
-                    ->label('Atur Token')
+                    ->label('Atur Token Angkat Produk')
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('warning')
                     ->schema([
                         TextInput::make('amount')
-                            ->label('Saldo Token Baru')
+                            ->label('Saldo Token Angkat Produk Baru')
                             ->numeric()
                             ->minValue(0)
                             ->required(),
@@ -161,8 +161,8 @@ class UsersTable
                         ]);
 
                         Notification::make()
-                            ->title('Saldo token diperbarui')
-                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->title('Saldo token angkat produk diperbarui')
+                            ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
                             ->success()
                             ->send();
                     }),

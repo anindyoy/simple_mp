@@ -28,4 +28,9 @@ class Setting extends Model
             ['value' => $value]
         );
     }
+
+    public static function getIntValue(string $key, int $default = 0, int $min = 0): int
+    {
+        return max($min, (int) static::getValue($key, (string) $default));
+    }
 }

@@ -51,6 +51,16 @@ class DatabaseSeeder extends Seeder
             Setting::factory()->userRulesContent()->make()->toArray()
         );
 
+        Setting::updateOrCreate(
+            ['key' => 'weekly_minimum_push_tokens'],
+            ['value' => '3']
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'initial_push_tokens'],
+            ['value' => '10']
+        );
+
         $this->command->info('Membuat user non admin...');
         User::factory(10)->create();
 

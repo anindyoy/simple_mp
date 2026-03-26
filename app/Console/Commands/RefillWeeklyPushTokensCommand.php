@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -19,7 +20,7 @@ class RefillWeeklyPushTokensCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Set token user ke nilai minimum mingguan setiap hari Jumat';
+    protected $description = 'Set token angkat produk user ke nilai minimum mingguan setiap hari Jumat';
 
     /**
      * Execute the console command.
@@ -35,13 +36,13 @@ class RefillWeeklyPushTokensCommand extends Command
                 'push_tokens' => $minimumWeeklyTokens,
             ]);
 
-        $this->info("Refill token mingguan selesai (minimum: {$minimumWeeklyTokens}). User diperbarui: {$affectedUsers}.");
+        $this->info("Refill token angkat produk mingguan selesai (minimum: {$minimumWeeklyTokens}). User diperbarui: {$affectedUsers}.");
 
         return self::SUCCESS;
     }
 
     private function minimumWeeklyTokens(): int
     {
-        return max(0, (int) config('app.weekly_minimum_push_tokens', 3));
+        return Setting::getIntValue('weekly_minimum_push_tokens', 3);
     }
 }

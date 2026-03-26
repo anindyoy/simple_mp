@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Setting;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +24,7 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $maxTokens = (int) (config('app.initial_push_tokens') ?? 10);
+        $maxTokens = Setting::getIntValue('initial_push_tokens', 10);
 
         return [
             'name' => fake()->name(),

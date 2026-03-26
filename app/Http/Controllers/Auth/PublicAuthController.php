@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -113,12 +114,12 @@ class PublicAuthController extends Controller
         }
 
         // ✅ Lanjut jika captcha valid
-        $appConfig = config('app');
+        $initialPushTokens = Setting::getIntValue('initial_push_tokens', 10);
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'push_tokens' => (int) ($appConfig['initial_push_tokens'] ?? 10),
+            'push_tokens' => $initialPushTokens,
             'password' => Hash::make($data['password']),
         ]);
 

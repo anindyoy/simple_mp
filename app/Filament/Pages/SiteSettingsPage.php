@@ -2,18 +2,18 @@
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use UnitEnum;
+use BackedEnum;
 use App\Models\Setting;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class SiteSettingsPage extends Page implements HasForms
 {
@@ -54,6 +54,8 @@ class SiteSettingsPage extends Page implements HasForms
             'site_description' => Setting::getValue('site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'),
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
+            'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
+            'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
             'rules_content' => Setting::getValue('user_rules_content', ''),
             'external_link_labels' => implode("\n", $this->getExternalLinkLabels()),
         ]);
@@ -97,6 +99,28 @@ class SiteSettingsPage extends Page implements HasForms
                             ->rows(3)
                             ->maxLength(500)
                             ->helperText('Kata kunci utama, pisahkan dengan koma.'),
+                    ]),
+
+                Section::make('Konfigurasi Token Angkat Produk')
+                    ->collapsible()
+                    ->collapsed()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('weekly_minimum_push_tokens')
+                            ->label('Minimum Token Angkat Produk Mingguan')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(3)
+                            ->helperText('Nilai minimum token angkat produk user setiap refill mingguan.'),
+
+                        TextInput::make('initial_push_tokens')
+                            ->label('Token Angkat Produk Awal User Baru')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(10)
+                            ->helperText('Nilai token angkat produk awal saat user mendaftar.'),
                     ]),
 
                 Section::make('Konten Peraturan Pengguna')
@@ -147,6 +171,8 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_description', $data['site_description'] ?? '');
         Setting::setValue('site_keywords', $data['site_keywords'] ?? '');
         Setting::setValue('site_region', $data['site_region'] ?? '');
+        Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
+        Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));
         Setting::setValue('user_rules_content', $data['rules_content'] ?? '');
 
         $labels = collect(preg_split('/\r\n|\r|\n/', (string) ($data['external_link_labels'] ?? '')))

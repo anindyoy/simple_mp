@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -32,6 +33,19 @@ class ProductController extends Controller
 
         $categories = Category::orderBy('category_name')->get();
 
+        $siteTitle = Setting::getValue(
+            'site_title',
+            'Lapak Online Warga'
+        );
+        $siteDescription = Setting::getValue(
+            'site_description',
+            'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'
+        );
+        $siteKeywords = Setting::getValue(
+            'site_keywords',
+            'marketplace, jual beli online, produk lokal, warga, toko online'
+        );
+
         return view('main', [
             'products' => $products,
             'categories' => $categories,
@@ -40,9 +54,9 @@ class ProductController extends Controller
             'selectedCondition' => $condition,
 
             'meta' => [
-                'title' => 'Jual Beli Cimanglid - Marketplace Warga',
-                'description' => 'Marketplace lokal warga Cimanglid. Temukan makanan, jasa, elektronik, dan kebutuhan harian.',
-                'keywords' => 'jual beli cimanglid, marketplace desa, iklan warga cimanglid',
+                'title' => $siteTitle,
+                'description' => $siteDescription,
+                'keywords' => $siteKeywords,
             ],
         ]);
     }
@@ -75,18 +89,25 @@ class ProductController extends Controller
             ->limit(8)
             ->get();
 
+        $siteTitle = Setting::getValue(
+            'site_title',
+            'Lapak Online Warga'
+        );
+        $region = Setting::getValue('site_region', 'Cimanglid');
+
         return view('product-detail', [
             'product' => $product,
             'hasReported' => $hasReported,
             'otherProductsInLapak' => $otherProductsInLapak,
+            'region' => $region,
             'meta' => [
-                'title' => $product->title . ' | Jual Beli Cimanglid',
+                'title' => $product->title . ' - Jual Beli ' . $region,
                 'description' => str()->limit(strip_tags($product->description), 155),
                 'keywords' => implode(', ', [
                     $product->title,
                     $product->category?->category_name,
                     $product->lapak?->nama_lapak,
-                    'jual beli cimanglid'
+                    'jual beli ' . strtolower($region)
                 ]),
                 'image' => optional($product->images->first())->image_url,
             ],

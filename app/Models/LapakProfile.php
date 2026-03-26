@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Support\Str;
 use App\Models\ProductModeration;
 use Illuminate\Database\Eloquent\Model;
@@ -103,9 +104,11 @@ class LapakProfile extends Model
             $number = '628' . substr($number, 2);
         }
 
+        $siteName = Setting::getValue('site_title', 'Lapak Online Warga');
+        $region = Setting::getValue('site_region', 'Cimanglid');
         $message = 'Halo, saya tertarik dengan produk di lapak *'
             . $this->name
-            . '* yang saya lihat di Jual Beli Cimanglid.';
+            . '* yang saya lihat di ' . $siteName . ' ' . $region . '.';
 
         return 'https://wa.me/' . $number . '?text=' . urlencode($message);
     }

@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Jual Beli Cimanglid')</title>
+    <title>@php
+    $defaultRegion = App\Models\Setting::getValue('site_region', 'Cimanglid');
+@endphp@yield('title', 'Jual Beli ' . $defaultRegion)</title>
 
     @include('partials.meta')
 
@@ -14,7 +16,10 @@
 
 <body class="bg-gray-50 dark:bg-gray-900">
 
-    @include('partials.navbar')
+    @php
+    $region = App\Models\Setting::getValue('site_region', 'Cimanglid');
+@endphp
+    @include('partials.navbar', ['region' => $region])
     @if (session('success'))
         <div class="max-w-6xl mx-auto mt-4 p-3 bg-green-100 text-green-700 rounded-lg">
             {{ session('success') }}
@@ -30,7 +35,7 @@
         <x-auth-modal type="register" />
     @endguest
 
-    @include('partials.footer')
+    @include('partials.footer', ['region' => $region])
 
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 

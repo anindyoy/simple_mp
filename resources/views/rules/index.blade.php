@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Peraturan Pengguna | Jual Beli Cimanglid')
+@section('title', $meta['title'])
+@section('meta_description', $meta['description'])
+@section('meta_keywords', $meta['keywords'])
 
 @section('content')
     <section class="py-10 px-4">

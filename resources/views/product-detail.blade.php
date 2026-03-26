@@ -8,8 +8,6 @@
 @section('og_type', 'product')
 @section('og_image', $meta['image'] ?? asset('images/og-default.jpg'))
 
-@section('title', $product->title . ' - Jual Beli Cimanglid')
-
 @section('content')
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

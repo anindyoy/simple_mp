@@ -140,6 +140,26 @@ class PublicAuthController extends Controller
             ->with('success', 'Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun sebelum login.');
     }
 
+    public function logTurnstileClientError(Request $request)
+    {
+        $data = $request->validate([
+            'code' => ['nullable', 'string', 'max:100'],
+            'origin' => ['nullable', 'string', 'max:255'],
+            'hostname' => ['nullable', 'string', 'max:255'],
+            'href' => ['nullable', 'string', 'max:1000'],
+            'sitekey_preview' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        Log::error('Turnstile client error callback', [
+            'host' => $request->getHost(),
+            'app_url_host' => parse_url(config('app.url'), PHP_URL_HOST),
+            'remote_ip' => $request->ip(),
+            ...$data,
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
     public function resendVerificationEmail(Request $request)
     {
         $data = $request->validate([

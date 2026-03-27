@@ -17,6 +17,9 @@ Route::get('/email/verify', [PublicAuthController::class, 'showVerificationNotic
 Route::post('/login', [PublicAuthController::class, 'login'])->name('login.public');
 Route::post('/logout', [PublicAuthController::class, 'logout'])->name('logout.public');
 Route::post('/register', [PublicAuthController::class, 'register'])->name('register.public');
+Route::post('/turnstile/client-error', [PublicAuthController::class, 'logTurnstileClientError'])
+    ->middleware('throttle:30,1')
+    ->name('turnstile.client-error');
 Route::post('/email/verification-notification', [PublicAuthController::class, 'resendVerificationEmail'])
     ->middleware('throttle:6,1')
     ->name('verification.send');

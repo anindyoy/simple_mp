@@ -74,6 +74,24 @@
                             host: window.location.hostname,
                             origin: window.location.origin,
                         });
+
+                        fetch('{{ route('turnstile.client-error') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({
+                                code,
+                                origin: window.location.origin,
+                                hostname: window.location.hostname,
+                                href: window.location.href,
+                                sitekey_preview: turnstileSiteKey ? `${turnstileSiteKey.slice(0, 6)}...` : null,
+                            }),
+                            credentials: 'same-origin',
+                            keepalive: true,
+                        }).catch(() => {});
                     },
                 });
 

@@ -77,6 +77,29 @@ class DatabaseSeeder extends Seeder
             ['value' => '62812345678']
         );
 
+        Setting::updateOrCreate(
+            ['key' => 'token_bank_accounts'],
+            [
+                'value' => json_encode([
+                    [
+                        'bank_name' => 'BCA',
+                        'account_number' => '1234567890',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                    [
+                        'bank_name' => 'Mandiri',
+                        'account_number' => '9876543210',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                    [
+                        'bank_name' => 'BNI',
+                        'account_number' => '1122334455',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                ], JSON_UNESCAPED_UNICODE),
+            ]
+        );
+
         $this->command->info('Membuat user non admin...');
         User::factory(10)->create();
 
@@ -90,7 +113,14 @@ class DatabaseSeeder extends Seeder
         Report::factory()->count(20)->create();
 
         $this->command->info('Membuat riwayat pembelian token...');
-        TokenPurchase::factory()->count(30)->create();
+        $bankAccountNumbers = $this->getTokenBankAccountNumbers();
+
+        TokenPurchase::factory()
+            ->count(30)
+            ->state(fn() => [
+                'bank_account' => fake()->randomElement($bankAccountNumbers),
+            ])
+            ->create();
 
         $this->command->info('Membuat pembelian token yang dikonfirmasi...');
         $this->createConfirmedTokenPurchases();
@@ -101,14 +131,38 @@ class DatabaseSeeder extends Seeder
      */
     private function createConfirmedTokenPurchases(): void
     {
-        User::all()->each(function (User $user) {
+        $bankAccountNumbers = $this->getTokenBankAccountNumbers();
+
+        User::all()->each(function (User $user) use ($bankAccountNumbers) {
             TokenPurchase::factory()
                 ->count(2)
                 ->confirmed()
+                ->state(fn() => [
+                    'bank_account' => fake()->randomElement($bankAccountNumbers),
+                ])
                 ->create(['user_id' => $user->id])
                 ->each(function (TokenPurchase $purchase) {
                     $purchase->user->addTokens($purchase->quantity);
                 });
         });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getTokenBankAccountNumbers(): array
+    {
+        $stored = Setting::getValue('token_bank_accounts');
+        $decoded = is_string($stored) ? json_decode($stored, true) : [];
+
+        $numbers = collect($decoded)
+            ->filter(fn($account) => is_array($account) && !empty($account['account_number']))
+            ->pluck('account_number')
+            ->map(fn($number) => (string) $number)
+            ->unique()
+            ->values()
+            ->all();
+
+        return !empty($numbers) ? $numbers : ['1234567890', '9876543210', '1122334455'];
     }
 }

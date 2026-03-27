@@ -10,12 +10,6 @@
             <a href="{{ route('rules.index') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
                 Peraturan
             </a>
-
-            @auth
-                <a href="{{ route('tokens.purchase') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
-                    Beli Token
-                </a>
-            @endauth
         </div>
 
         {{-- Actions --}}

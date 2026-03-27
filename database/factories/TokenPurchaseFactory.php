@@ -38,11 +38,25 @@ class TokenPurchaseFactory extends Factory
             'total_price' => $totalPrice,
             'status' => $status,
             'payment_method' => 'bank_transfer',
-            'bank_account' => $this->faker->numerify('###########'),
+            'bank_account' => $this->faker->randomElement($this->bankAccountOptions()),
             'proof_of_payment' => null,
             'notes' => $this->faker->optional()->sentence(),
             'created_at' => $created,
             'confirmed_at' => $confirmedAt,
+        ];
+    }
+
+    /**
+     * Bank account options used by token purchase factory.
+     *
+     * @return array<int, string>
+     */
+    protected function bankAccountOptions(): array
+    {
+        return [
+            '1234567890',
+            '9876543210',
+            '1122334455',
         ];
     }
 

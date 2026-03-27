@@ -68,14 +68,16 @@
                         type="password"
                         autocomplete="new-password"
                         minlength="8" />
-                    <div class="mt-4 flex justify-center">
-                        <div id="turnstile-register"></div>
-                    </div>
-                    @error('cf-turnstile-response')
-                        <div class="text-sm text-red-500 mt-2">
-                            {{ $message }}
+                    @unless (app()->environment('local'))
+                        <div class="mt-4 flex justify-center">
+                            <div id="turnstile-register"></div>
                         </div>
-                    @enderror
+                        @error('cf-turnstile-response')
+                            <div class="text-sm text-red-500 mt-2">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    @endunless
                 @endunless
 
                 <button class="w-full bg-blue-600 text-white py-2 rounded-lg">

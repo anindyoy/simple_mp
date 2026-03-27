@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PublicAuthController extends Controller
 {
@@ -107,6 +108,16 @@ class PublicAuthController extends Controller
             );
 
             if (! $verify->json('success')) {
+                Log::warning('Turnstile verification failed', [
+                    'host' => $request->getHost(),
+                    'app_url_host' => parse_url(config('app.url'), PHP_URL_HOST),
+                    'remote_ip' => $request->ip(),
+                    'status' => $verify->status(),
+                    'error_codes' => $verify->json('error-codes'),
+                    'action' => $verify->json('action'),
+                    'cdata' => $verify->json('cdata'),
+                ]);
+
                 return back()
                     ->withErrors(['cf-turnstile-response' => 'Verifikasi captcha gagal.'])
                     ->withInput();

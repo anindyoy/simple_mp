@@ -37,27 +37,60 @@
 
     @include('partials.footer', ['region' => $region])
 
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    @unless (app()->environment('local'))
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
-    <script>
-        let turnstileWidgetId = null;
+        <script>
+            let turnstileWidgetId = null;
+            const turnstileSiteKey = '{{ config('services.turnstile.site_key') }}';
 
-        function renderTurnstile() {
-            if (turnstileWidgetId !== null) return;
-
-            turnstileWidgetId = turnstile.render('#turnstile-register', {
-                sitekey: '{{ config('services.turnstile.site_key') }}',
-            });
-        }
-
-        document.addEventListener('click', function(e) {
-            if (e.target.matches('[data-modal-target="registerModal"]')) {
-                setTimeout(() => {
-                    renderTurnstile();
-                }, 300);
+            function logTurnstileDebug(event, payload = {}) {
+                console.info('[Turnstile]', event, {
+                    host: window.location.hostname,
+                    origin: window.location.origin,
+                    siteKeyPreview: turnstileSiteKey ? `${turnstileSiteKey.slice(0, 6)}...` : null,
+                    ...payload,
+                });
             }
-        });
-    </script>
+
+            function renderTurnstile() {
+                if (turnstileWidgetId !== null || typeof turnstile === 'undefined') return;
+
+                const container = document.getElementById('turnstile-register');
+                if (!container) return;
+
+                logTurnstileDebug('render:start');
+
+                turnstileWidgetId = turnstile.render('#turnstile-register', {
+                    sitekey: turnstileSiteKey,
+                    callback: function(token) {
+                        logTurnstileDebug('token:received', {
+                            tokenLength: token ? token.length : 0,
+                        });
+                    },
+                    'error-callback': function(code) {
+                        console.error('[Turnstile] widget error', {
+                            code,
+                            host: window.location.hostname,
+                            origin: window.location.origin,
+                        });
+                    },
+                });
+
+                logTurnstileDebug('render:done', {
+                    widgetId: turnstileWidgetId,
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('[data-modal-target="registerModal"]')) {
+                    setTimeout(() => {
+                        renderTurnstile();
+                    }, 300);
+                }
+            });
+        </script>
+    @endunless
 </body>
 
 </html>

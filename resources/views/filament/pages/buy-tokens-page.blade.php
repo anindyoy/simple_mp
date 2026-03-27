@@ -50,13 +50,13 @@
             {{ $this->form }}
         </div>
 
-        <div style="margin-top: 1.5rem;" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="text-sm font-medium text-gray-600">
+        <div style="margin-top: 1.5rem;" class="gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="text-sm font-medium text-gray-600 mb-3">
                 Pastikan nominal transfer dan rekening tujuan sudah sesuai.
             </div>
 
             <x-filament::button type="submit">
-                Buat Permintaan
+                Ajukan tambah token
             </x-filament::button>
         </div>
     </form>

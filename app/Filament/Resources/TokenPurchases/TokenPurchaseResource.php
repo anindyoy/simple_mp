@@ -9,8 +9,8 @@ use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\TokenPurchase;
 use Filament\Resources\Resource;
-use Filament\Support\Icons\Heroicon;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -104,6 +104,16 @@ class TokenPurchaseResource extends Resource
 
             TextInput::make('bank_account')
                 ->label('Rekening Bank')
+                ->disabled(),
+
+            FileUpload::make('proof_of_payment')
+                ->label('Bukti Transfer')
+                ->image()
+                ->disk('public')
+                ->visibility('public')
+                ->directory('token-purchases/proof')
+                ->openable()
+                ->downloadable()
                 ->disabled(),
         ]);
 

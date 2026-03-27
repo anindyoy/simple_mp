@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
+     * @var array<int, string>|null
+     */
+    private ?array $tokenBankAccountNumbers = null;
+
+    /**
      * Seed the application's database.
      */
     public function run(): void
@@ -36,50 +41,28 @@ class DatabaseSeeder extends Seeder
         if (!Category::exists()) {
             $this->command->info('Membuat kategori produk...');
             $categories = ['Makanan', 'Fashion', 'Elektronik', 'Otomotif', 'Jasa'];
-            foreach ($categories as $cat) {
-                Category::create(['category_name' => $cat]);
-            }
+
+            Category::insert(
+                collect($categories)
+                    ->map(fn(string $categoryName) => ['category_name' => $categoryName])
+                    ->all()
+            );
         }
 
         $this->command->info('Membuat setting default...');
-        Setting::updateOrCreate(
-            ['key' => 'lapak_external_link_labels'],
-            Setting::factory()->externalLinkLabels()->make()->toArray()
-        );
+        $externalLinkLabels = Setting::factory()->externalLinkLabels()->make();
+        $userRulesContent = Setting::factory()->userRulesContent()->make();
 
-        Setting::updateOrCreate(
-            ['key' => 'user_rules_content'],
-            Setting::factory()->userRulesContent()->make()->toArray()
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'weekly_minimum_push_tokens'],
-            ['value' => '3']
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'initial_push_tokens'],
-            ['value' => '10']
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'token_price'],
-            ['value' => '2000']
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'min_tokens_for_normal_price'],
-            ['value' => '5']
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'token_purchase_whatsapp'],
-            ['value' => '62812345678']
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'token_bank_accounts'],
+        $settings = [
+            ['key' => 'lapak_external_link_labels', 'value' => $externalLinkLabels->value],
+            ['key' => 'user_rules_content', 'value' => $userRulesContent->value],
+            ['key' => 'weekly_minimum_push_tokens', 'value' => '3'],
+            ['key' => 'initial_push_tokens', 'value' => '10'],
+            ['key' => 'token_price', 'value' => '2000'],
+            ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
+            ['key' => 'token_purchase_whatsapp', 'value' => '62812345678'],
             [
+                'key' => 'token_bank_accounts',
                 'value' => json_encode([
                     [
                         'bank_name' => 'BCA',
@@ -97,7 +80,19 @@ class DatabaseSeeder extends Seeder
                         'account_holder' => 'PT SimpleMP',
                     ],
                 ], JSON_UNESCAPED_UNICODE),
-            ]
+            ],
+        ];
+
+        $now = now();
+
+        Setting::query()->upsert(
+            array_map(fn(array $setting) => [
+                ...$setting,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $settings),
+            ['key'],
+            ['value', 'updated_at']
         );
 
         $this->command->info('Membuat user non admin...');
@@ -133,18 +128,25 @@ class DatabaseSeeder extends Seeder
     {
         $bankAccountNumbers = $this->getTokenBankAccountNumbers();
 
-        User::all()->each(function (User $user) use ($bankAccountNumbers) {
-            TokenPurchase::factory()
-                ->count(2)
-                ->confirmed()
-                ->state(fn() => [
-                    'bank_account' => fake()->randomElement($bankAccountNumbers),
-                ])
-                ->create(['user_id' => $user->id])
-                ->each(function (TokenPurchase $purchase) {
-                    $purchase->user->addTokens($purchase->quantity);
-                });
-        });
+        User::query()
+            ->select('id')
+            ->chunkById(200, function ($users) use ($bankAccountNumbers) {
+                foreach ($users as $user) {
+                    $purchases = TokenPurchase::factory()
+                        ->count(2)
+                        ->confirmed()
+                        ->state(fn() => [
+                            'bank_account' => fake()->randomElement($bankAccountNumbers),
+                        ])
+                        ->create(['user_id' => $user->id]);
+
+                    $totalConfirmedTokens = (int) $purchases->sum('quantity');
+
+                    if ($totalConfirmedTokens > 0) {
+                        User::whereKey($user->id)->increment('push_tokens', $totalConfirmedTokens);
+                    }
+                }
+            });
     }
 
     /**
@@ -152,6 +154,10 @@ class DatabaseSeeder extends Seeder
      */
     private function getTokenBankAccountNumbers(): array
     {
+        if ($this->tokenBankAccountNumbers !== null) {
+            return $this->tokenBankAccountNumbers;
+        }
+
         $stored = Setting::getValue('token_bank_accounts');
         $decoded = is_string($stored) ? json_decode($stored, true) : [];
 
@@ -163,6 +169,10 @@ class DatabaseSeeder extends Seeder
             ->values()
             ->all();
 
-        return !empty($numbers) ? $numbers : ['1234567890', '9876543210', '1122334455'];
+        $this->tokenBankAccountNumbers = !empty($numbers)
+            ? $numbers
+            : ['1234567890', '9876543210', '1122334455'];
+
+        return $this->tokenBankAccountNumbers;
     }
 }

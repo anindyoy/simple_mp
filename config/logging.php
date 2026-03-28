@@ -1,10 +1,10 @@
 <?php
 
-use App\Logging\TelegramExceptionFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
+use App\Logging\CreateTelegramLogger;
 use Monolog\Handler\SyslogUdpHandler;
-use Monolog\Handler\TelegramBotHandler;
+use App\Logging\TelegramExceptionFormatter;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 $stackChannels = array_values(array_filter(array_map(
@@ -12,12 +12,10 @@ $stackChannels = array_values(array_filter(array_map(
     explode(',', (string) env('LOG_STACK', 'single'))
 )));
 
-if (env('APP_ENV') === 'production') {
-    $hasTelegramConfig = filled(config('services.telegram.bot_token')) && filled(config('services.telegram.chat_id'));
+$enableTelegramLogging = env('LOG_TELEGRAM_ENABLED', env('APP_ENV') === 'production');
 
-    if ($hasTelegramConfig) {
-        $stackChannels[] = 'telegram';
-    }
+if ($enableTelegramLogging) {
+    $stackChannels[] = 'telegram';
 
     $stackChannels = array_values(array_unique($stackChannels));
 }
@@ -141,13 +139,9 @@ return [
         ],
 
         'telegram' => [
-            'driver' => 'monolog',
+            'driver' => 'custom',
+            'via' => CreateTelegramLogger::class,
             'level' => env('LOG_TELEGRAM_LEVEL', 'error'),
-            'handler' => TelegramBotHandler::class,
-            'handler_with' => [
-                'apiKey' => config('services.telegram.bot_token'),
-                'channel' => config('services.telegram.chat_id'),
-            ],
             'formatter' => TelegramExceptionFormatter::class,
             'replace_placeholders' => true,
         ],

@@ -30,14 +30,27 @@ Route::get('/email/verify/{id}/{hash}', [PublicAuthController::class, 'verifyEma
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');
 
 Route::middleware('auth')->get('/debug/telegram-exception', function () {
-    try {
-        throw new Exception('Simulasi exception dari route debug Telegram');
-    } catch (Exception $e) {
-        Log::channel('telegram')->error($e->getMessage(), ['exception' => $e]);
-
-        throw $e;
-    }
+    throw new Exception('Simulasi exception dari route debug Telegram');
 })->name('debug.telegram-exception');
+
+Route::middleware(['auth', 'throttle:10,1'])->get('/debug/telegram-test', function () {
+    try {
+        $message = 'Test log Telegram dari debug route '.now()->toDateTimeString();
+        Log::channel('telegram')->error($message);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Log Telegram berhasil dikirim.',
+            'payload' => $message,
+        ]);
+    } catch (\Throwable $exception) {
+        return response()->json([
+            'ok' => false,
+            'message' => 'Gagal mengirim log Telegram.',
+            'error' => $exception->getMessage(),
+        ], 500);
+    }
+})->name('debug.telegram-test');
 
 // Token purchase routes (requires authentication)
 Route::middleware('auth')->group(function () {

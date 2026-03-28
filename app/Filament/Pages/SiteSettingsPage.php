@@ -55,6 +55,7 @@ class SiteSettingsPage extends Page implements HasForms
             'site_description' => Setting::getValue('site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'),
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
+            'daily_minimum_push_tokens' => Setting::getIntValue('daily_minimum_push_tokens', 2),
             'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
             'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
             'token_price' => Setting::getIntValue('token_price', 2000),
@@ -111,6 +112,14 @@ class SiteSettingsPage extends Page implements HasForms
                     ->collapsed()
                     ->columns(2)
                     ->schema([
+                        TextInput::make('daily_minimum_push_tokens')
+                            ->label('Minimum Token Angkat Produk Harian')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(2)
+                            ->helperText('Nilai minimum token angkat produk user setiap refill harian.'),
+
                         TextInput::make('weekly_minimum_push_tokens')
                             ->label('Minimum Token Angkat Produk Mingguan')
                             ->required()
@@ -234,6 +243,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_description', $data['site_description'] ?? '');
         Setting::setValue('site_keywords', $data['site_keywords'] ?? '');
         Setting::setValue('site_region', $data['site_region'] ?? '');
+        Setting::setValue('daily_minimum_push_tokens', (string) max(0, (int) ($data['daily_minimum_push_tokens'] ?? 2)));
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
         Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));
         Setting::setValue('token_price', (string) max(0, (int) ($data['token_price'] ?? 2000)));

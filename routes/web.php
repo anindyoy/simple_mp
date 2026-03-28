@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\LapakController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;
@@ -27,6 +28,16 @@ Route::get('/email/verify/{id}/{hash}', [PublicAuthController::class, 'verifyEma
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');
+
+Route::middleware('auth')->get('/debug/telegram-exception', function () {
+    try {
+        throw new Exception('Simulasi exception dari route debug Telegram');
+    } catch (Exception $e) {
+        Log::channel('telegram')->error($e->getMessage(), ['exception' => $e]);
+
+        throw $e;
+    }
+})->name('debug.telegram-exception');
 
 // Token purchase routes (requires authentication)
 Route::middleware('auth')->group(function () {

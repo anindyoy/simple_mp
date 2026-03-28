@@ -1,9 +1,21 @@
 <?php
 
+use App\Logging\TelegramExceptionFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Handler\TelegramBotHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
+
+$stackChannels = array_values(array_filter(array_map(
+    static fn (string $channel): string => trim($channel),
+    explode(',', (string) env('LOG_STACK', 'single'))
+)));
+
+if (env('APP_ENV') === 'production') {
+    $stackChannels[] = 'telegram';
+    $stackChannels = array_values(array_unique($stackChannels));
+}
 
 return [
 
@@ -54,7 +66,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => $stackChannels,
             'ignore_exceptions' => false,
         ],
 
@@ -121,6 +133,18 @@ return [
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
+        ],
+
+        'telegram' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_TELEGRAM_LEVEL', 'error'),
+            'handler' => TelegramBotHandler::class,
+            'handler_with' => [
+                'apiKey' => config('services.telegram.bot_token'),
+                'channel' => config('services.telegram.chat_id'),
+            ],
+            'formatter' => TelegramExceptionFormatter::class,
+            'replace_placeholders' => true,
         ],
 
         'emergency' => [

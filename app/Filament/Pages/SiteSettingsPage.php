@@ -38,17 +38,17 @@ class SiteSettingsPage extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->is_admin === true;
+        return (bool) auth()->user()?->is_admin;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->is_admin === true;
+        return (bool) auth()->user()?->is_admin;
     }
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->is_admin === true, 403);
+        abort_unless((bool) auth()->user()?->is_admin, 403);
 
         $this->form->fill([
             'site_title' => Setting::getValue('site_title', 'Lapak Online Warga'),

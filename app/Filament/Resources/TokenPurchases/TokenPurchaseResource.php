@@ -61,14 +61,14 @@ class TokenPurchaseResource extends Resource
     public static function canEdit(Model $record): bool
     {
         // Only admin can edit
-        return auth()->user()?->is_admin === true;
+        return (bool) auth()->user()?->is_admin;
     }
 
     public static function canView(Model $record): bool
     {
         $user = auth()->user();
         // Admin can view all, users can only view their own
-        return $user?->is_admin === true || $record->user_id === $user?->id;
+        return (bool) $user?->is_admin || $record->user_id === $user?->id;
     }
 
     public static function canDelete(Model $record): bool
@@ -78,7 +78,7 @@ class TokenPurchaseResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $isAdmin = auth()->user()?->is_admin === true;
+        $isAdmin = (bool) auth()->user()?->is_admin;
 
         $fields = [];
 
@@ -158,7 +158,7 @@ class TokenPurchaseResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $isAdmin = auth()->user()?->is_admin === true;
+        $isAdmin = (bool) auth()->user()?->is_admin;
 
         $columns = [];
 

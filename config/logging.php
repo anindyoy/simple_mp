@@ -13,7 +13,12 @@ $stackChannels = array_values(array_filter(array_map(
 )));
 
 if (env('APP_ENV') === 'production') {
-    $stackChannels[] = 'telegram';
+    $hasTelegramConfig = filled(config('services.telegram.bot_token')) && filled(config('services.telegram.chat_id'));
+
+    if ($hasTelegramConfig) {
+        $stackChannels[] = 'telegram';
+    }
+
     $stackChannels = array_values(array_unique($stackChannels));
 }
 

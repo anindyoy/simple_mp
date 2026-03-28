@@ -2,10 +2,10 @@
 
 namespace App\Logging;
 
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\TelegramBotHandler;
 use Monolog\Level;
 use Monolog\Logger;
+use Monolog\Handler\NullHandler;
+use Monolog\Handler\TelegramBotHandler;
 
 class CreateTelegramLogger
 {
@@ -13,8 +13,8 @@ class CreateTelegramLogger
     {
         $logger = new Logger('telegram');
 
-        $apiKey = (string) config('services.telegram.bot_token', '');
-        $chatId = (string) config('services.telegram.chat_id', '');
+        $apiKey = (string) config('services.telegram.bot_token');
+        $chatId = (string) config('services.telegram.chat_id');
         $level = Level::fromName(strtoupper((string) ($config['level'] ?? 'error')));
 
         if (blank($apiKey) || blank($chatId)) {

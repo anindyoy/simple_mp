@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LapakController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;

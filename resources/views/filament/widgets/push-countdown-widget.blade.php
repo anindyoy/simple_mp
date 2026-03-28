@@ -1,6 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <div
+            wire:key="push-countdown-{{ $refreshNonce }}"
             wire:poll.30s
             x-data="{
                 remaining: {{ max(0, (int) $remainingSeconds) }},
@@ -29,10 +30,6 @@
                     'text-danger-600 dark:text-danger-400' => (int) $pushTokens === 0,
                 ])>{{ (int) $pushTokens }}</span>
             </div>
-
-            {{-- <div class="text-sm font-medium text-gray-900 dark:text-white">
-                Waktu Tunggu Angkat Produk Selanjutnya
-            </div> --}}
 
             <div class="mt-2 text-gray-600 dark:text-gray-300">
                 <template x-if="pushTokens === 0">

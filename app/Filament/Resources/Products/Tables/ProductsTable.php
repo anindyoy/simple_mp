@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
+use Livewire\Component as Livewire;
 
 class ProductsTable
 {
@@ -244,7 +245,7 @@ class ProductsTable
 
                     ->tooltip(fn() => ProductPolicy::pushTooltip())
 
-                    ->action(function ($record) {
+                    ->action(function ($record, Livewire $livewire) {
                         if (! ProductPolicy::canPush()) {
                             Notification::make()
                                 ->title('Belum bisa angkat')
@@ -300,6 +301,12 @@ class ProductsTable
                             ->body('Token tersisa: ' . $remainingTokens)
                             ->success()
                             ->send();
+
+                        $livewire->dispatch('push-countdown-refresh');
+
+                        if (method_exists($livewire, 'resetTable')) {
+                            $livewire->resetTable();
+                        }
                     }),
 
                 EditAction::make(),

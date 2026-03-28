@@ -9,18 +9,19 @@ use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\TokenPurchase;
 use Filament\Resources\Resource;
+use Livewire\Component as Livewire;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use App\Filament\Resources\TokenPurchases\Pages\ViewTokenPurchase;
 use App\Filament\Resources\TokenPurchases\Pages\ListTokenPurchases;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class TokenPurchaseResource extends Resource
 {
@@ -143,6 +144,13 @@ class TokenPurchaseResource extends Resource
                     'cancelled' => 'Dibatalkan',
                 ])
                 ->disabled();
+
+            $fields[] = Textarea::make('notes')
+                ->label('Keterangan Pembatalan')
+                ->rows(3)
+                ->disabled()
+                ->columnSpanFull()
+                ->visible(fn(?TokenPurchase $record): bool => $record?->status === 'cancelled' && filled($record?->notes));
         }
 
         return $schema->schema($fields);
@@ -195,6 +203,19 @@ class TokenPurchaseResource extends Resource
                 ->sortable()
                 ->dateTime('d/m/Y H:i'),
         ]);
+
+        if (! $isAdmin) {
+            $columns[] = TextColumn::make('notes')
+                ->label('Keterangan')
+                ->state(fn(TokenPurchase $record): string => $record->status === 'cancelled'
+                    ? ((string) ($record->notes ?: '-'))
+                    : '-')
+                ->limit(40)
+                ->tooltip(fn(TokenPurchase $record): ?string => $record->status === 'cancelled' && filled($record->notes)
+                    ? (string) $record->notes
+                    : null)
+                ->wrap();
+        }
 
         // Only show proof_of_payment for admin
         if ($isAdmin) {
@@ -256,7 +277,15 @@ class TokenPurchaseResource extends Resource
                         ->color('success')
                         ->requiresConfirmation()
                         ->visible(fn(TokenPurchase $record) => $record->status === 'pending')
-                        ->action(fn(TokenPurchase $record) => static::confirmPurchase($record)),
+                        ->action(function (TokenPurchase $record, Livewire $livewire): void {
+                            static::confirmPurchase($record);
+
+                            $livewire->dispatch('push-countdown-refresh');
+
+                            if (method_exists($livewire, 'resetTable')) {
+                                $livewire->resetTable();
+                            }
+                        }),
 
                     Action::make('cancel')
                         ->label('Batalkan')
@@ -264,7 +293,20 @@ class TokenPurchaseResource extends Resource
                         ->color('danger')
                         ->requiresConfirmation()
                         ->visible(fn(TokenPurchase $record) => $record->status === 'pending')
-                        ->action(fn(TokenPurchase $record) => static::cancelPurchase($record)),
+                        ->schema([
+                            Textarea::make('notes')
+                                ->label('Keterangan Pembatalan')
+                                ->required()
+                                ->maxLength(1000)
+                                ->rows(3),
+                        ])
+                        ->action(function (TokenPurchase $record, array $data, Livewire $livewire): void {
+                            static::cancelPurchase($record, (string) ($data['notes'] ?? ''));
+
+                            if (method_exists($livewire, 'resetTable')) {
+                                $livewire->resetTable();
+                            }
+                        }),
                 ] : [],
 
                 Action::make('view')
@@ -288,6 +330,12 @@ class TokenPurchaseResource extends Resource
         $record->user->addTokens($record->quantity);
 
         \Filament\Notifications\Notification::make()
+            ->title('Pembelian token dikonfirmasi admin')
+            ->body('Pembelian ' . $record->quantity . ' token telah dikonfirmasi. Token sudah ditambahkan ke akun Anda.')
+            ->success()
+            ->sendToDatabase($record->user);
+
+        \Filament\Notifications\Notification::make()
             ->title('Pembelian token dikonfirmasi')
             ->success()
             ->send();
@@ -296,11 +344,18 @@ class TokenPurchaseResource extends Resource
     /**
      * Cancel token purchase
      */
-    protected static function cancelPurchase(TokenPurchase $record): void
+    protected static function cancelPurchase(TokenPurchase $record, string $notes): void
     {
         $record->update([
             'status' => 'cancelled',
+            'notes' => $notes,
         ]);
+
+        \Filament\Notifications\Notification::make()
+            ->title('Pembelian token dibatalkan admin')
+            ->body('Pembelian token Anda dibatalkan. Keterangan: ' . $notes)
+            ->danger()
+            ->sendToDatabase($record->user);
 
         \Filament\Notifications\Notification::make()
             ->title('Pembelian token dibatalkan')

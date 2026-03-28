@@ -170,6 +170,7 @@ class SiteSettingsPage extends Page implements HasForms
                         Repeater::make('token_bank_accounts')
                             ->label('Rekening Bank Tujuan')
                             ->helperText('Daftar rekening bank untuk menerima pembayaran pembelian token.')
+                            ->itemLabel(fn(array $state): ?string => filled($state['bank_name'] ?? null) ? (string) $state['bank_name'] : null)
                             ->schema([
                                 TextInput::make('bank_name')
                                     ->label('Nama Bank')

@@ -104,13 +104,8 @@ class ProductsTable
                 TextColumn::make('pushed_at')
                     ->label('Diangkat')
                     ->since()
-                    ->sortable(),
-
-                TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->date('d M Y')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
             ])
             ->modifyQueryUsing(
                 fn(Builder $query) => $query->with([

@@ -4,7 +4,7 @@
         <div class="flex items-center gap-6">
             {{-- Brand --}}
             <a href="/" class="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
-                Jual Beli <span class="text-orange-500">{{ $region ?? 'Cimanglid' }}</span>
+                {{ $siteTitle ?? App\Models\Setting::getValue('site_title', 'Lapak Online Warga') }} <span class="text-orange-500">{{ $region ?? 'Cimanglid' }}</span>
             </a>
 
             <a href="{{ route('rules.index') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">

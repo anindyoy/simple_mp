@@ -101,7 +101,7 @@ class ProductController extends Controller
             'otherProductsInLapak' => $otherProductsInLapak,
             'region' => $region,
             'meta' => [
-                'title' => $product->title . ' - Jual Beli ' . $region,
+                'title' => $product->title . ' - ' . $siteTitle . ' ' . $region,
                 'description' => str()->limit(strip_tags($product->description), 155),
                 'keywords' => implode(', ', [
                     $product->title,

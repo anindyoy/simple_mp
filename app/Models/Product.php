@@ -13,10 +13,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
     protected $guarded = [];
 
     // Mengubah string pushed_at menjadi objek Carbon (Waktu) secara otomatis
@@ -149,5 +151,12 @@ class Product extends Model
             'seken' => 'Bekas',
             default => null,
         };
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title', 'slug', 'price', 'is_active', 'condition'])
+            ->useLogName('product');
     }
 }

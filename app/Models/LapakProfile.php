@@ -12,10 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class LapakProfile extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
     protected $guarded = [];
 
     protected $casts = [
@@ -147,5 +149,12 @@ class LapakProfile extends Model
             ->where('status', ProductModeration::STATUS_PENDING)
             ->latest()
             ->first();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'description', 'slug'])
+            ->useLogName('lapak');
     }
 }

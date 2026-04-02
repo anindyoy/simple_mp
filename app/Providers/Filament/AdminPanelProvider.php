@@ -36,12 +36,19 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->maxContentWidth('full')
             ->login()
+            ->brandLogo(asset('img/logo-transparent.png'))
+            ->brandLogoHeight('3rem')
+            ->favicon(asset('img/favicon-32x32.png'))
             ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling('15s')
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn() => view('filament.topbar.scripts')
+            )
+            ->renderHook(
+                PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
+                fn() => view('filament.auth.logo')
             )
             ->colors([
                 'primary' => Color::hex('#3F9AAE'),

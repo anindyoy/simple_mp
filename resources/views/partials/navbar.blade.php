@@ -4,7 +4,7 @@
         <div class="flex items-center gap-6">
             {{-- Brand --}}
             <a href="/" class="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
-                {{ $siteTitle ?? App\Models\Setting::getValue('site_title', 'Lapak Warga') }} <span class="text-orange-500">{{ $region ?? 'Cimanglid' }}</span>
+                <img src="{{ asset('img/logo-transparent.png') }}" alt="{{ $siteTitle ?? App\Models\Setting::getValue('site_title', 'Lapak Warga') }}" class="h-12 w-auto" />
             </a>
 
             <a href="{{ route('rules.index') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">

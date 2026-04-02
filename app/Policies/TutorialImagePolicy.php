@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\TutorialImage;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\TutorialImage;
 
 class TutorialImagePolicy
 {
@@ -13,7 +12,7 @@ class TutorialImagePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -21,7 +20,7 @@ class TutorialImagePolicy
      */
     public function view(User $user, TutorialImage $tutorialImage): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -29,7 +28,7 @@ class TutorialImagePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -37,7 +36,7 @@ class TutorialImagePolicy
      */
     public function update(User $user, TutorialImage $tutorialImage): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -45,7 +44,7 @@ class TutorialImagePolicy
      */
     public function delete(User $user, TutorialImage $tutorialImage): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -53,7 +52,7 @@ class TutorialImagePolicy
      */
     public function restore(User $user, TutorialImage $tutorialImage): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
@@ -61,6 +60,6 @@ class TutorialImagePolicy
      */
     public function forceDelete(User $user, TutorialImage $tutorialImage): bool
     {
-        return false;
+        return $user->is_admin;
     }
 }

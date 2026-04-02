@@ -35,7 +35,7 @@ Route::middleware('auth')->get('/debug/telegram-exception', function () {
 
 Route::middleware(['auth', 'throttle:10,1'])->get('/debug/telegram-test', function () {
     try {
-        $message = 'Test log Telegram dari debug route '.now()->toDateTimeString();
+        $message = 'Test log Telegram dari debug route ' . now()->toDateTimeString();
         Log::channel('telegram')->error($message);
 
         return response()->json([
@@ -64,4 +64,27 @@ Route::middleware('auth')->group(function () {
         // History
         Route::get('/tokens/history', 'history')->name('tokens.history');
     });
+});
+
+Route::get('/api/tutorial-images', function () {
+    $url = '/' . ltrim(request('url'), '/');
+
+    $tutorial = \App\Models\TutorialPage::with('images')
+        ->where('url', $url)
+        ->first();
+
+    if (!$tutorial) {
+        return response()->json([
+            'images' => []
+        ]);
+    }
+
+    $images = $tutorial->images->map(fn($img) => [
+        'url' => $img->image_url,
+        'caption' => $img->caption,
+    ]);
+
+    return response()->json([
+        'images' => $images
+    ]);
 });

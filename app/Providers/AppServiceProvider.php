@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
+use App\Models\TutorialPage;
 use Filament\Facades\Filament;
 use Filament\Support\Assets\Js;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Filament\Support\Facades\FilamentAsset;
@@ -39,21 +42,24 @@ class AppServiceProvider extends ServiceProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::GLOBAL_SEARCH_AFTER,
             function (): string {
-                $user = Auth::user();
 
-                $html = view('filament.topbar.home-button')->render();
+                $url = '/' . ltrim(Request::path(), '/');
 
-                // if ($user && ! $user->is_admin) {
-                //     $pushAt = Carbon::today()
-                //         ->setTime(21, 0)
-                //         ->timestamp * 1000;
+                $hasTutorial = Cache::remember(
+                    'tutorial_exists_' . md5($url),
+                    now()->addMinutes(5),
+                    fn() => TutorialPage::where('url', $url)
+                        ->whereHas('images')
+                        ->exists()
+                );
 
-                //     $html .= view('filament.topbar.push-countdown', [
-                //         'pushAt' => $pushAt,
-                //     ])->render();
-                // }
+                if (! $hasTutorial) {
+                    return '';
+                }
 
-                return $html;
+                return view('filament.topbar.actions', [
+                    'hasTutorial' => $hasTutorial,
+                ])->render();
             }
         );
     }

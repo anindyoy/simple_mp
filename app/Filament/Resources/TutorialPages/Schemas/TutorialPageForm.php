@@ -28,6 +28,7 @@ class TutorialPageForm
                     ->schema([
                         FileUpload::make('image')
                             ->image()
+                            ->disk('public')
                             ->directory('tutorials')
                             ->required(),
 

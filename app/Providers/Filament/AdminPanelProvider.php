@@ -44,7 +44,13 @@ class AdminPanelProvider extends PanelProvider
                 fn() => view('filament.topbar.scripts')
             )
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#3F9AAE'),
+                'secondary' => Color::hex('#79C9C5'),
+                'accent' => Color::hex('#FFE2AF'),
+                'other' => Color::hex('#F96E5B'),
+                'info' => Color::hex('#79C9C5'),
+                'warning' => Color::hex('#FFE2AF'),
+                'danger' => Color::hex('#F96E5B'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

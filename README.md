@@ -1,75 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Simple MP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Simple MP adalah aplikasi marketplace warga berbasis Laravel + Filament.
+Aplikasi ini mendukung katalog produk publik, profil lapak, autentikasi user dengan verifikasi email, pelaporan konten, moderasi admin, serta sistem token untuk fitur angkat produk.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Publik (tanpa login)
+- Melihat daftar produk dengan filter pencarian, kategori, dan kondisi.
+- Melihat detail produk dan daftar produk lain dari lapak yang sama.
+- Melihat halaman profil lapak.
+- Melihat halaman peraturan pengguna.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Member (setelah login)
+- Registrasi dan login publik.
+- Wajib verifikasi email sebelum bisa mengakses panel member/admin.
+- Mengelola profil lapak sendiri.
+- Mengelola produk milik lapak sendiri.
+- Melakukan report produk/lapak.
+- Membeli token angkat produk (request pembelian + upload bukti transfer).
+- Melihat riwayat pembelian token.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Admin
+- Moderasi laporan (report) dari pengguna.
+- Konfirmasi atau pembatalan pembelian token user.
+- Kelola pengguna dan aktivitas log.
+- Atur konfigurasi aplikasi dari panel (judul situs, SEO, wilayah, token, rekening bank, konten peraturan, label link external lapak).
 
-## Verifikasi Email
+## Stack Teknologi
 
-Project ini mewajibkan verifikasi email sebelum user bisa login ke area member.
+- PHP 8.2
+- Laravel 12
+- Filament 5
+- MySQL/DB relasional (mengikuti konfigurasi .env)
+- Vite + Tailwind CSS 4
 
-Alur yang digunakan:
-- Setelah register berhasil, user diarahkan ke halaman konfirmasi verifikasi email.
-- Sistem mengirim link verifikasi ke email user.
-- User harus klik link verifikasi sebelum bisa login.
-- Jika email belum masuk, user bisa kirim ulang dari halaman verifikasi.
+## Alur Verifikasi Email
 
-Konfigurasi yang perlu diperhatikan:
-- Pastikan `APP_URL` sesuai domain aplikasi agar link verifikasi valid.
-- Untuk development cepat, `MAIL_MAILER=log` akan menulis email ke log Laravel.
-- Untuk pengiriman email nyata, gunakan SMTP melalui variabel `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, dan `MAIL_FROM_ADDRESS`.
-- Contoh konfigurasi SMTP sudah disediakan di `.env.example`.
+Verifikasi email diwajibkan sebelum user dapat masuk ke area panel.
 
-## Learning Laravel
+Alur:
+- Setelah register berhasil, sistem mengirim email verifikasi.
+- User klik link verifikasi.
+- Jika belum menerima email, user dapat kirim ulang dari halaman verifikasi.
+- Login akan ditolak jika email belum terverifikasi.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Konfigurasi penting:
+- Pastikan APP_URL sesuai domain aplikasi agar URL verifikasi valid.
+- Untuk pengembangan cepat, MAIL_MAILER=log akan menulis email ke log Laravel.
+- Untuk email nyata, gunakan SMTP dengan variabel MAIL_MAILER, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, dan MAIL_FROM_ADDRESS.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Sistem Token Angkat Produk
 
-## Laravel Sponsors
+User mendapatkan token awal saat registrasi.
+Token dipakai untuk fitur angkat produk, dan user bisa membeli token tambahan melalui transfer bank.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Yang tersedia di sistem:
+- Request pembelian token oleh user.
+- Upload bukti transfer.
+- Validasi dan konfirmasi/cancel oleh admin.
+- Refill minimum token harian dan mingguan via scheduler.
 
-### Premium Partners
+Scheduler bawaan:
+- tokens:refill-daily (setiap hari pukul 00:00)
+- tokens:refill-weekly (setiap Jumat pukul 00:00)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Menjalankan Project (Local)
 
-## Contributing
+### 1. Instalasi cepat
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Gunakan script bawaan composer:
 
-## Code of Conduct
+```bash
+composer run setup
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Script ini menjalankan:
+- install dependency PHP
+- membuat file .env (jika belum ada)
+- generate app key
+- migrate database
+- install dependency frontend
+- build asset frontend
 
-## Security Vulnerabilities
+### 2. Jalankan mode development
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer run dev
+```
 
-## License
+Perintah ini menjalankan sekaligus:
+- Laravel dev server
+- queue worker
+- log viewer (pail)
+- Vite dev server
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Environment yang Perlu Diperhatikan
+
+- APP_URL: wajib sesuai domain/host aktif.
+- DB_*: sesuaikan koneksi database.
+- MAIL_*: untuk verifikasi email.
+- TURNSTILE_SITE_KEY dan TURNSTILE_SECRET_KEY: untuk proteksi captcha (non-local).
+
+## Aturan Warna
+
+Project ini menggunakan palet warna dari Color Hunt:
+https://colorhunt.co/palette/3f9aae79c9c5ffe2aff96e5b
+
+- Primary: #3F9AAE
+- Secondary: #79C9C5
+- Accent: #FFE2AF
+- Other: #F96E5B
+
+Aturan penggunaan:
+- Primary digunakan untuk identitas utama brand, tombol primer, dan elemen fokus utama.
+- Secondary digunakan untuk area pendukung seperti badge sekunder, panel informasi, atau hover state ringan.
+- Accent digunakan sebagai warna latar highlight, callout, atau area penekanan non-kritis.
+- Other digunakan untuk aksi penting seperti peringatan, error, atau CTA yang butuh kontras tinggi.
+
+Token CSS disediakan di resources/css/app.css:
+- --color-primary
+- --color-secondary
+- --color-accent
+- --color-other

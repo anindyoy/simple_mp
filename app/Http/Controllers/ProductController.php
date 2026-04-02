@@ -35,7 +35,7 @@ class ProductController extends Controller
 
         $siteTitle = Setting::getValue(
             'site_title',
-            'Lapak Online Warga'
+            'Lapak Warga'
         );
         $siteDescription = Setting::getValue(
             'site_description',
@@ -91,7 +91,7 @@ class ProductController extends Controller
 
         $siteTitle = Setting::getValue(
             'site_title',
-            'Lapak Online Warga'
+            'Lapak Warga'
         );
         $region = Setting::getValue('site_region', 'Cimanglid');
 

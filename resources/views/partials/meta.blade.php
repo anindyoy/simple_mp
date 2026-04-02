@@ -1,5 +1,5 @@
 @php
-    $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Online Warga');
+    $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Warga');
     $defaultRegion = App\Models\Setting::getValue('site_region', 'Cimanglid');
 @endphp
 <meta name="description" content="@yield('meta_description', 'Marketplace lokal warga ' . $defaultRegion . '. Jual beli langsung via WhatsApp & Telegram.')">

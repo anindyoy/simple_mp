@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32x32.png') }}">
 
     <title>@php
-    $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Online Warga');
+    $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Warga');
     $defaultRegion = App\Models\Setting::getValue('site_region', 'Cimanglid');
 @endphp@yield('title', $siteTitle . ' ' . $defaultRegion)</title>
 

@@ -106,7 +106,7 @@ class LapakProfile extends Model
             $number = '628' . substr($number, 2);
         }
 
-        $siteName = Setting::getValue('site_title', 'Lapak Online Warga');
+        $siteName = Setting::getValue('site_title', 'Lapak Warga');
         $region = Setting::getValue('site_region', 'Cimanglid');
         $message = 'Halo, saya tertarik dengan produk di lapak *'
             . $this->name

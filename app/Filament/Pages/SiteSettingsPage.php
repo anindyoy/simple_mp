@@ -51,7 +51,7 @@ class SiteSettingsPage extends Page implements HasForms
         abort_unless((bool) auth()->user()?->is_admin, 403);
 
         $this->form->fill([
-            'site_title' => Setting::getValue('site_title', 'Lapak Online Warga'),
+            'site_title' => Setting::getValue('site_title', 'Lapak Warga'),
             'site_description' => Setting::getValue('site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'),
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),

@@ -9,7 +9,7 @@ class UserRulesController extends Controller
 {
     public function index()
     {
-        $siteTitle = Setting::getValue('site_title', 'Lapak Online Warga');
+        $siteTitle = Setting::getValue('site_title', 'Lapak Warga');
         $region = Setting::getValue('site_region', 'Cimanglid');
 
         return view('rules.index', [

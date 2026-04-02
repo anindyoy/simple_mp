@@ -14,6 +14,7 @@ use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use App\Filament\Widgets\PushCountdownWidget;
+use JibayMcs\FilamentTour\FilamentTourPlugin;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use App\Http\Middleware\EnsureLapakProfileExists;
@@ -38,6 +39,8 @@ class AdminPanelProvider extends PanelProvider
                 condition: true,
                 force: fn(): bool => app()->environment('production') && (bool) auth()->user()?->is_admin,
             );
+
+        $plugins[] = FilamentTourPlugin::make()->enableCssSelector(app()->environment('local'));
 
         if (
             app()->environment('local') &&
@@ -71,10 +74,6 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn() => view('filament.topbar.scripts')
-            )
-            ->renderHook(
-                PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
-                fn() => view('filament.auth.logo')
             )
             ->colors([
                 'primary' => Color::hex('#3F9AAE'),

@@ -12,6 +12,7 @@ use Filament\Widgets\AccountWidget;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
 use App\Filament\Widgets\PushCountdownWidget;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,7 +30,32 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $panelConfig = $panel
+        $plugins = [];
+
+        $plugins[] = BreezyCore::make()
+            ->myProfile()
+            ->enableTwoFactorAuthentication(
+                condition: true,
+                force: fn(): bool => app()->environment('production') && (bool) auth()->user()?->is_admin,
+            );
+
+        if (
+            app()->environment('local') &&
+            !app()->runningUnitTests() &&
+            Schema::hasTable('users') &&
+            Schema::hasColumn('users', 'is_admin')
+        ) {
+            $plugins[] = FilamentDeveloperLoginsPlugin::make()
+                ->enabled(true)
+                ->users(
+                    collect([
+                        'Admin' => User::where('is_admin', true)->pluck('email')->first(),
+                        'User' => User::whereHas('lapak')->pluck('email')->first(),
+                    ])->filter()->toArray()
+                );
+        }
+
+        return $panel
             ->default()
             ->id('admin')
             ->path('admin')
@@ -69,27 +95,8 @@ class AdminPanelProvider extends PanelProvider
                 PushCountdownWidget::class,
                 AccountWidget::class,
                 FilamentInfoWidget::class,
-            ]);
-
-        if (
-            app()->environment('local') &&
-            !app()->runningUnitTests() &&
-            Schema::hasTable('users') &&
-            Schema::hasColumn('users', 'is_admin')
-        ) {
-            $panelConfig->plugins([
-                FilamentDeveloperLoginsPlugin::make()
-                    ->enabled(true)
-                    ->users(
-                        collect([
-                            'Admin' => User::where('is_admin', true)->pluck('email')->first(),
-                            'User' => User::whereHas('lapak')->pluck('email')->first(),
-                        ])->filter()->toArray()
-                    )
-            ]);
-        }
-
-        return $panelConfig
+            ])
+            ->plugins($plugins)
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

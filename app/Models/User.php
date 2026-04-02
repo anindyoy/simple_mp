@@ -3,20 +3,22 @@
 namespace App\Models;
 
 use Filament\Panel;
-use Filament\Models\Contracts\FilamentUser;
 use App\Models\LapakProfile;
+use App\Models\TokenPurchase;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 
 class User extends Authenticatable implements MustVerifyEmailContract, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, MustVerifyEmail, Notifiable, LogsActivity;
+    use HasFactory, MustVerifyEmail, Notifiable, LogsActivity, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.

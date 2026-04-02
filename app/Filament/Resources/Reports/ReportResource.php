@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Reports;
 
 use BackedEnum;
-use ValueError;
 use App\Models\Report;
 use App\Models\Product;
 use Filament\Tables\Table;
@@ -11,8 +10,6 @@ use App\Models\LapakProfile;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
-use Filament\Support\Icons\Heroicon;
-use Filament\Schemas\Components\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Reports\Pages\EditReport;
@@ -26,7 +23,7 @@ class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
     // protected static ?string $navigationGroup = 'Moderasi';
-    protected static ?string $navigationLabel = 'Laporan';
+    protected static ?string $navigationLabel = 'Moderasi';
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-flag';
 
     public static function canViewAny(): bool

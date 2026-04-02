@@ -2,8 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use BackedEnum;
+use App\Models\User;
 use Filament\Tables;
+use App\Models\Report;
+use App\Models\Product;
+use App\Models\Setting;
+use App\Models\Category;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Spatie\Activitylog\Models\Activity;
@@ -14,6 +20,7 @@ class ActivityLogResource extends Resource
     protected static ?string $model = Activity::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static UnitEnum|string|null $navigationGroup = 'Pengaturan';
 
     protected static ?string $navigationLabel = 'Activity Logs';
 
@@ -29,7 +36,7 @@ class ActivityLogResource extends Resource
                     ->label('Action'),
                 Tables\Columns\TextColumn::make('log_name')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'user' => 'blue',
                         'product' => 'green',
                         'lapak' => 'indigo',
@@ -48,7 +55,7 @@ class ActivityLogResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label('Model')
-                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->formatStateUsing(fn(string $state): string => class_basename($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

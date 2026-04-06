@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Products\Pages;
 
-use App\Filament\Resources\Products\ProductResource;
-use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Resources\Products\ProductResource;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class CreateProduct extends CreateRecord
@@ -21,6 +21,11 @@ class CreateProduct extends CreateRecord
         unset($data['uploaded_images']);
 
         return $data;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 
     protected function afterCreate(): void

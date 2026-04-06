@@ -10,6 +10,7 @@ use App\Models\ProductImage;
 use App\Models\ProductModeration;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\ProductScheduleService;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,6 +41,15 @@ class Product extends Model
 
             $product->pushed_at = now()->subHours(2);
         });
+
+        static::created(function ($product) {
+            ProductScheduleService::append($product);
+        });
+
+        static::deleted(function ($product) {
+            ProductScheduleService::rebuild($product->lapak_id);
+        });
+
 
         /**
          * Validasi condition berdasarkan kategori

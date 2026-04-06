@@ -64,6 +64,10 @@ class ProductSeeder extends Seeder
                 ? $existingLapaks->random()->id
                 : LapakProfile::factory()->create()->id;
 
+            $time = now()->subHours(rand(1, 24));
+
+            $product->created_at = $time;
+
             $product->save();
 
             ProductImage::factory(rand(1, 3))->create([

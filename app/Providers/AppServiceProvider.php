@@ -53,10 +53,6 @@ class AppServiceProvider extends ServiceProvider
                         ->exists()
                 );
 
-                if (! $hasTutorial) {
-                    return '';
-                }
-
                 return view('filament.topbar.actions', [
                     'hasTutorial' => $hasTutorial,
                 ])->render();

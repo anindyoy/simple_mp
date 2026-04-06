@@ -20,16 +20,39 @@ class ProductController extends Controller
             'lapak',
             'images' => fn($q) => $q->where('is_primary', true),
         ])
-            ->whereHas('lapak', function ($lapakQuery) {
-                $lapakQuery->where('is_active', true);
-            })
+            ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
             ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
             ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
             ->when($condition, fn($q) => $q->where('condition', $condition))
             ->orderBy('pushed_at', 'desc')
-            ->paginate(16)
-            ->withQueryString();
+            ->get();
+
+        $products = $products->filter(function ($product) {
+            $schedule = \App\Services\ProductScheduleService::get($product->lapak_id);
+
+            // 🔥 kalau kosong → rebuild
+            if (empty($schedule)) {
+                \App\Services\ProductScheduleService::rebuild($product->lapak_id);
+                $schedule = \App\Services\ProductScheduleService::get($product->lapak_id);
+            }
+
+            $publishAt = $schedule[$product->id] ?? null;
+
+            if (! $publishAt) {
+                return false;
+            }
+
+            return $publishAt <= now();
+        });
+
+        $products = new \Illuminate\Pagination\LengthAwarePaginator(
+            $products->forPage(request()->page ?? 1, 16),
+            $products->count(),
+            16,
+            request()->page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         $categories = Category::orderBy('category_name')->get();
 

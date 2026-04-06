@@ -9,6 +9,7 @@ use App\Models\Product;
 class ProductPolicy
 {
     private const PUSH_COOLDOWN_HOURS = 6;
+    private const PUSH_COOLDOWN_AFTER_CREATE = 4;
     private const PUSH_TOKEN_COST = 1;
 
     private function ownsProduct(User $user, Product $product): bool
@@ -24,6 +25,10 @@ class ProductPolicy
             return null;
         }
 
+        $lastProduct = Product::where('lapak_id', $user->lapak->id)
+            ->latest('created_at')
+            ->first();
+
         $lastPush = Product::where('lapak_id', $user->lapak->id)
             ->whereNotNull('pushed_at')
             ->max('pushed_at');
@@ -32,7 +37,16 @@ class ProductPolicy
             return null;
         }
 
-        return Carbon::parse($lastPush);
+        $lastPushAt = Carbon::parse($lastPush);
+
+        // jika produk terakhir baru dibuat → pakai rule 4 jam
+        if ($lastProduct && $lastProduct->created_at->gt($lastPushAt)) {
+            return $lastProduct->created_at->copy()
+                ->addHours(self::PUSH_COOLDOWN_AFTER_CREATE)
+                ->subHours(self::PUSH_COOLDOWN_HOURS);
+        }
+
+        return $lastPushAt;
     }
 
     public static function nextPushAt(): ?Carbon

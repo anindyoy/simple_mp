@@ -4,17 +4,17 @@ namespace App\Models;
 
 use App\Models\Report;
 use App\Models\Category;
-use App\Models\ProductModeration;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use App\Models\ProductImage;
+use App\Models\ProductModeration;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Product extends Model
 {
@@ -36,6 +36,9 @@ class Product extends Model
          */
         static::creating(function ($product) {
             $product->slug = Str::slug($product->title) . '-' . rand(1000, 9999);
+            $product->lapak_id = auth()->user()?->lapak?->id;
+
+            $product->pushed_at = now()->subHours(2);
         });
 
         /**

@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Models\User;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use App\Policies\ProductPolicy;
 use Filament\Actions\EditAction;
 use App\Models\ProductModeration;
+use Illuminate\Support\Facades\DB;
 use Filament\Tables\Filters\Filter;
+use Livewire\Component as Livewire;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -17,11 +20,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
 use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
-use Livewire\Component as Livewire;
 
 class ProductsTable
 {
@@ -103,8 +103,15 @@ class ProductsTable
 
                 TextColumn::make('pushed_at')
                     ->label('Diangkat')
-                    ->since()
                     ->sortable()
+                    ->formatStateUsing(function ($state, $record) {
+                        // Jika pushed_at == created_at (produk baru, belum pernah push)
+                        if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
+                            return '-';
+                        }
+
+                        return $record->pushed_at?->diffForHumans();
+                    })
                     ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
             ])
             ->modifyQueryUsing(

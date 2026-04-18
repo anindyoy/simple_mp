@@ -33,13 +33,23 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                // ImageColumn::make('primaryImage.image_url')
+                //     ->label('Foto')
+                //     ->disk('public')
+                //     ->height(48)
+                //     ->width(48)
+                //     ->square()
+                //     ->defaultImageUrl(url('/images/no-image.png')),
+
                 ImageColumn::make('primaryImage.image_url')
+                    ->circular()
+                    ->stacked()
                     ->label('Foto')
                     ->disk('public')
-                    ->height(48)
-                    ->width(48)
-                    ->square()
-                    ->defaultImageUrl(url('/images/no-image.png')),
+                    ->limit(3)
+                    ->overlap(4)
+                    ->remainingTextBadge(true)
+                    ->imageGallery(),
 
                 TextColumn::make('title')
                     ->label('Produk')
@@ -129,6 +139,7 @@ class ProductsTable
                         fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
                     )
             )
+            // ->stackedOnMobile()
             ->defaultSort('pushed_at', 'desc')
             ->filtersFormColumns(3)
             ->filters([

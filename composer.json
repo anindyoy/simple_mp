@@ -28,7 +28,8 @@
         "laravel/telescope": "^5.19",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "*"
+        "pestphp/pest": "*",
+        "spatie/guidelines-skills": "@dev"
     },
     "autoload": {
         "psr-4": {

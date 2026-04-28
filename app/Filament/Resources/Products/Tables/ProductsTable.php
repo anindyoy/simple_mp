@@ -12,15 +12,14 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Filters\Filter;
 use Livewire\Component as Livewire;
 use Filament\Actions\BulkActionGroup;
-use Filament\Support\Enums\Alignment;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\ProductModerationService;
@@ -32,123 +31,90 @@ class ProductsTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Stack::make([
+                    Split::make([
+                        ImageColumn::make('images')
+                            ->circular()
+                            ->stacked()
+                            ->label('Foto')
+                            ->disk('public')
+                            ->limit(3)
+                            ->overlap(4)
+                            ->remainingTextBadge(true)
+                            ->imageGallery()
+                            ->getStateUsing(fn($record) => $record->images->pluck('image_url')->all())
+                            ->height(120)
+                            ->width(120),
 
-                Split::make([
-                    ImageColumn::make('primaryImage.image_url')
-                        ->circular()
-                        ->stacked()
-                        ->label('Foto')
-                        ->disk('public')
-                        ->limit(3)
-                        ->overlap(4)
-                        ->remainingTextBadge(true)
-                        ->imageGallery(),
+                        TextColumn::make('is_active')
+                            ->label('Aktif')
+                            ->badge()
+                            ->formatStateUsing(fn($state) => $state ? 'Aktif' : 'Tidak Aktif')
+                            ->color(fn($state) => $state ? 'success' : 'danger')
+                            ->alignEnd()
+                            ->grow(false),
+                    ]),
 
-                    Stack::make([
-                        TextColumn::make('title')
-                            ->label('Produk')
-                            ->searchable()
-                            ->sortable()
-                            ->description(fn($record) => $record->condition ? 'Kondisi: ' . ucfirst($record->condition) : null)
-                            ->state(function ($record): array {
-                                $lines = [$record->title];
+                    TextColumn::make('title')
+                        ->label('Produk')
+                        ->searchable()
+                        ->sortable()
+                        ->weight(FontWeight::Bold)
+                        ->wrap(),
 
-                                $reason = $record->latestDeactivation?->reason;
+                    TextColumn::make('category.category_name')
+                        ->label('Kategori')
+                        ->sortable()
+                        ->badge()
+                        ->color('gray'),
 
-                                if ((! $record->is_active) && $reason) {
-                                    $lines[] = 'Dinonaktifkan, sebab: ' . $reason;
-                                }
+                    TextColumn::make('lapak.name')
+                        ->label('Lapak')
+                        ->searchable()
+                        ->hidden(!auth()->user()->is_admin)
+                        ->sortable(),
 
-                                return $lines;
-                            })
-                            ->listWithLineBreaks()
-                            ->color(fn($state): ?string => str_starts_with((string) $state, 'Dinonaktifkan, sebab:') ? 'danger' : null)
-                            ->wrap(),
+                    TextColumn::make('price')
+                        ->label('Harga')
+                        ->money('IDR', locale: 'id')
+                        ->sortable()
+                        ->weight(FontWeight::Bold)
+                        ->color('success'),
 
-                        TextColumn::make('lapak.name')
-                            ->label('Lapak')
-                            ->searchable()
-                            ->hidden(!auth()->user()->is_admin)
-                            ->sortable()
-                            ->description(fn($record) => $record->lapak?->user ? 'Pemilik: ' . $record->lapak->user->name : null),
+                    TextColumn::make('pushed_at')
+                        ->label('Diangkat')
+                        ->sortable()
+                        ->formatStateUsing(function ($state, $record) {
+                            if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
+                                return '-';
+                            }
+                            return $record->pushed_at?->diffForHumans();
+                        })
+                        ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
 
-                        TextColumn::make('category.category_name')
-                            ->label('Kategori')
-                            ->sortable(),
-                    ])
-                        ->space(1),
-
-                    Stack::make([
-                        TextColumn::make('price')
-                            ->label('Harga')
-                            ->money('IDR', locale: 'id')
-                            ->sortable(),
-
-                        TextColumn::make('pushed_at')
-                            ->label('Diangkat')
-                            ->sortable()
-                            ->formatStateUsing(function ($state, $record) {
-                                if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
-                                    return '-';
-                                }
-
-                                return $record->pushed_at?->diffForHumans();
-                            })
-                            ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
-                    ])
-                        ->alignment(Alignment::End)
-                        ->space(1)
-                        ->visibleFrom('md'),
+                    TextColumn::make('latestReactivationRequest.status')
+                        ->label('Aktivasi Ulang')
+                        ->badge()
+                        ->toggleable(isToggledHiddenByDefault: true)
+                        ->color(fn(?string $state) => match ($state) {
+                            ProductModeration::STATUS_PENDING => 'warning',
+                            ProductModeration::STATUS_APPROVED => 'success',
+                            ProductModeration::STATUS_REJECTED => 'danger',
+                            default => 'gray',
+                        })
+                        ->formatStateUsing(fn(?string $state) => match ($state) {
+                            ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
+                            ProductModeration::STATUS_APPROVED => 'Disetujui',
+                            ProductModeration::STATUS_REJECTED => 'Ditolak',
+                            default => '-',
+                        }),
                 ])
-                    ->from('md'),
-
-                TextColumn::make('price')
-                    ->label('Harga')
-                    ->money('IDR', locale: 'id')
-                    ->sortable()
-                    ->hiddenFrom('md'),
-
-                TextColumn::make('pushed_at')
-                    ->label('Diangkat')
-                    ->sortable()
-                    ->formatStateUsing(function ($state, $record) {
-                        if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
-                            return '-';
-                        }
-
-                        return $record->pushed_at?->diffForHumans();
-                    })
-                    ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y'))
-                    ->hiddenFrom('md'),
-
-                ToggleColumn::make('is_active')
-                    ->label('Aktif')
-                    ->disabled(
-                        fn($record) => auth()->user()->is_admin || $record->latestDeactivation?->reason !== 'Produk tidak sesuai ketentuan'
-                    ),
-
-                TextColumn::make('latestReactivationRequest.status')
-                    ->label('Aktivasi Ulang')
-                    ->state(fn($record) => $record->latestReactivationRequest?->status)
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->color(fn(?string $state) => match ($state) {
-                        ProductModeration::STATUS_PENDING => 'warning',
-                        ProductModeration::STATUS_APPROVED => 'success',
-                        ProductModeration::STATUS_REJECTED => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn(?string $state) => match ($state) {
-                        ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
-                        ProductModeration::STATUS_APPROVED => 'Disetujui',
-                        ProductModeration::STATUS_REJECTED => 'Ditolak',
-                        default => '-',
-                    }),
-
             ])
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 3,
+            ])
+            ->defaultSort('pushed_at', 'desc')
             ->modifyQueryUsing(
                 fn(Builder $query) => $query->with([
                     'primaryImage',
@@ -164,7 +130,6 @@ class ProductsTable
                         fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
                     )
             )
-            ->stackedOnMobile()
             ->defaultSort('pushed_at', 'desc')
             ->filtersFormColumns(3)
             ->filters([

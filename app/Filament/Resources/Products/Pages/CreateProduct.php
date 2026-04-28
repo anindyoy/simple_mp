@@ -39,11 +39,22 @@ class CreateProduct extends CreateRecord
                 ->all()
         );
 
+        // Ensure the first image becomes primary
+        $first = $this->record->images()->orderBy('id')->first();
+        if ($first) {
+            $this->record->images()->update(['is_primary' => false]);
+            $first->update(['is_primary' => true]);
+        }
+
         $this->optimizeUploadedImages();
     }
 
     protected function optimizeUploadedImages(): void
     {
+        if (app()->runningInConsole() && env('SKIP_IMAGE_OPTIMIZER', false)) {
+            return;
+        }
+
         foreach ($this->uploadedImages as $imageUrl) {
             if (! Storage::disk('public')->exists($imageUrl)) {
                 continue;

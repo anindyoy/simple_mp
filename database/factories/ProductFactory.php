@@ -32,7 +32,6 @@ class ProductFactory extends Factory
             'description' => $this->faker->paragraph(3),
             'price' => $this->faker->numberBetween(10_000, 2_000_000),
 
-            // 👉 logic kondisi produk
             'condition' => $category->supportsCondition()
                 ? $this->faker->randomElement(['baru', 'seken'])
                 : null,

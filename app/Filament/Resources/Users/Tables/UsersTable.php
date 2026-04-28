@@ -124,12 +124,12 @@ class UsersTable
                 Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
 
                 Action::make('addPushToken')
-                    ->label('Tambah Token Angkat Produk')
+                    ->label('Tambah Token')
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
                     ->schema([
                         TextInput::make('amount')
-                            ->label('Jumlah Token Angkat Produk')
+                            ->label('Jumlah Token')
                             ->numeric()
                             ->minValue(1)
                             ->required(),
@@ -138,19 +138,19 @@ class UsersTable
                         $record->increment('push_tokens', (int) $data['amount']);
 
                         Notification::make()
-                            ->title('Token angkat produk berhasil ditambahkan')
-                            ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->title('Token berhasil ditambahkan')
+                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
                             ->success()
                             ->send();
                     }),
 
                 Action::make('setPushToken')
-                    ->label('Atur Token Angkat Produk')
+                    ->label('Atur Token')
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('warning')
                     ->schema([
                         TextInput::make('amount')
-                            ->label('Saldo Token Angkat Produk Baru')
+                            ->label('Saldo Token Baru')
                             ->numeric()
                             ->minValue(0)
                             ->required(),

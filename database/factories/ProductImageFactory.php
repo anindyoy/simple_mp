@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,10 +19,15 @@ class ProductImageFactory extends Factory
      */
     public function definition(): array
     {
+        // Download a placeholder image and store it in the public disk so
+        // Filament's ImageColumn with ->disk('public') can resolve it.
+        $files = Storage::disk('public')->files('seed-samples');
+        $path = !empty($files) ? $files[array_rand($files)] : 'products/placeholder.jpg';
+
         return [
             'product_id' => Product::factory(),
-            'image_url' => 'https://picsum.photos/seed/' . rand(1, 1000) . '/640/480',
-            'is_primary' => $this->faker->boolean(80), // 80% kemungkinan jadi foto utama
+            'image_url' => $path,
+            'is_primary' => $this->faker->boolean(80),
         ];
     }
 }

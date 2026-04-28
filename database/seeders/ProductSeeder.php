@@ -70,7 +70,7 @@ class ProductSeeder extends Seeder
 
             $product->save();
 
-            ProductImage::factory(rand(1, 3))->create([
+            ProductImage::factory(rand(2, 4))->create([
                 'product_id' => $product->id,
             ]);
         });

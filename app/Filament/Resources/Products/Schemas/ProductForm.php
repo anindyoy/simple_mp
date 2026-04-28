@@ -5,11 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use Filament\Forms;
 use App\Models\Category;
 use Filament\Schemas\Schema;
-use App\Models\ProductModeration;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Placeholder;
 
 class ProductForm
 {
@@ -71,40 +67,6 @@ class ProductForm
                     ])
                     ->columns(2),
 
-                // Section::make('Status Moderasi')
-                //     ->visible(
-                //         fn($record) =>
-                //         $record
-                //             && ! $record->is_active
-                //             && $record->latestDeactivation
-                //     )
-                //     ->schema([
-                //         Placeholder::make('nonaktif_info')
-                //             ->label('Status')
-                //             ->content(fn($record) => 'Produk ini dinonaktifkan oleh admin.'),
-
-                //         Textarea::make('deactivation_reason')
-                //             ->label('Alasan Dinonaktifkan')
-                //             ->default(fn($record) => $record->latestDeactivation?->reason)
-                //             ->disabled(fn() => ! auth()->user()?->is_admin)
-                //             ->dehydrated(false),
-
-                //         Placeholder::make('reactivation_status')
-                //             ->label('Status Aktivasi Ulang')
-                //             ->visible(fn($record) => (bool) $record->latestReactivationRequest)
-                //             ->content(function ($record) {
-                //                 $status = $record->latestReactivationRequest?->status;
-
-                //                 return match ($status) {
-                //                     ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
-                //                     ProductModeration::STATUS_APPROVED => 'Disetujui',
-                //                     ProductModeration::STATUS_REJECTED => 'Ditolak',
-                //                     default => '-',
-                //                 };
-                //             }),
-                //     ])
-                //     ->columns(1),
-
                 Section::make('Gambar Produk')
                     ->description('Gambar pertama akan digunakan sebagai gambar utama')
                     ->schema([
@@ -113,9 +75,11 @@ class ProductForm
                             ->image()
                             ->imageEditor()
                             ->multiple()
+                            ->panelLayout('grid')
                             ->reorderable()
                             ->maxFiles(5)
                             ->directory('products')
+                            ->disk('public')
                             ->required(),
                     ]),
             ])

@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,10 +19,26 @@ class ProductImageFactory extends Factory
      */
     public function definition(): array
     {
-        // Download a placeholder image and store it in the public disk so
-        // Filament's ImageColumn with ->disk('public') can resolve it.
-        $files = Storage::disk('public')->files('seed-samples');
-        $path = !empty($files) ? $files[array_rand($files)] : 'products/placeholder.jpg';
+        $disk = Storage::disk('public');
+
+        $files = $disk->files('seed-samples');
+
+        if (!empty($files)) {
+            $source = $files[array_rand($files)];
+
+            // ambil extension file
+            $ext = pathinfo($source, PATHINFO_EXTENSION);
+
+            // generate nama random
+            $randomName = 'products/' . Str::uuid() . '.' . $ext;
+
+            // copy file ke nama baru
+            $disk->copy($source, $randomName);
+
+            $path = $randomName;
+        } else {
+            $path = 'products/' . Str::uuid() . '.jpg';
+        }
 
         return [
             'product_id' => Product::factory(),

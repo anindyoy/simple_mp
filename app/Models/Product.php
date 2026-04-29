@@ -50,6 +50,11 @@ class Product extends Model
             ProductScheduleService::rebuild($product->lapak_id);
         });
 
+        static::deleting(function ($product) {
+            $product->images->each(function ($image) {
+                $image->delete(); // trigger event deleting di ProductImage
+            });
+        });
 
         /**
          * Validasi condition berdasarkan kategori

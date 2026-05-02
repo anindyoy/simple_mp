@@ -37,8 +37,10 @@ class LapakProfileFactory extends Factory
             ->values()
             ->all();
 
+        $user = User::factory()->create();
+
         return [
-            'user_id' => User::factory(),
+            'user_id' => $user->id,
             'name' => $name = $this->faker->company() . " Shop",
             'slug' => Str::slug($name) . '-' . Str::random(5),
             'profile_image' => asset('img/default-lapak-image.png'),

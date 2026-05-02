@@ -28,7 +28,10 @@ class LapakProfile extends Model
     protected static function booted()
     {
         static::creating(function ($lapak) {
-            $lapak->user_id = auth()->id();
+            // Set user_id dari auth hanya jika belum ada (respect factory setting)
+            if (is_null($lapak->user_id) && auth()->check()) {
+                $lapak->user_id = auth()->id();
+            }
             $lapak->slug = static::generateUniqueSlug($lapak->name);
         });
 

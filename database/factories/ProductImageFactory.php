@@ -19,12 +19,12 @@ class ProductImageFactory extends Factory
      */
     public function definition(): array
     {
-        $disk = Storage::disk('public');
-
-        $files = $disk->files('seed-samples');
+        $seedDir = public_path('img/seed-samples');
+        $files = array_filter(scandir($seedDir), fn($f) => !in_array($f, ['.', '..']));
 
         if (!empty($files)) {
             $source = $files[array_rand($files)];
+            $sourcePath = $seedDir . '/' . $source;
 
             // ambil extension file
             $ext = pathinfo($source, PATHINFO_EXTENSION);
@@ -32,8 +32,9 @@ class ProductImageFactory extends Factory
             // generate nama random
             $randomName = 'products/' . Str::uuid() . '.' . $ext;
 
-            // copy file ke nama baru
-            $disk->copy($source, $randomName);
+            // copy file ke storage disk
+            $disk = Storage::disk('public');
+            $disk->put($randomName, file_get_contents($sourcePath));
 
             $path = $randomName;
         } else {

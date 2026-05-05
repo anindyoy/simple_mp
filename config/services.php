@@ -45,4 +45,8 @@ return [
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
 
+    'filament' => [
+        'two_factor_enabled' => env('FILAMENT_2FA_ENABLED', true),
+    ],
+
 ];

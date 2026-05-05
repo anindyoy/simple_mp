@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
         $plugins[] = BreezyCore::make()
             ->myProfile()
             ->enableTwoFactorAuthentication(
-                condition: true,
+                condition: (bool) config('services.filament.two_factor_enabled', true),
                 force: fn(): bool => app()->environment('production') && (bool) auth()->user()?->is_admin,
             );
 

@@ -13,11 +13,13 @@ use Filament\Tables\Filters\Filter;
 use Livewire\Component as Livewire;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\ProductModerationService;
@@ -29,101 +31,90 @@ class ProductsTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Stack::make([
+                    Split::make([
+                        ImageColumn::make('images')
+                            ->circular()
+                            ->stacked()
+                            ->label('Foto')
+                            ->disk('public')
+                            ->limit(3)
+                            ->overlap(4)
+                            ->remainingTextBadge(true)
+                            ->imageGallery()
+                            ->getStateUsing(fn($record) => $record->images->pluck('image_url')->all())
+                            ->height(120)
+                            ->width(120),
 
-                // ImageColumn::make('primaryImage.image_url')
-                //     ->label('Foto')
-                //     ->disk('public')
-                //     ->height(48)
-                //     ->width(48)
-                //     ->square()
-                //     ->defaultImageUrl(url('/images/no-image.png')),
+                        TextColumn::make('is_active')
+                            ->label('Aktif')
+                            ->badge()
+                            ->formatStateUsing(fn($state) => $state ? 'Aktif' : 'Tidak Aktif')
+                            ->color(fn($state) => $state ? 'success' : 'danger')
+                            ->alignEnd()
+                            ->grow(false),
+                    ]),
 
-                ImageColumn::make('primaryImage.image_url')
-                    ->circular()
-                    ->stacked()
-                    ->label('Foto')
-                    ->disk('public')
-                    ->limit(3)
-                    ->overlap(4)
-                    ->remainingTextBadge(true)
-                    ->imageGallery(),
+                    TextColumn::make('title')
+                        ->label('Produk')
+                        ->searchable()
+                        ->sortable()
+                        ->weight(FontWeight::Bold)
+                        ->wrap(),
 
-                TextColumn::make('title')
-                    ->label('Produk')
-                    ->searchable()
-                    ->sortable()
-                    ->description(fn($record) => $record->condition ? 'Kondisi: ' . ucfirst($record->condition) : null)
-                    ->state(function ($record): array {
-                        $lines = [$record->title];
+                    TextColumn::make('category.category_name')
+                        ->label('Kategori')
+                        ->sortable()
+                        ->badge()
+                        ->color('gray'),
 
-                        $reason = $record->latestDeactivation?->reason;
+                    TextColumn::make('lapak.name')
+                        ->label('Lapak')
+                        ->searchable()
+                        ->hidden(!auth()->user()->is_admin)
+                        ->sortable(),
 
-                        if ((! $record->is_active) && $reason) {
-                            $lines[] = 'Dinonaktifkan, sebab: ' . $reason;
-                        }
+                    TextColumn::make('price')
+                        ->label('Harga')
+                        ->money('IDR', locale: 'id')
+                        ->sortable()
+                        ->weight(FontWeight::Bold)
+                        ->color('success'),
 
-                        return $lines;
-                    })
-                    ->listWithLineBreaks()
-                    ->color(fn($state): ?string => str_starts_with((string) $state, 'Dinonaktifkan, sebab:') ? 'danger' : null)
-                    ->wrap(),
+                    TextColumn::make('pushed_at')
+                        ->label('Diangkat')
+                        ->sortable()
+                        ->formatStateUsing(function ($state, $record) {
+                            if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
+                                return '-';
+                            }
+                            return $record->pushed_at?->diffForHumans();
+                        })
+                        ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
 
-                TextColumn::make('lapak.name')
-                    ->label('Lapak')
-                    ->searchable()
-                    ->hidden(!auth()->user()->is_admin)
-                    ->sortable()
-                    ->description(fn($record) => $record->lapak?->user ? 'Pemilik: ' . $record->lapak->user->name : null),
-
-                TextColumn::make('category.category_name')
-                    ->label('Kategori')
-                    ->sortable(),
-
-                TextColumn::make('price')
-                    ->label('Harga')
-                    ->money('IDR', locale: 'id')
-                    ->sortable(),
-
-                ToggleColumn::make('is_active')
-                    ->label('Aktif')
-                    ->disabled(
-                        fn($record) => auth()->user()->is_admin || $record->latestDeactivation?->reason !== 'Produk tidak sesuai ketentuan'
-                    ),
-
-                TextColumn::make('latestReactivationRequest.status')
-                    ->label('Aktivasi Ulang')
-                    ->state(fn($record) => $record->latestReactivationRequest?->status)
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->color(fn(?string $state) => match ($state) {
-                        ProductModeration::STATUS_PENDING => 'warning',
-                        ProductModeration::STATUS_APPROVED => 'success',
-                        ProductModeration::STATUS_REJECTED => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn(?string $state) => match ($state) {
-                        ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
-                        ProductModeration::STATUS_APPROVED => 'Disetujui',
-                        ProductModeration::STATUS_REJECTED => 'Ditolak',
-                        default => '-',
-                    }),
-
-                TextColumn::make('pushed_at')
-                    ->label('Diangkat')
-                    ->sortable()
-                    ->formatStateUsing(function ($state, $record) {
-                        // Jika pushed_at == created_at (produk baru, belum pernah push)
-                        if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
-                            return '-';
-                        }
-
-                        return $record->pushed_at?->diffForHumans();
-                    })
-                    ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
+                    TextColumn::make('latestReactivationRequest.status')
+                        ->label('Aktivasi Ulang')
+                        ->badge()
+                        ->toggleable(isToggledHiddenByDefault: true)
+                        ->color(fn(?string $state) => match ($state) {
+                            ProductModeration::STATUS_PENDING => 'warning',
+                            ProductModeration::STATUS_APPROVED => 'success',
+                            ProductModeration::STATUS_REJECTED => 'danger',
+                            default => 'gray',
+                        })
+                        ->formatStateUsing(fn(?string $state) => match ($state) {
+                            ProductModeration::STATUS_PENDING => 'Menunggu Moderasi',
+                            ProductModeration::STATUS_APPROVED => 'Disetujui',
+                            ProductModeration::STATUS_REJECTED => 'Ditolak',
+                            default => '-',
+                        }),
+                ])
             ])
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 3,
+            ])
+            ->defaultSort('pushed_at', 'desc')
             ->modifyQueryUsing(
                 fn(Builder $query) => $query->with([
                     'primaryImage',
@@ -139,7 +130,6 @@ class ProductsTable
                         fn($q) => $q->where('lapak_id', auth()->user()->lapak->id)
                     )
             )
-            // ->stackedOnMobile()
             ->defaultSort('pushed_at', 'desc')
             ->filtersFormColumns(3)
             ->filters([

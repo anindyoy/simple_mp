@@ -8,12 +8,13 @@ use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Support\Str;
 use App\Models\ProductModeration;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class LapakProfile extends Model
 {
@@ -27,13 +28,22 @@ class LapakProfile extends Model
     protected static function booted()
     {
         static::creating(function ($lapak) {
-            $lapak->user_id = auth()->id();
+            // Set user_id dari auth hanya jika belum ada (respect factory setting)
+            if (is_null($lapak->user_id) && auth()->check()) {
+                $lapak->user_id = auth()->id();
+            }
             $lapak->slug = static::generateUniqueSlug($lapak->name);
         });
 
         static::updating(function ($lapak) {
             if ($lapak->isDirty('name')) {
                 $lapak->slug = static::generateUniqueSlug($lapak->name);
+            }
+        });
+
+        static::deleting(function ($lapak) {
+            if ($lapak->profile_image) {
+                Storage::disk('public')->delete($lapak->profile_image);
             }
         });
     }

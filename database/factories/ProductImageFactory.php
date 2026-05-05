@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,10 +19,31 @@ class ProductImageFactory extends Factory
      */
     public function definition(): array
     {
+        $disk = Storage::disk('public');
+
+        $files = $disk->files('seed-samples');
+
+        if (!empty($files)) {
+            $source = $files[array_rand($files)];
+
+            // ambil extension file
+            $ext = pathinfo($source, PATHINFO_EXTENSION);
+
+            // generate nama random
+            $randomName = 'products/' . Str::uuid() . '.' . $ext;
+
+            // copy file ke nama baru
+            $disk->copy($source, $randomName);
+
+            $path = $randomName;
+        } else {
+            $path = 'products/' . Str::uuid() . '.jpg';
+        }
+
         return [
             'product_id' => Product::factory(),
-            'image_url' => 'https://picsum.photos/seed/' . rand(1, 1000) . '/640/480',
-            'is_primary' => $this->faker->boolean(80), // 80% kemungkinan jadi foto utama
+            'image_url' => $path,
+            'is_primary' => $this->faker->boolean(80),
         ];
     }
 }

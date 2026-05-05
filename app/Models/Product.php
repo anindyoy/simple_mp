@@ -9,6 +9,7 @@ use App\Models\LapakProfile;
 use App\Models\ProductImage;
 use App\Models\ProductModeration;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ProductScheduleService;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -37,7 +38,11 @@ class Product extends Model
          */
         static::creating(function ($product) {
             $product->slug = Str::slug($product->title) . '-' . rand(1000, 9999);
-            $product->lapak_id = auth()->user()?->lapak?->id;
+
+            // Set lapak_id dari auth user hanya jika belum ada
+            if (is_null($product->lapak_id) && auth()->check()) {
+                $product->lapak_id = auth()->user()?->lapak?->id;
+            }
 
             $product->pushed_at = now()->subHours(2);
         });
@@ -50,6 +55,11 @@ class Product extends Model
             ProductScheduleService::rebuild($product->lapak_id);
         });
 
+        static::deleting(function ($product) {
+            $product->images->each(function ($image) {
+                $image->delete(); // trigger event deleting di ProductImage
+            });
+        });
 
         /**
          * Validasi condition berdasarkan kategori

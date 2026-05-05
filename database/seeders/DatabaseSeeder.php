@@ -96,10 +96,14 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->command->info('Membuat user non admin...');
-        User::factory(10)->create();
+        $users = User::factory(10)->create();
 
         $this->command->info('Membuat lapak...');
-        LapakProfile::factory()->count(10)->create();
+        $users->each(function (User $user) {
+            LapakProfile::factory()->create([
+                'user_id' => $user->id,
+            ]);
+        });
 
         $this->command->info('Membuat produk...');
         $this->call([ProductSeeder::class]);

@@ -124,7 +124,7 @@ class ReportsTable
                     ->label('Tipe')
                     ->options([
                         \App\Models\Product::class => 'Produk',
-                        \App\Models\Lapak::class => 'Lapak',
+                        \App\Models\LapakProfile::class => 'Lapak',
                     ])
                     ->query(function (Builder $query, array $data) {
                         if ($data['value'] ?? null) {

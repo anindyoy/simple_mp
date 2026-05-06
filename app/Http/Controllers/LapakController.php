@@ -56,7 +56,7 @@ class LapakController extends Controller
             'meta' => [
                 'title' => $lapak->name . ' | Lapak ' . $region,
                 'description' => 'Lapak ' . $lapak->name . ' di marketplace warga ' . $region . '. Lihat produk & hubungi penjual langsung.',
-                'keywords' => 'lapak ' . $region . ', ' . $lapak->name . ', jual beli warga',
+                'keywords' => 'lapak ' . strtolower($region) . ', ' . $lapak->name . ', jual beli warga',
                 'image' => $lapak->profile_image,
             ],
         ]);

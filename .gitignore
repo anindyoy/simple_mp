@@ -21,5 +21,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+<<<<<<< HEAD
 prompt.php
 tests/coverage
+=======
+prompt.php
+>>>>>>> 6b1e1aa5d60031b9020f5a0fa274f4761e8a3c29

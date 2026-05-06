@@ -13,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
@@ -117,6 +118,8 @@ class ReportsTable
                     )
                     ->color('gray'),
             ])
+            ->defaultSort('last_reported_at', 'desc')
+            ->defaultSort(null) // reset fallback (trik penting)
             ->filters([
 
                 // 1️⃣ Filter Tipe (Produk / Lapak)
@@ -136,14 +139,17 @@ class ReportsTable
                 Filter::make('minimum_reports')
                     ->label('Minimal Total Report')
                     ->form([
-                        \Filament\Forms\Components\TextInput::make('min')
+                        TextInput::make('min')
                             ->numeric()
-                            ->label('Minimal')
+                            ->label('Minimal'),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if ($data['min'] ?? null) {
-                            $query->havingRaw('COUNT(*) >= ?', [$data['min']]);
+
+                        if (! isset($data['min'])) {
+                            return $query;
                         }
+
+                        return $query->where('aggregated_reports.total_reports', '>=', $data['min']);
                     }),
 
                 // 3️⃣ Filter Berdasarkan Waktu Terakhir Dilaporkan

@@ -64,18 +64,28 @@ class ReportResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->from('reports')
+            ->fromSub(function ($query) {
+                $query->from('reports')
+                    ->select([
+                        DB::raw('MIN(reports.id) as id'),
+                        'reports.reportable_type',
+                        'reports.reportable_id',
+                        DB::raw('COUNT(reports.id) as total_reports'),
+                        DB::raw('MAX(reports.created_at) as last_reported_at'),
+                    ])
+                    ->groupBy('reports.reportable_type', 'reports.reportable_id');
+            }, 'aggregated_reports')
 
             // JOIN PRODUCT
             ->leftJoin('products', function ($join) {
-                $join->on('products.id', '=', 'reports.reportable_id')
-                    ->where('reports.reportable_type', Product::class);
+                $join->on('products.id', '=', 'aggregated_reports.reportable_id')
+                    ->where('aggregated_reports.reportable_type', Product::class);
             })
 
             // JOIN LAPAK (langsung)
             ->leftJoin('lapak_profiles as direct_lapak', function ($join) {
-                $join->on('direct_lapak.id', '=', 'reports.reportable_id')
-                    ->where('reports.reportable_type', LapakProfile::class);
+                $join->on('direct_lapak.id', '=', 'aggregated_reports.reportable_id')
+                    ->where('aggregated_reports.reportable_type', LapakProfile::class);
             })
 
             // JOIN LAPAK dari PRODUCT
@@ -93,17 +103,15 @@ class ReportResource extends Resource
             })
 
             ->select([
-                'reports.reportable_type',
-                'reports.reportable_id',
-
-                DB::raw('COUNT(reports.id) as total_reports'),
-                DB::raw('MAX(reports.created_at) as last_reported_at'),
+                'aggregated_reports.id',
+                'aggregated_reports.reportable_type',
+                'aggregated_reports.reportable_id',
+                'aggregated_reports.total_reports',
+                'aggregated_reports.last_reported_at',
 
                 DB::raw('MAX(products.title) as product_title'),
                 DB::raw('MAX(direct_lapak.name) as lapak_name'),
-
                 DB::raw('MAX(product_lapak.name) as product_lapak_name'),
-
                 DB::raw('MAX(direct_owner.name) as direct_owner_name'),
                 DB::raw('MAX(product_owner.name) as product_owner_name'),
 
@@ -111,9 +119,11 @@ class ReportResource extends Resource
                 DB::raw('MAX(direct_lapak.is_active) as lapak_status'),
             ])
 
+            ->reorder('aggregated_reports.last_reported_at', 'desc')
+
             ->groupBy(
-                'reports.reportable_type',
-                'reports.reportable_id'
+                'aggregated_reports.reportable_type',
+                'aggregated_reports.reportable_id'
             );
     }
 

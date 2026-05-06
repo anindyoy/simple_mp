@@ -132,6 +132,7 @@ class ProductsTable
             )
             ->defaultSort('pushed_at', 'desc')
             ->filtersFormColumns(3)
+            ->recordUrl(null)
             ->filters([
                 SelectFilter::make('category_id')
                     ->label('Kategori')

@@ -23,7 +23,7 @@ class LapakProfileFactory extends Factory
             ['label' => 'Tokopedia', 'link' => 'https://www.tokopedia.com/' . Str::slug($this->faker->userName())],
             ['label' => 'Shopee', 'link' => 'https://shopee.co.id/' . Str::slug($this->faker->userName())],
             ['label' => 'Instagram', 'link' => 'https://instagram.com/' . Str::slug($this->faker->userName())],
-            ['label' => 'Website Toko', 'link' => $this->faker->url()],
+            ['label' => 'Website', 'link' => $this->faker->url()],
         ];
 
         $externalLinks = collect($this->faker->randomElements(

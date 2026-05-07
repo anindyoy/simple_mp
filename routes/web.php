@@ -13,20 +13,27 @@ Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/peraturan-pengguna', [UserRulesController::class, 'index'])->name('rules.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/lapak/{lapak}', [LapakController::class, 'show'])->name('lapak.show');
-Route::get('/email/verify', [PublicAuthController::class, 'showVerificationNotice'])->name('verification.notice');
 
-Route::post('/login', [PublicAuthController::class, 'login'])->name('login.public');
-Route::post('/logout', [PublicAuthController::class, 'logout'])->name('logout.public');
-Route::post('/register', [PublicAuthController::class, 'register'])->name('register.public');
-Route::post('/turnstile/client-error', [PublicAuthController::class, 'logTurnstileClientError'])
-    ->middleware('throttle:30,1')
-    ->name('turnstile.client-error');
-Route::post('/email/verification-notification', [PublicAuthController::class, 'resendVerificationEmail'])
-    ->middleware('throttle:6,1')
-    ->name('verification.send');
-Route::get('/email/verify/{id}/{hash}', [PublicAuthController::class, 'verifyEmail'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
+// Authentication routes
+Route::controller(PublicAuthController::class)->group(function () {
+    Route::get('/email/verify', 'showVerificationNotice')->name('verification.notice');
+    Route::post('/login', 'login')->name('login.public');
+    Route::post('/logout', 'logout')->name('logout.public');
+    Route::post('/register', 'register')->name('register.public');
+
+    Route::post('/turnstile/client-error', 'logTurnstileClientError')
+        ->middleware('throttle:30,1')
+        ->name('turnstile.client-error');
+
+    Route::post('/email/verification-notification', 'resendVerificationEmail')
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    Route::get('/email/verify/{id}/{hash}', 'verifyEmail')
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+});
+
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');
 
 Route::middleware('auth')->get('/debug/telegram-exception', function () {

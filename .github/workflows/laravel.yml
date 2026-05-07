@@ -33,6 +33,6 @@ jobs:
     - name: Generate key
       run: php artisan key:generate
     - name: Run Migrations
-      run: php artisan migrate --force
+      run: php artisan migrate --force --seed
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       run: php artisan test --parallel --processes=4

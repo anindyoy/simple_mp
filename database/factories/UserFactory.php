@@ -27,8 +27,8 @@ class UserFactory extends Factory
         $maxTokens = Setting::getIntValue('initial_push_tokens', 10);
 
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $name = fake()->name(),
+            'email' => $name ? Str::slug($name) . '_' . random_int(1000, 9999) . '@gmail.com' : fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'push_tokens' => random_int(0, $maxTokens),
@@ -41,7 +41,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

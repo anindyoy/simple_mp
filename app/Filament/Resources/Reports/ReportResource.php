@@ -120,6 +120,7 @@ class ReportResource extends Resource
             ])
 
             ->reorder('aggregated_reports.last_reported_at', 'desc')
+            ->orderBy('aggregated_reports.id', 'asc')
 
             ->groupBy(
                 'aggregated_reports.reportable_type',

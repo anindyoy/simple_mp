@@ -118,8 +118,6 @@ class ReportsTable
                     )
                     ->color('gray'),
             ])
-            ->defaultSort('last_reported_at', 'desc')
-            ->defaultSort(null) // reset fallback (trik penting)
             ->filters([
 
                 // 1️⃣ Filter Tipe (Produk / Lapak)
@@ -131,7 +129,7 @@ class ReportsTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         if ($data['value'] ?? null) {
-                            $query->where('reportable_type', $data['value']);
+                            $query->where('aggregated_reports.reportable_type', $data['value']);
                         }
                     }),
 

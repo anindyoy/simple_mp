@@ -148,11 +148,11 @@ it('filters aggregated rows by report type and minimum report count logic', func
     ]);
 
     $productRows = ReportResource::getEloquentQuery()
-        ->where('reports.reportable_type', Product::class)
+        ->where('aggregated_reports.reportable_type', Product::class)
         ->get();
 
     $minimumReportRows = ReportResource::getEloquentQuery()
-        ->havingRaw('COUNT(*) >= ?', [2])
+        ->where('aggregated_reports.total_reports', '>=', 2)
         ->get();
 
     expect($productRows)->toHaveCount(1);
@@ -270,7 +270,7 @@ it('filters table by reportable type (product)', function () {
     Report::factory()->forLapak($lapak)->create();
 
     $expected = ReportResource::getEloquentQuery()
-        ->where('reports.reportable_type', Product::class)
+        ->where('aggregated_reports.reportable_type', Product::class)
         ->get();
 
     Livewire::test(ListReports::class)
@@ -292,7 +292,7 @@ it('filters table by minimum report count', function () {
             'min' => 2,
         ])
         ->assertCountTableRecords(1);
-})->skip()->todo('masih eror');
+});
 
 it('generates correct detail url from record data', function () {
     Report::factory()->forProduct($this->product)->count(2)->create();

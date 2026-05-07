@@ -32,5 +32,7 @@ jobs:
         touch database/database.sqlite
     - name: Generate key
       run: php artisan key:generate
+    - name: Run Migrations
+      run: php artisan migrate --force
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       run: php artisan test --parallel --processes=4

@@ -185,4 +185,10 @@ class Product extends Model implements HasMedia
             ->logOnly(['title', 'slug', 'price', 'is_active', 'condition'])
             ->useLogName('product');
     }
+
+    public function getThumbnailUrlAttribute(): string
+    {
+        return $this->getFirstMediaUrl('products', 'thumb')
+            ?: asset('img/default-lapak-image.png');
+    }
 }

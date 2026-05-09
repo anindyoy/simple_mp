@@ -17,6 +17,7 @@ class ProductController extends Controller
         $condition = $request->query('condition');
 
         $products = Product::with([
+            'media',
             'lapak',
             'images' => fn($q) => $q->where('is_primary', true),
         ])
@@ -101,6 +102,7 @@ class ProductController extends Controller
         }
 
         $otherProductsInLapak = Product::with([
+            'media',
             'lapak',
             'category',
             'images' => fn($q) => $q->where('is_primary', true),

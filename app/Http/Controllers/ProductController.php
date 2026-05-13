@@ -19,7 +19,6 @@ class ProductController extends Controller
         $products = Product::with([
             'media',
             'lapak',
-            'images' => fn($q) => $q->where('is_primary', true),
         ])
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
@@ -105,7 +104,6 @@ class ProductController extends Controller
             'media',
             'lapak',
             'category',
-            'images' => fn($q) => $q->where('is_primary', true),
         ])
             ->where('lapak_id', $product->lapak_id)
             ->where('is_active', true)

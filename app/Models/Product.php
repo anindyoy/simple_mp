@@ -13,12 +13,13 @@ use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ProductScheduleService;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Product extends Model implements HasMedia
 {
@@ -186,9 +187,47 @@ class Product extends Model implements HasMedia
             ->useLogName('product');
     }
 
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('thumb')
+            ->width(300)
+            ->height(300)
+            ->nonQueued();
+    }
+
     public function getThumbnailUrlAttribute(): string
     {
-        return $this->getFirstMediaUrl('products', 'thumb')
-            ?: asset('img/default-lapak-image.png');
+        $url = $this->getFirstMediaUrl('products', 'thumb');
+        return $url ?: asset('img/default-lapak-image.png');
+    }
+
+    public function addRandomImage(): void
+    {
+        $seedDir = storage_path('app/seed-samples');
+        $files = collect(scandir($seedDir))
+            ->reject(fn($f) => in_array($f, ['.', '..']))
+            ->values();
+
+        if ($files->isEmpty()) {
+            logger()->error('NO FILES FOUND');
+            return;
+        }
+
+        $file = $files->random();
+
+        $fullPath = $seedDir . '/' . $file;
+
+        try {
+            $this
+                ->addMedia($fullPath)
+                ->preservingOriginal()
+                ->toMediaCollection('products');
+        } catch (\Throwable $e) {
+            logger()->error('MEDIA FAILED', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 }

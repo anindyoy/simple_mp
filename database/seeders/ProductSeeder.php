@@ -70,9 +70,9 @@ class ProductSeeder extends Seeder
 
             $product->save();
 
-            ProductImage::factory(rand(2, 4))->create([
-                'product_id' => $product->id,
-            ]);
+            foreach (range(1, rand(2, 4)) as $i) {
+                $product->addRandomImage();
+            }
         });
     }
 
@@ -104,10 +104,7 @@ class ProductSeeder extends Seeder
             $product->pushed_at = $time;
 
             $product->save();
-
-            ProductImage::factory()->create([
-                'product_id' => $product->id,
-            ]);
+            $product->addRandomImage();
         });
     }
 

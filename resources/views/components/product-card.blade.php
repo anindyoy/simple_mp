@@ -7,7 +7,7 @@
 
     <div class="relative overflow-hidden rounded-t-2xl z-0">
         @php
-            $imageUrl = $$product->thumbnail_url;
+            $imageUrl = $product->thumbnail_url;
         @endphp
 
         <img

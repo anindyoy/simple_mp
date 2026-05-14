@@ -17,8 +17,8 @@ class ProductController extends Controller
         $condition = $request->query('condition');
 
         $products = Product::with([
+            'media',
             'lapak',
-            'images' => fn($q) => $q->where('is_primary', true),
         ])
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
@@ -60,10 +60,12 @@ class ProductController extends Controller
             'site_title',
             'Lapak Warga'
         );
+
         $siteDescription = Setting::getValue(
             'site_description',
             'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'
         );
+
         $siteKeywords = Setting::getValue(
             'site_keywords',
             'marketplace, jual beli online, produk lokal, warga, toko online'
@@ -86,7 +88,11 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['lapak', 'category', 'images']);
+        $product->load([
+            'media',
+            'lapak',
+            'category',
+        ]);
 
         if (! $product->is_active || ! $product->lapak?->is_active) {
             abort(404);
@@ -101,9 +107,9 @@ class ProductController extends Controller
         }
 
         $otherProductsInLapak = Product::with([
+            'media',
             'lapak',
             'category',
-            'images' => fn($q) => $q->where('is_primary', true),
         ])
             ->where('lapak_id', $product->lapak_id)
             ->where('is_active', true)
@@ -132,7 +138,7 @@ class ProductController extends Controller
                     $product->lapak?->nama_lapak,
                     'jual beli ' . strtolower($region)
                 ]),
-                'image' => optional($product->images->first())->image_url,
+                'image' => $product->getFirstMediaUrl('products'),
             ],
         ]);
     }

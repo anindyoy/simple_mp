@@ -7,15 +7,11 @@
 
     <div class="relative overflow-hidden rounded-t-2xl z-0">
         @php
-            $primaryImage = $product->images->first();
-            $imageUrl = $primaryImage
-                ? (Str::startsWith($primaryImage->image_url, ['http://', 'https://'])
-                    ? $primaryImage->image_url
-                    : asset('storage/' . $primaryImage->image_url))
-                : asset('img/default-lapak-image.png');
+            $imageUrl = $product->thumbnail_url;
         @endphp
 
-        <img class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
+        <img
+            class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
             src="{{ $imageUrl }}"
             alt="{{ $product->title }}" />
 

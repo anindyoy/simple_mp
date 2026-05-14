@@ -179,7 +179,7 @@ class TokenPurchaseResource extends Resource
             TextColumn::make('total_price')
                 ->label('Harga')
                 ->sortable()
-                ->formatStateUsing(fn(int $state) => 'Rp ' . number_format($state, 0, ',', '.')),
+                ->formatStateUsing(fn(int $state) => 'Rp ' . number_format($state)),
 
             TextColumn::make('status')
                 ->label('Status')

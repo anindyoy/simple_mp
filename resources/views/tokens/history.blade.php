@@ -23,7 +23,7 @@
                 <!-- Total Spent -->
                 <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-lg p-6 text-white col-span-1 md:col-span-1">
                     <p class="text-purple-100 text-sm mb-2">Total Pengeluaran</p>
-                    <h2 class="text-3xl font-bold">Rp {{ number_format($totalSpent, 0, ',', '.') }}</h2>
+                    <h2 class="text-3xl font-bold">Rp {{ number_format($totalSpent) }}</h2>
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
                                             {{ $purchase->quantity }} token
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                            Rp {{ number_format($purchase->total_price, 0, ',', '.') }}
+                                            Rp {{ number_format($purchase->total_price) }}
                                         </td>
                                         <td class="px-6 py-4 text-sm">
                                             <span class="inline-block px-3 py-1 rounded-full text-xs font-medium
@@ -151,7 +151,7 @@
                                     <div>
                                         <p class="text-xs text-gray-600 dark:text-gray-400">Total Harga</p>
                                         <p class="font-semibold text-gray-900 dark:text-gray-100">
-                                            Rp {{ number_format($purchase->total_price, 0, ',', '.') }}
+                                            Rp {{ number_format($purchase->total_price) }}
                                         </p>
                                     </div>
                                 </div>

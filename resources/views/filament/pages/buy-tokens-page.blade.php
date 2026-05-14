@@ -5,7 +5,7 @@
                 <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700" x-data="{ copied: false }">
                     <div class="text-sm text-gray-500">Total Nominal</div>
                     <div class="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        Rp {{ number_format($this->getTotalAmount(), 0, ',', '.') }}
+                        Rp {{ number_format($this->getTotalAmount()) }}
                     </div>
                     <div class="mt-3">
                         <x-filament::button

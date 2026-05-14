@@ -5,21 +5,25 @@ namespace App\Models;
 use App\Models\Report;
 use App\Models\Category;
 use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
 use App\Models\LapakProfile;
-use App\Models\ProductImage;
 use App\Models\ProductModeration;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ProductScheduleService;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     use HasFactory, LogsActivity;
     protected $guarded = [];
 
@@ -53,12 +57,6 @@ class Product extends Model
 
         static::deleted(function ($product) {
             ProductScheduleService::rebuild($product->lapak_id);
-        });
-
-        static::deleting(function ($product) {
-            $product->images->each(function ($image) {
-                $image->delete(); // trigger event deleting di ProductImage
-            });
         });
 
         /**
@@ -112,11 +110,6 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function images(): HasMany
-    {
-        return $this->hasMany(ProductImage::class);
-    }
-
     public function moderations(): HasMany
     {
         return $this->hasMany(ProductModeration::class);
@@ -150,11 +143,6 @@ class Product extends Model
         return $this->morphMany(Report::class, 'reportable');
     }
 
-    public function primaryImage()
-    {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
-    }
-
     // Helper untuk cek apakah sudah boleh push (6 jam)
     public function canBePushed(): bool
     {
@@ -181,5 +169,55 @@ class Product extends Model
         return LogOptions::defaults()
             ->logOnly(['title', 'slug', 'price', 'is_active', 'condition'])
             ->useLogName('product');
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('thumb')
+            ->fit(Fit::Crop, 300, 300)
+            ->quality(70)
+            ->nonQueued();
+
+        $this
+            ->addMediaConversion('webp')
+            ->format('webp')
+            ->quality(80)
+            ->nonQueued();
+    }
+
+    public function getThumbnailUrlAttribute(): string
+    {
+        $url = $this->getFirstMediaUrl('products', 'thumb');
+        return $url ?: asset('img/default-lapak-image.png');
+    }
+
+    public function addRandomImage(): void
+    {
+        $seedDir = storage_path('app/seed-samples');
+        $files = collect(scandir($seedDir))
+            ->reject(fn($f) => in_array($f, ['.', '..']))
+            ->values();
+
+        if ($files->isEmpty()) {
+            logger()->error('NO FILES FOUND');
+            return;
+        }
+
+        $file = $files->random();
+
+        $fullPath = $seedDir . '/' . $file;
+
+        try {
+            $this
+                ->addMedia($fullPath)
+                ->preservingOriginal()
+                ->toMediaCollection('products');
+        } catch (\Throwable $e) {
+            logger()->error('MEDIA FAILED', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 }

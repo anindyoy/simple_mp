@@ -6,6 +6,7 @@ use Filament\Forms;
 use App\Models\Category;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProductForm
 {
@@ -70,17 +71,16 @@ class ProductForm
                 Section::make('Gambar Produk')
                     ->description('Gambar pertama akan digunakan sebagai gambar utama')
                     ->schema([
-                        Forms\Components\FileUpload::make('uploaded_images')
+                        SpatieMediaLibraryFileUpload::make('images')
                             ->label('Gambar')
+                            ->collection('products')
+                            ->multiple()
+                            ->reorderable()
+                            ->panelLayout('grid')
                             ->image()
                             ->imageEditor()
-                            ->multiple()
-                            ->panelLayout('grid')
-                            ->reorderable()
                             ->maxFiles(5)
-                            ->directory('products')
-                            ->disk('public')
-                            ->required(),
+                            ->required()
                     ]),
             ])
             ->columns(1);

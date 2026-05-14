@@ -78,7 +78,7 @@
                                 </span>
                             </div>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                Harga: Rp {{ number_format($tokenPrice, 0, ',', '.') }} per token
+                                Harga: Rp {{ number_format($tokenPrice) }} per token
                             </p>
                         </div>
 
@@ -87,13 +87,13 @@
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-700 dark:text-gray-300">Harga Satuan:</span>
                                 <span class="font-medium text-gray-900 dark:text-gray-100">
-                                    Rp <span id="unit-price">{{ number_format($tokenPrice, 0, ',', '.') }}</span>
+                                    Rp <span id="unit-price">{{ number_format($tokenPrice) }}</span>
                                 </span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-700 dark:text-gray-300 font-medium">Total Harga:</span>
                                 <span class="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                    Rp <span id="total-price">{{ number_format($tokenPrice * 5, 0, ',', '.') }}</span>
+                                    Rp <span id="total-price">{{ number_format($tokenPrice * 5) }}</span>
                                 </span>
                             </div>
                         </div>

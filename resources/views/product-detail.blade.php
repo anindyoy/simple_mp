@@ -12,11 +12,10 @@
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
-                @if ($product->images->count() === 1)
-                    {{-- Single Image (tanpa carousel) --}}
+                @if ($product->getMedia('products')->count() === 1) {{-- Single Image (tanpa carousel) --}}
                     @php
-                        $image = $product->images->first();
-                        $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
+                        $image = $product->getFirstMedia('products');
+                        $imgUrl = $image->getUrl();
                     @endphp
 
                     <div class="w-full h-56 md:h-96 bg-white border rounded-base shadow-sm flex items-center justify-center">
@@ -25,20 +24,17 @@
                             class="max-w-full max-h-full object-contain"
                             alt="Gambar Produk {{ $product->title }}">
                     </div>
-                @elseif ($product->images->count() > 1)
+                @elseif ($product->getMedia('products')->count() > 1)
                     {{-- Carousel (jika > 1 foto) --}}
                     <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
                         <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
-                            @foreach ($product->images as $index => $image)
-                                @php
-                                    $imgUrl = Str::startsWith($image->image_url, ['http://', 'https://']) ? $image->image_url : asset('storage/' . $image->image_url);
-                                @endphp
-
+                            @foreach ($product->getMedia('products') as $index => $image)
                                 <div
                                     data-carousel-item="{{ $index === 0 ? 'active' : '' }}"
                                     class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out">
+
                                     <img
-                                        src="{{ $imgUrl }}"
+                                        src="{{ $image->getUrl() }}"
                                         class="block w-full h-full object-contain mx-auto"
                                         alt="Gambar Produk {{ $product->title }}">
                                 </div>
@@ -47,7 +43,7 @@
 
                         {{-- Indicators --}}
                         <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
-                            @foreach ($product->images as $i => $img)
+                            @foreach ($product->getMedia('products') as $i => $img)
                                 <button
                                     type="button"
                                     class="w-3 h-3 rounded-base bg-white/50"
@@ -73,7 +69,7 @@
 
             <div>
                 <h1 class="text-4xl font-extrabold text-gray-900">{{ $product->title }}</h1>
-                <p class="text-2xl font-bold text-blue-600 mt-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                <p class="text-2xl font-bold text-blue-600 mt-2">Rp {{ number_format($product->price) }}</p>
                 @if ($product->hasCondition())
                     <div class="mt-2">
                         <span
@@ -136,8 +132,8 @@
                             @endif
 
                             @if (filled($product->lapak->external_links) && is_array($product->lapak->external_links))
-                                @foreach ($product->lapak->external_links as $externalLink)
-                                    @if (! empty($externalLink['label']) && ! empty($externalLink['link']))
+                                @foreach ($product->getMedia('products') as $index => $image)
+                                    @if (!empty($externalLink['label']) && !empty($externalLink['link']))
                                         <a href="{{ $externalLink['link'] }}"
                                             target="_blank"
                                             rel="noopener noreferrer"

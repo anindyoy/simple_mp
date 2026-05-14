@@ -71,7 +71,7 @@
                             Total Harga
                         </p>
                         <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
-                            Rp {{ number_format($purchase->total_price, 0, ',', '.') }}
+                            Rp {{ number_format($purchase->total_price) }}
                         </p>
                     </div>
                 </div>
@@ -115,10 +115,10 @@
 
                         <div class="mt-6 pt-6 border-t border-blue-200 dark:border-blue-800">
                             <p class="text-sm text-blue-800 dark:text-blue-300 mb-4">
-                                <strong>Perhatian:</strong> Transfer tepat sesuai nominal Rp {{ number_format($purchase->total_price, 0, ',', '.') }} untuk memudahkan verifikasi.
+                                <strong>Perhatian:</strong> Transfer tepat sesuai nominal Rp {{ number_format($purchase->total_price) }} untuk memudahkan verifikasi.
                             </p>
                             <a
-                                href="https://wa.me/{{ str_replace(['+', '-', ' '], '', $whatsappNumber) }}?text=Saya%20ingin%20konfirmasi%20pembayaran%20token%20dengan%20ID%20%23{{ $purchase->id }}%20sebesar%20Rp%20{{ number_format($purchase->total_price, 0, ',', '.') }}"
+                                href="https://wa.me/{{ str_replace(['+', '-', ' '], '', $whatsappNumber) }}?text=Saya%20ingin%20konfirmasi%20pembayaran%20token%20dengan%20ID%20%23{{ $purchase->id }}%20sebesar%20Rp%20{{ number_format($purchase->total_price) }}"
                                 target="_blank"
                                 class="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition"
                             >

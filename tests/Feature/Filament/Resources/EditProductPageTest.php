@@ -3,7 +3,6 @@
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\ProductImage;
 use App\Models\ProductModeration;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;

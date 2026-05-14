@@ -69,7 +69,7 @@ class BuyTokensPage extends Page implements HasForms
                             ->maxValue(10000)
                             ->default(1)
                             ->live()
-                            ->helperText('Harga per token: Rp ' . number_format($this->tokenPrice, 0, ',', '.')),
+                            ->helperText('Harga per token: Rp ' . number_format($this->tokenPrice)),
 
                         Select::make('bank_account')
                             ->label('Rekening Tujuan')

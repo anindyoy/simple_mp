@@ -3,85 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Category;
 use App\Models\Setting;
+use App\Models\Category;
+use App\Models\LapakProfile;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
+use App\Services\ProductScheduleService;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->query('search');
+        $search     = $request->query('search');
         $categoryId = $request->query('category');
-        $condition = $request->query('condition');
+        $condition  = $request->query('condition');
 
-        $products = Product::with([
-            'media',
-            'lapak',
-        ])
+        // ✅ Dapat dari cache, hanya rebuild tiap 60 detik
+        $eligibleProductIds = \App\Services\ProductScheduleService::getEligibleProductIds();
+
+        $products = Product::with(['media', 'lapak'])
+            ->whereIn('id', $eligibleProductIds)
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
-            ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
+            ->when($search,     fn($q) => $q->where('title', 'like', "%$search%"))
             ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
-            ->when($condition, fn($q) => $q->where('condition', $condition))
+            ->when($condition,  fn($q) => $q->where('condition', $condition))
             ->orderBy('pushed_at', 'desc')
-            ->get();
+            ->paginate(16);
 
-        $products = $products->filter(function ($product) {
-            $schedule = \App\Services\ProductScheduleService::get($product->lapak_id);
-
-            // 🔥 kalau kosong → rebuild
-            if (empty($schedule)) {
-                \App\Services\ProductScheduleService::rebuild($product->lapak_id);
-                $schedule = \App\Services\ProductScheduleService::get($product->lapak_id);
-            }
-
-            $publishAt = $schedule[$product->id] ?? null;
-
-            if (! $publishAt) {
-                return false;
-            }
-
-            return $publishAt <= now();
-        });
-
-        $products = new \Illuminate\Pagination\LengthAwarePaginator(
-            $products->forPage(request()->page ?? 1, 16),
-            $products->count(),
-            16,
-            request()->page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        $categories = Category::orderBy('category_name')->get();
-
-        $siteTitle = Setting::getValue(
-            'site_title',
-            'Lapak Warga'
-        );
-
-        $siteDescription = Setting::getValue(
-            'site_description',
-            'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'
-        );
-
-        $siteKeywords = Setting::getValue(
-            'site_keywords',
-            'marketplace, jual beli online, produk lokal, warga, toko online'
+        $categories = Cache::remember(
+            'categories_list',
+            3600,
+            fn() => Category::orderBy('category_name')->get()
         );
 
         return view('main', [
-            'products' => $products,
-            'categories' => $categories,
-            'search' => $search,
-            'selectedCategory' => $categoryId,
+            'products'          => $products,
+            'categories'        => $categories,
+            'search'            => $search,
+            'selectedCategory'  => $categoryId,
             'selectedCondition' => $condition,
-
             'meta' => [
-                'title' => $siteTitle,
-                'description' => $siteDescription,
-                'keywords' => $siteKeywords,
+                'title'       => Setting::getValue('site_title', 'Lapak Warga'),
+                'description' => Setting::getValue('site_description', '...'),
+                'keywords'    => Setting::getValue('site_keywords', '...'),
             ],
         ]);
     }

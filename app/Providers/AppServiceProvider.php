@@ -3,14 +3,18 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
+use App\Models\Product;
+use App\Models\LapakProfile;
 use App\Models\TutorialPage;
 use Filament\Facades\Filament;
 use Filament\Support\Assets\Js;
+use App\Observers\ProductObserver;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use App\Observers\LapakProfileObserver;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
@@ -39,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Product::observe(ProductObserver::class);
+        LapakProfile::observe(LapakProfileObserver::class);
+
         FilamentView::registerRenderHook(
             PanelsRenderHook::GLOBAL_SEARCH_AFTER,
             function (): string {

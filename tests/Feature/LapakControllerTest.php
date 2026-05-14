@@ -3,7 +3,6 @@
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\LapakProfile;
-use App\Models\ProductImage;
 
 beforeEach(function () {
     $this->lapak = LapakProfile::factory()->create([
@@ -83,17 +82,13 @@ test('memuat relasi images dari produk', function () {
         'is_active' => true,
     ]);
 
-    ProductImage::factory()->count(3)->create([
-        'product_id' => $product->id,
-    ]);
-
     $response = $this->get(route('lapak.show', $this->lapak));
 
     $response->assertViewHas('lapak', function ($lapak) use ($product) {
         return $lapak->products->first()->relationLoaded('images')
             && $lapak->products->first()->images->count() === 3;
     });
-});
+})->skip('fitur gambar dihapus sementara');
 
 test('memuat relasi category dari produk', function () {
     $category = Category::factory()->create();

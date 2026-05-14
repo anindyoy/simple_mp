@@ -4,7 +4,6 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\LapakProfile;
-use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\Builder;
 
 beforeEach(function () {
@@ -117,8 +116,6 @@ it('loads required relationships correctly', function () {
     $product = Product::factory()->create([
         'lapak_id' => $this->lapak->id,
     ]);
-
-    ProductImage::factory()->create(['product_id' => $product->id]);
 
     $query = Product::query()
         ->with([

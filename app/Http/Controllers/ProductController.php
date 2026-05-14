@@ -60,10 +60,12 @@ class ProductController extends Controller
             'site_title',
             'Lapak Warga'
         );
+
         $siteDescription = Setting::getValue(
             'site_description',
             'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'
         );
+
         $siteKeywords = Setting::getValue(
             'site_keywords',
             'marketplace, jual beli online, produk lokal, warga, toko online'

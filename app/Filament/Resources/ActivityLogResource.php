@@ -80,7 +80,6 @@ class ActivityLogResource extends Resource
                         \App\Models\Product::class => 'Product',
                         \App\Models\LapakProfile::class => 'Lapak Profile',
                         \App\Models\Category::class => 'Category',
-                        \App\Models\ProductImage::class => 'Product Image',
                         \App\Models\ProductModeration::class => 'Product Moderation',
                         \App\Models\Report::class => 'Report',
                         \App\Models\Setting::class => 'Setting',

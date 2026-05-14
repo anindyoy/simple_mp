@@ -7,7 +7,6 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
 use App\Models\LapakProfile;
-use App\Models\ProductImage;
 use App\Models\ProductModeration;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Activitylog\LogOptions;
@@ -58,12 +57,6 @@ class Product extends Model implements HasMedia
 
         static::deleted(function ($product) {
             ProductScheduleService::rebuild($product->lapak_id);
-        });
-
-        static::deleting(function ($product) {
-            $product->images->each(function ($image) {
-                $image->delete(); // trigger event deleting di ProductImage
-            });
         });
 
         /**
@@ -117,11 +110,6 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
-    public function images(): HasMany
-    {
-        return $this->hasMany(ProductImage::class);
-    }
-
     public function moderations(): HasMany
     {
         return $this->hasMany(ProductModeration::class);
@@ -153,11 +141,6 @@ class Product extends Model implements HasMedia
     public function reports()
     {
         return $this->morphMany(Report::class, 'reportable');
-    }
-
-    public function primaryImage()
-    {
-        return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
 
     // Helper untuk cek apakah sudah boleh push (6 jam)

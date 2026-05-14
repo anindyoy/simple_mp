@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Report;
 use App\Models\Category;
 use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
 use App\Models\LapakProfile;
 use App\Models\ProductImage;
 use App\Models\ProductModeration;
@@ -13,12 +14,12 @@ use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ProductScheduleService;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Product extends Model implements HasMedia
@@ -191,8 +192,14 @@ class Product extends Model implements HasMedia
     {
         $this
             ->addMediaConversion('thumb')
-            ->width(300)
-            ->height(300)
+            ->fit(Fit::Crop, 300, 300)
+            ->quality(70)
+            ->nonQueued();
+
+        $this
+            ->addMediaConversion('webp')
+            ->format('webp')
+            ->quality(80)
             ->nonQueued();
     }
 

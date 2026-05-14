@@ -34,7 +34,7 @@
                                     class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out">
 
                                     <img
-                                        src="{{ $image->getUrl('webp') }}"
+                                        src="{{ $image->getUrl() }}"
                                         class="block w-full h-full object-contain mx-auto"
                                         alt="Gambar Produk {{ $product->title }}">
                                 </div>

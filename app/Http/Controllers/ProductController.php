@@ -86,7 +86,11 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['lapak', 'category', 'images']);
+        $product->load([
+            'media',
+            'lapak',
+            'category',
+        ]);
 
         if (! $product->is_active || ! $product->lapak?->is_active) {
             abort(404);
@@ -132,7 +136,7 @@ class ProductController extends Controller
                     $product->lapak?->nama_lapak,
                     'jual beli ' . strtolower($region)
                 ]),
-                'image' => optional($product->images->first())->image_url,
+                'image' => $product->getFirstMediaUrl('products'),
             ],
         ]);
     }

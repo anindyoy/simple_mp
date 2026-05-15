@@ -114,7 +114,6 @@ class ProductsTable
             ->defaultSort('pushed_at', 'desc')
             ->modifyQueryUsing(
                 fn(Builder $query) => $query->with([
-                    'primaryImage',
                     'lapak',
                     'lapak.user',
                     'category',

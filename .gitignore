@@ -23,6 +23,7 @@ Homestead.yaml
 Thumbs.db
 prompt.php
 tests/coverage
+test-results.php
 
 /storage/app/public
 /storage/app/private

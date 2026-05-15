@@ -5,16 +5,16 @@ namespace App\Filament\Resources\Users\Tables;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Tables\Filters\Filter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
 use STS\FilamentImpersonate\Actions\Impersonate;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class UsersTable
 {
@@ -75,43 +75,41 @@ class UsersTable
                         false: fn(Builder $query) => $query->whereNull('email_verified_at'),
                     ),
 
-                Filter::make('created_at')
+                DateRangeFilter::make('created_at')
                     ->label('Tanggal Daftar')
-                    ->form([
-                        \Filament\Forms\Components\DatePicker::make('from')
-                            ->label('Dari'),
-                        \Filament\Forms\Components\DatePicker::make('until')
-                            ->label('Sampai'),
+                    ->timezone('Asia/Jakarta')
+                    ->displayFormat('DD/MM/YYYY')
+                    ->format('d/m/Y')
+                    ->defaultLast30Days()
+                    ->ranges([
+                        'Hari Ini' => [now()->startOfDay(), now()->endOfDay()],
+                        'Kemarin' => [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()],
+                        '7 Hari Terakhir' => [now()->subDays(6)->startOfDay(), now()->endOfDay()],
+                        '30 Hari Terakhir' => [now()->subDays(29)->startOfDay(), now()->endOfDay()],
+                        'Bulan Ini' => [now()->startOfMonth(), now()->endOfMonth()],
+                        'Bulan Lalu' => [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()],
                     ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query
-                            ->when(
-                                $data['from'],
-                                fn($q) => $q->whereDate('created_at', '>=', $data['from'])
-                            )
-                            ->when(
-                                $data['until'],
-                                fn($q) => $q->whereDate('created_at', '<=', $data['until'])
-                            );
-                    }),
+                    ->useRangeLabels()
+                    ->autoApply()
+                    ->withIndicator(),
 
-                Filter::make('updated_at')
+                DateRangeFilter::make('updated_at')
                     ->label('Tanggal Update')
-                    ->form([
-                        \Filament\Forms\Components\DatePicker::make('from'),
-                        \Filament\Forms\Components\DatePicker::make('until'),
+                    ->timezone('Asia/Jakarta')
+                    ->displayFormat('DD/MM/YYYY')
+                    ->format('d/m/Y')
+                    ->defaultLast30Days()
+                    ->ranges([
+                        'Hari Ini' => [now()->startOfDay(), now()->endOfDay()],
+                        'Kemarin' => [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()],
+                        '7 Hari Terakhir' => [now()->subDays(6)->startOfDay(), now()->endOfDay()],
+                        '30 Hari Terakhir' => [now()->subDays(29)->startOfDay(), now()->endOfDay()],
+                        'Bulan Ini' => [now()->startOfMonth(), now()->endOfMonth()],
+                        'Bulan Lalu' => [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()],
                     ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query
-                            ->when(
-                                $data['from'],
-                                fn($q) => $q->whereDate('updated_at', '>=', $data['from'])
-                            )
-                            ->when(
-                                $data['until'],
-                                fn($q) => $q->whereDate('updated_at', '<=', $data['until'])
-                            );
-                    }),
+                    ->useRangeLabels()
+                    ->autoApply()
+                    ->withIndicator(),
             ])
             ->modifyQueryUsing(function (Builder $query) {
                 $query->withCount([

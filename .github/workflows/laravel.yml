@@ -50,7 +50,7 @@ jobs:
     - name: Generate key
       run: php artisan key:generate
     - name: Run Migrations
-      run: php artisan migrate --force --seed
+      run: php artisan migrate --force
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       id: tests
       continue-on-error: true

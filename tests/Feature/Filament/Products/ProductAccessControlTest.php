@@ -4,7 +4,6 @@ use App\Filament\Resources\Products\ProductResource;
 
 use function Pest\Laravel\actingAs;
 
-require_once __DIR__ . '/helpers.php';
 
 describe('Product Access Control', function () {
 

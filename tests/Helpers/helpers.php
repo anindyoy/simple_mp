@@ -1,9 +1,5 @@
 <?php
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared helpers untuk semua test ProductResource.
-// ─────────────────────────────────────────────────────────────────────────────
-
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
@@ -13,8 +9,13 @@ use App\Models\ProductModeration;
 if (! function_exists('makeUser')) {
     function makeUser(bool $isAdmin = false): User
     {
-        $user = User::factory()->create(['is_admin' => $isAdmin]);
-        $user->lapak()->save(LapakProfile::factory()->make());
+        $user = User::factory()->create([
+            'is_admin' => $isAdmin,
+        ]);
+
+        $user->lapak()->save(
+            LapakProfile::factory()->make()
+        );
 
         return $user->fresh();
     }

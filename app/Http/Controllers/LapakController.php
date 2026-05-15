@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LapakProfile;
 use App\Models\Setting;
+use App\Models\LapakProfile;
 use App\Http\Controllers\Controller;
 
 class LapakController extends Controller
@@ -43,7 +43,6 @@ class LapakController extends Controller
                 $query->where('is_active', true)
                     ->orderBy('pushed_at', 'desc');
             },
-            'products.images',
             'products.category',
         ]);
 

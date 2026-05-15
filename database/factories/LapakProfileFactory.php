@@ -43,6 +43,7 @@ class LapakProfileFactory extends Factory
             'user_id' => $user->id,
             'name' => $name = $this->faker->company() . " Shop",
             'slug' => Str::slug($name) . '-' . Str::random(5),
+            'is_active' => 1,
             'profile_image' => asset('img/default-lapak-image.png'),
             'whatsapp_number' => '628' . $this->faker->numerify('##########'),
             'telegram_username' => $this->faker->userName(),

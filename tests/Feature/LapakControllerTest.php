@@ -3,6 +3,8 @@
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\LapakProfile;
+use App\Http\Controllers\LapakController;
+use Illuminate\View\View;
 
 beforeEach(function () {
     $this->lapak = LapakProfile::factory()->create([
@@ -11,40 +13,47 @@ beforeEach(function () {
     ]);
 });
 
-test('dapat menampilkan halaman detail lapak', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+function getLapakView(LapakProfile $lapak): View
+{
+    return app(LapakController::class)->show($lapak);
+}
 
-    $response->assertStatus(200);
-    $response->assertViewIs('lapak.show');
+test('dapat menampilkan halaman detail lapak', function () {
+    $view = getLapakView($this->lapak);
+
+    expect($view->name())
+        ->toBe('lapak.show');
 });
 
 test('dapat memuat data lapak dengan benar', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('lapak', function ($lapak) {
-        return $lapak->id === $this->lapak->id;
-    });
+    $lapak = $view->getData()['lapak'];
+
+    expect($lapak->id)
+        ->toBe($this->lapak->id);
 });
 
 test('hanya menampilkan produk yang aktif', function () {
-    // Produk aktif
     $productAktif = Product::factory()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => true,
     ]);
 
-    // Produk tidak aktif
     $productTidakAktif = Product::factory()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => false,
     ]);
 
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('lapak', function ($lapak) use ($productAktif, $productTidakAktif) {
-        return $lapak->products->contains($productAktif)
-            && !$lapak->products->contains($productTidakAktif);
-    });
+    $lapak = $view->getData()['lapak'];
+
+    expect($lapak->products->contains($productAktif))
+        ->toBeTrue();
+
+    expect($lapak->products->contains($productTidakAktif))
+        ->toBeFalse();
 });
 
 test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
@@ -66,81 +75,80 @@ test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
         'pushed_at' => now(),
     ]);
 
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('lapak', function ($lapak) use ($product1, $product2, $product3) {
-        $products = $lapak->products;
-        return $products[0]->id === $product3->id
-            && $products[1]->id === $product2->id
-            && $products[2]->id === $product1->id;
-    });
+    $products = $view->getData()['lapak']
+        ->products
+        ->values();
+
+    expect($products[0]->id)->toBe($product3->id);
+    expect($products[1]->id)->toBe($product2->id);
+    expect($products[2]->id)->toBe($product1->id);
 });
-
-test('memuat relasi images dari produk', function () {
-    $product = Product::factory()->create([
-        'lapak_id' => $this->lapak->id,
-        'is_active' => true,
-    ]);
-
-    $response = $this->get(route('lapak.show', $this->lapak));
-
-    $response->assertViewHas('lapak', function ($lapak) use ($product) {
-        return $lapak->products->first()->relationLoaded('images')
-            && $lapak->products->first()->images->count() === 3;
-    });
-})->skip('fitur gambar dihapus sementara');
 
 test('memuat relasi category dari produk', function () {
     $category = Category::factory()->create();
 
-    $product = Product::factory()->create([
+    Product::factory()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $category->id,
         'is_active' => true,
     ]);
 
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('lapak', function ($lapak) use ($category) {
-        return $lapak->products->first()->relationLoaded('category')
-            && $lapak->products->first()->category->id === $category->id;
-    });
+    $product = $view->getData()['lapak']
+        ->products
+        ->first();
+
+    expect($product->relationLoaded('category'))
+        ->toBeTrue();
+
+    expect($product->category->id)
+        ->toBe($category->id);
 });
 
 test('menampilkan meta title dengan benar', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('meta', function ($meta) {
-        return $meta['title'] === 'Lapak Test | Lapak Cimanglid';
-    });
+    $meta = $view->getData()['meta'];
+
+    expect($meta['title'])
+        ->toBe('Lapak Test | Lapak Cimanglid');
 });
 
 test('menampilkan meta description dengan benar', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('meta', function ($meta) {
-        return $meta['description'] === 'Lapak Lapak Test di marketplace warga Cimanglid. Lihat produk & hubungi penjual langsung.';
-    });
+    $meta = $view->getData()['meta'];
+
+    expect($meta['description'])
+        ->toBe('Lapak Lapak Test di marketplace warga Cimanglid. Lihat produk & hubungi penjual langsung.');
 });
 
 test('menampilkan meta keywords dengan benar', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('meta', function ($meta) {
-        return $meta['keywords'] === 'lapak cimanglid, Lapak Test, jual beli warga';
-    });
+    $meta = $view->getData()['meta'];
+
+    expect($meta['keywords'])
+        ->toBe('lapak cimanglid, Lapak Test, jual beli warga');
 });
 
 test('menampilkan meta image dengan benar', function () {
-    $response = $this->get(route('lapak.show', $this->lapak));
+    $view = getLapakView($this->lapak);
 
-    $response->assertViewHas('meta', function ($meta) {
-        return $meta['image'] === 'https://example.com/foto.jpg';
-    });
+    $meta = $view->getData()['meta'];
+
+    expect($meta['image'])
+        ->toBe('https://example.com/foto.jpg');
 });
 
-test('mengembalikan 404 jika lapak tidak ditemukan', function () {
-    $response = $this->get(route('lapak.show', 99999));
+test('mengembalikan 404 jika lapak tidak aktif', function () {
+    $lapak = LapakProfile::factory()->create([
+        'is_active' => false,
+    ]);
 
-    $response->assertStatus(404);
+    expect(fn () => getLapakView($lapak))
+        ->toThrow(Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
 });

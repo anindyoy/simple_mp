@@ -8,7 +8,6 @@ use App\Filament\Resources\Products\Pages\CreateProduct;
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
 
-require_once __DIR__ . '/helpers.php';
 
 describe('Create Product', function () {
 

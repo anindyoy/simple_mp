@@ -5,7 +5,6 @@ use App\Filament\Resources\Products\Pages\ListProducts;
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
 
-require_once __DIR__ . '/helpers.php';
 
 describe('List Products', function () {
 

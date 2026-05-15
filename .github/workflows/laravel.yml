@@ -53,10 +53,9 @@ jobs:
       run: php artisan migrate --force
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       id: tests
-      continue-on-error: true
       run: |
         set -o pipefail
-        php artisan test --parallel --processes=4 2>&1 | tee test-results.txt
+        php artisan test --parallel --processes=4 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tee test-results.txt
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4

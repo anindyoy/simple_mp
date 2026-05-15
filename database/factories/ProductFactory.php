@@ -30,6 +30,9 @@ class ProductFactory extends Factory
             'title' => $title = $this->faker->words(3, true),
             'slug' => Str::slug($title) . '-' . rand(100, 999),
 
+            'lapak_id' => LapakProfile::query()->inRandomOrder()->value('id')
+                ?? LapakProfile::factory()->create()->id,
+
             'description' => $this->faker->paragraph(3),
             'price' => $this->faker->numberBetween(10_000, 2_000_000),
 

@@ -31,6 +31,8 @@ class Product extends Model implements HasMedia
     protected $casts = [
         'pushed_at' => 'datetime',
         'is_active' => 'boolean',
+        'price' => 'integer',
+
     ];
 
     protected static function boot()

@@ -4,12 +4,9 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\Filament\Resources\Products\Pages\EditProduct;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
 
-
 describe('Edit Product', function () {
-
     it('renders edit page for owner', function () {
         $user    = makeUser();
         $product = makeProduct($user->lapak);

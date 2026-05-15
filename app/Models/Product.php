@@ -72,27 +72,6 @@ class Product extends Model implements HasMedia
                 );
             }
         });
-
-        /**
-         * Pastikan gambar pertama menjadi gambar utama
-         * Dieksekusi SETELAH product tersimpan
-         */
-        static::saved(function ($product) {
-            $primaryImage = $product->images()
-                ->orderBy('id')
-                ->first();
-
-            if ($primaryImage) {
-                $product->images()
-                    ->update([
-                        'is_primary' => false,
-                    ]);
-
-                $primaryImage->update([
-                    'is_primary' => true,
-                ]);
-            }
-        });
     }
 
     public function getRouteKeyName()

@@ -16,47 +16,4 @@ class CreateProduct extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
-    protected function afterCreate(): void
-    {
-        $this->record->images()->createMany(
-            collect($this->uploadedImages)
-                ->map(fn(string $imageUrl): array => [
-                    'image_url' => $imageUrl,
-                    'is_primary' => false,
-                ])
-                ->all()
-        );
-
-        // Ensure the first image becomes primary
-        $first = $this->record->images()->orderBy('id')->first();
-        if ($first) {
-            $this->record->images()->update(['is_primary' => false]);
-            $first->update(['is_primary' => true]);
-        }
-
-        $this->optimizeUploadedImages();
-    }
-
-    protected function optimizeUploadedImages(): void
-    {
-        if (app()->runningInConsole() && env('SKIP_IMAGE_OPTIMIZER', false)) {
-            return;
-        }
-
-        foreach ($this->uploadedImages as $imageUrl) {
-            if (! Storage::disk('public')->exists($imageUrl)) {
-                continue;
-            }
-
-            try {
-                ImageOptimizer::optimize(Storage::disk('public')->path($imageUrl));
-            } catch (\Throwable $exception) {
-                Log::warning('Image optimization skipped.', [
-                    'path' => $imageUrl,
-                    'message' => $exception->getMessage(),
-                ]);
-            }
-        }
-    }
 }

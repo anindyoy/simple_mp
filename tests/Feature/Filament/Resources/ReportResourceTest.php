@@ -35,7 +35,6 @@ beforeEach(function () {
     $this->product = Product::factory()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $this->category->id,
-        'condition' => null,
     ]);
 });
 
@@ -209,8 +208,6 @@ it('deactivates reported product and marks pending reports as reviewed', functio
     $product = Product::factory()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $this->category->id,
-        'condition' => null,
-        'is_active' => true,
     ]);
 
     $olderReport = Report::factory()->forProduct($product)->create([

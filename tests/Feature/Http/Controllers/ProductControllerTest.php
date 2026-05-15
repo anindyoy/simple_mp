@@ -22,22 +22,18 @@ describe('ProductController@index', function () {
     it('menampilkan daftar produk aktif yang eligible', function () {
         $category = Category::factory()->create();
 
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $eligibleProduct = Product::factory()->create([
             'title' => 'iPhone 15',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         $notEligibleProduct = Product::factory()->create([
             'title' => 'Samsung Galaxy',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         ProductScheduleService::rebuild($eligibleProduct->id);
@@ -53,20 +49,16 @@ describe('ProductController@index', function () {
     });
 
     it('dapat filter berdasarkan search', function () {
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $productA = Product::factory()->create([
             'title' => 'Macbook Pro',
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         $productB = Product::factory()->create([
             'title' => 'Asus ROG',
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         ProductScheduleService::rebuild($productA->id);
@@ -86,23 +78,18 @@ describe('ProductController@index', function () {
         $categoryA = Category::factory()->create();
         $categoryB = Category::factory()->create();
 
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $productA = Product::factory()->create([
             'title' => 'Produk A',
             'category_id' => $categoryA->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
-            'condition' => 'baru',
         ]);
 
         $productB = Product::factory()->create([
             'title' => 'Produk B',
             'category_id' => $categoryB->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         ProductScheduleService::rebuild($productA->id);
@@ -126,8 +113,8 @@ describe('ProductController@index', function () {
         $product = Product::factory()->create([
             'title' => 'Produk Non Aktif',
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
+
         ProductScheduleService::rebuild($product->id);
         $response = $this->get(route('products.index'));
 
@@ -141,15 +128,11 @@ describe('ProductController@index', function () {
 
         $category = Category::factory()->create();
 
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         Product::factory()->create([
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
-            'condition' => 'baru',
             'created_at' => now()->subHours(10),
         ]);
 
@@ -177,7 +160,6 @@ describe('ProductController@show', function () {
         ]);
 
         $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
             'name' => 'Toko Saya',
         ]);
 
@@ -185,7 +167,6 @@ describe('ProductController@show', function () {
             'title' => 'Laptop Gaming',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
-            'is_active' => true,
             'description' => 'Deskripsi produk',
         ]);
 
@@ -199,13 +180,10 @@ describe('ProductController@show', function () {
     });
 
     it('mengembalikan 404 jika produk tidak aktif', function () {
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $product = Product::factory()->create([
             'lapak_id' => $lapak->id,
-            'is_active' => false,
         ]);
 
         $this->get(route('product.show', $product))
@@ -219,7 +197,6 @@ describe('ProductController@show', function () {
 
         $product = Product::factory()->create([
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         $this->get(route('product.show', $product))
@@ -229,13 +206,10 @@ describe('ProductController@show', function () {
     it('set hasReported true jika user pernah report produk', function () {
         $user = User::factory()->create();
 
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $product = Product::factory()->create([
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         $product->reports()->create([
@@ -253,20 +227,16 @@ describe('ProductController@show', function () {
     });
 
     it('menampilkan produk lain dalam lapak yang sama', function () {
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => true,
-        ]);
+        $lapak = LapakProfile::factory()->create();
 
         $mainProduct = Product::factory()->create([
             'title' => 'Produk Utama',
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         $otherProduct = Product::factory()->create([
             'title' => 'Produk Lain',
             'lapak_id' => $lapak->id,
-            'is_active' => true,
         ]);
 
         Product::factory()->create([

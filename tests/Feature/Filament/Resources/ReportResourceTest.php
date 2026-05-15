@@ -8,14 +8,10 @@ use App\Models\Category;
 use App\Models\LapakProfile;
 use Illuminate\Support\Carbon;
 use App\Models\ProductModeration;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Services\ProductModerationService;
 use App\Filament\Resources\Reports\ReportResource;
 use App\Filament\Resources\Reports\Pages\ListReports;
 use App\Filament\Resources\Reports\Pages\ViewReportDetails;
-
-use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->user = User::factory()->create([
@@ -276,7 +272,7 @@ it('filters table by reportable type (product)', function () {
     Livewire::test(ListReports::class)
         ->filterTable('reportable_type', Product::class)
         ->assertCanSeeTableRecords($expected)
-        ->assertCountTableRecords(1); // ✅ ini yang penting
+        ->assertCountTableRecords(1);
 });
 
 it('filters table by minimum report count', function () {

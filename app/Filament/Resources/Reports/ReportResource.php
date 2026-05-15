@@ -123,8 +123,11 @@ class ReportResource extends Resource
             ->orderBy('aggregated_reports.id', 'asc')
 
             ->groupBy(
+                'aggregated_reports.id',
                 'aggregated_reports.reportable_type',
-                'aggregated_reports.reportable_id'
+                'aggregated_reports.reportable_id',
+                'aggregated_reports.total_reports',
+                'aggregated_reports.last_reported_at',
             );
     }
 

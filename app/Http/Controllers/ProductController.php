@@ -22,7 +22,11 @@ class ProductController extends Controller
         // ✅ Dapat dari cache, hanya rebuild tiap 60 detik
         $eligibleProductIds = \App\Services\ProductScheduleService::getEligibleProductIds();
 
-        $products = Product::with(['media', 'lapak'])
+        $products = Product::with([
+            'media',
+            'lapak:id,name,slug',
+        ])
+
             ->whereIn('id', $eligibleProductIds)
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)

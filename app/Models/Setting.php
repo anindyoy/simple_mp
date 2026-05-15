@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Setting extends Model
 {
@@ -18,9 +19,23 @@ class Setting extends Model
 
     public static function getValue(string $key, ?string $default = null): ?string
     {
-        return static::query()
-            ->where('key', $key)
-            ->value('value') ?? $default;
+        return Cache::remember(
+            "setting.{$key}",
+            now()->addHours(6),
+            fn() => static::query()->where('key', $key)->value('value')
+        ) ?? $default;
+    }
+
+    // Invalidate otomatis saat setting diubah
+    protected static function booted(): void
+    {
+        static::saved(function ($setting) {
+            Cache::forget("setting.{$setting->key}");
+        });
+
+        static::deleted(function ($setting) {
+            Cache::forget("setting.{$setting->key}");
+        });
     }
 
     public static function setValue(string $key, ?string $value): void

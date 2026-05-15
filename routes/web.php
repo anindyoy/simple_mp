@@ -10,6 +10,7 @@ use App\Http\Controllers\UserTokenController;
 use App\Http\Controllers\Auth\PublicAuthController;
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
+
 Route::get('/peraturan-pengguna', [UserRulesController::class, 'index'])->name('rules.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/lapak/{lapak}', [LapakController::class, 'show'])->name('lapak.show');

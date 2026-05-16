@@ -184,6 +184,7 @@ describe('ProductController@show', function () {
 
         $product = Product::factory()->create([
             'lapak_id' => $lapak->id,
+            'is_active' => false,
         ]);
 
         $this->get(route('product.show', $product))

@@ -10,6 +10,7 @@ use App\Models\LapakProfile;
 use App\Models\TokenPurchase;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
@@ -26,7 +27,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->command->info('Membersihkan file media lama...');
+        foreach (Storage::disk('public')->directories() as $dir) {
+            Storage::disk('public')->deleteDirectory($dir);
+        }
 
         if (!User::whereIsAdmin(true)->exists()) {
             $this->command->info('Membuat user admin default...');

@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\LapakProfile;
+use App\Services\ProductScheduleService;
 use Illuminate\Database\Seeder;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ProductSeeder extends Seeder
 {
@@ -49,30 +51,30 @@ class ProductSeeder extends Seeder
     {
         $categories = Category::all();
         $existingLapaks = LapakProfile::all();
+        $files = $this->getSeedFiles();
 
-        Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks) {
+        Product::withoutEvents(function () use ($categories, $existingLapaks, $files) {
+            Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks, $files) {
+                $category = $categories->random();
+                $product->category_id = $category->id;
 
-            $category = $categories->random();
-            $product->category_id = $category->id;
+                $product->condition = $category->supportsCondition()
+                    ? fake()->randomElement(['baru', 'seken'])
+                    : null;
 
-            $product->condition = $category->supportsCondition()
-                ? fake()->randomElement(['baru', 'seken'])
-                : null;
+                $product->lapak_id = $existingLapaks->isNotEmpty()
+                    ? $existingLapaks->random()->id
+                    : LapakProfile::factory()->create()->id;
 
-            $product->lapak_id = $existingLapaks->isNotEmpty()
-                ? $existingLapaks->random()->id
-                : LapakProfile::factory()->create()->id;
+                $product->created_at = now()->subHours(rand(1, 24));
+                $product->save();
 
-            $time = now()->subHours(rand(1, 24));
-
-            $product->created_at = $time;
-
-            $product->save();
-
-            foreach (range(1, rand(2, 4)) as $i) {
-                $product->addRandomImage();
-            }
+                $product->addRandomImage($files);
+            });
         });
+
+        ResponseCache::clear();
+        ProductScheduleService::forgetEligible();
     }
 
     /**
@@ -85,26 +87,37 @@ class ProductSeeder extends Seeder
         if ($categories->isEmpty()) return;
 
         $lapak = LapakProfile::first() ?? LapakProfile::factory()->create();
+        $files = $this->getSeedFiles();
 
-        Product::factory($total)->make()->each(function ($product) use ($categories, $lapak) {
+        Product::withoutEvents(function () use ($total, $categories, $lapak, $files) {
+            Product::factory($total)->make()->each(function ($product) use ($categories, $lapak, $files) {
+                $category = $categories->random();
 
-            $category = $categories->random();
+                $product->category_id = $category->id;
+                $product->lapak_id = $lapak->id;
 
-            $product->category_id = $category->id;
-            $product->lapak_id = $lapak->id;
+                $product->condition = $category->supportsCondition()
+                    ? fake()->randomElement(['baru', 'seken'])
+                    : null;
 
-            $product->condition = $category->supportsCondition()
-                ? fake()->randomElement(['baru', 'seken'])
-                : null;
+                $time = now()->subHours(rand(1, 24));
+                $product->created_at = $time;
+                $product->pushed_at = $time;
 
-            $time = now()->subHours(rand(1, 24));
-
-            $product->created_at = $time;
-            $product->pushed_at = $time;
-
-            $product->save();
-            $product->addRandomImage();
+                $product->save();
+                $product->addRandomImage($files);
+            });
         });
+    }
+
+    protected function getSeedFiles(): array
+    {
+        $seedDir = storage_path('app/seed-samples');
+        return collect(scandir($seedDir))
+            ->reject(fn($f) => in_array($f, ['.', '..']))
+            ->map(fn($f) => $seedDir . DIRECTORY_SEPARATOR . $f)
+            ->values()
+            ->toArray();
     }
 
     /**

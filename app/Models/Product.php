@@ -157,37 +157,44 @@ class Product extends Model implements HasMedia
         $this
             ->addMediaConversion('thumb')
             ->fit(Fit::Crop, 300, 300)
-            ->quality(70)
-            ->nonQueued();
+            ->quality(70);
 
         $this
             ->addMediaConversion('webp')
             ->format('webp')
-            ->quality(80)
-            ->nonQueued();
+            ->quality(80);
     }
 
     public function getThumbnailUrlAttribute(): string
     {
-        $url = $this->getFirstMediaUrl('products', 'thumb');
-        return $url ?: asset('img/default-lapak-image.png');
+        $media = $this->getFirstMedia('products');
+
+        if (! $media) {
+            return asset('img/default-lapak-image.png');
+        }
+
+        return $media->hasGeneratedConversion('thumb')
+            ? $media->getUrl('thumb')
+            : $media->getUrl();
     }
 
-    public function addRandomImage(): void
+    public function addRandomImage(array $files = []): void
     {
-        $seedDir = storage_path('app/seed-samples');
-        $files = collect(scandir($seedDir))
-            ->reject(fn($f) => in_array($f, ['.', '..']))
-            ->values();
+        if (empty($files)) {
+            $seedDir = storage_path('app/seed-samples');
+            $files = collect(scandir($seedDir))
+                ->reject(fn($f) => in_array($f, ['.', '..']))
+                ->map(fn($f) => $seedDir . '/' . $f)
+                ->values()
+                ->toArray();
+        }
 
-        if ($files->isEmpty()) {
+        if (empty($files)) {
             logger()->error('NO FILES FOUND');
             return;
         }
 
-        $file = $files->random();
-
-        $fullPath = $seedDir . '/' . $file;
+        $fullPath = $files[array_rand($files)];
 
         try {
             $this

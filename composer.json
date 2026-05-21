@@ -21,7 +21,7 @@
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-image-optimizer": "^1.8",
         "spatie/laravel-medialibrary": "*",
-        "spatie/laravel-responsecache": "^8.4",
+        "spatie/laravel-responsecache": "^7.7",
         "stechstudio/filament-impersonate": "^4.1"
     },
     "require-dev": {

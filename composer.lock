@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3e82c54aa8519632e40a39b70d239f6",
+    "content-hash": "f238439864426c230a0f0821145d2762",
     "packages": [
         {
             "name": "al-saloul/filament-image-gallery",
@@ -5379,69 +5379,6 @@
             "time": "2021-08-15T12:53:48+00:00"
         },
         {
-            "name": "predis/predis",
-            "version": "v3.4.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/predis/predis.git",
-                "reference": "2033429520d8997a7815a2485f56abe6d2d0e075"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/2033429520d8997a7815a2485f56abe6d2d0e075",
-                "reference": "2033429520d8997a7815a2485f56abe6d2d0e075",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0",
-                "psr/http-message": "^1.0|^2.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.3",
-                "phpstan/phpstan": "^1.9",
-                "phpunit/phpcov": "^6.0 || ^8.0",
-                "phpunit/phpunit": "^8.0 || ~9.4.4"
-            },
-            "suggest": {
-                "ext-relay": "Faster connection with in-memory caching (>=0.6.2)"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Predis\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Till Krüss",
-                    "homepage": "https://till.im",
-                    "role": "Maintainer"
-                }
-            ],
-            "description": "A flexible and feature-complete Redis/Valkey client for PHP.",
-            "homepage": "http://github.com/predis/predis",
-            "keywords": [
-                "nosql",
-                "predis",
-                "redis"
-            ],
-            "support": {
-                "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v3.4.2"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/tillkruss",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-03-09T20:33:04+00:00"
-        },
-        {
             "name": "psr/clock",
             "version": "1.0.0",
             "source": {
@@ -6805,36 +6742,33 @@
         },
         {
             "name": "spatie/laravel-responsecache",
-            "version": "8.4.0",
+            "version": "7.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-responsecache.git",
-                "reference": "a8a685cceafdebc201c6cc228d330f38b9b55e2c"
+                "reference": "d551f0498dbb2d98df47359364e5a1c8203a6376"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-responsecache/zipball/a8a685cceafdebc201c6cc228d330f38b9b55e2c",
-                "reference": "a8a685cceafdebc201c6cc228d330f38b9b55e2c",
+                "url": "https://api.github.com/repos/spatie/laravel-responsecache/zipball/d551f0498dbb2d98df47359364e5a1c8203a6376",
+                "reference": "d551f0498dbb2d98df47359364e5a1c8203a6376",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": "^12.0|^13.0",
-                "illuminate/console": "^12.0|^13.0",
-                "illuminate/container": "^12.0|^13.0",
-                "illuminate/http": "^12.0|^13.0",
-                "illuminate/support": "^12.0|^13.0",
-                "nesbot/carbon": "^3.0",
-                "php": "^8.4",
-                "spatie/laravel-package-tools": "^1.9",
-                "spatie/php-attribute-reader": "^1.0"
+                "illuminate/cache": "^10.0|^11.0|^12.0",
+                "illuminate/console": "^10.0|^11.0|^12.0",
+                "illuminate/container": "^10.0|^11.0|^12.0",
+                "illuminate/http": "^10.0|^11.0|^12.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "nesbot/carbon": "^2.63|^3.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.9"
             },
             "require-dev": {
-                "larastan/larastan": "^3.9",
-                "laravel/framework": "^12.0|^13.0",
-                "laravel/pint": "^1.13.7",
-                "mockery/mockery": "^1.6",
-                "orchestra/testbench": "^10.0|^11.0",
-                "pestphp/pest": "^4.0"
+                "laravel/framework": "^10.0|^11.0|^12.0",
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "pestphp/pest": "^2.22|^3.0"
             },
             "type": "library",
             "extra": {
@@ -6875,8 +6809,7 @@
                 "spatie"
             ],
             "support": {
-                "issues": "https://github.com/spatie/laravel-responsecache/issues",
-                "source": "https://github.com/spatie/laravel-responsecache/tree/8.4.0"
+                "source": "https://github.com/spatie/laravel-responsecache/tree/7.7.0"
             },
             "funding": [
                 {
@@ -6888,65 +6821,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-11T08:22:08+00:00"
-        },
-        {
-            "name": "spatie/php-attribute-reader",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/php-attribute-reader.git",
-                "reference": "46e7484d7b51f5b22d672745c541e48c5a385404"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/php-attribute-reader/zipball/46e7484d7b51f5b22d672745c541e48c5a385404",
-                "reference": "46e7484d7b51f5b22d672745c541e48c5a385404",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "pestphp/pest": "^1.0|^2.0|^3.0|^4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\Attributes\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A clean API for working with PHP attributes",
-            "homepage": "https://github.com/spatie/php-attribute-reader",
-            "keywords": [
-                "attributes",
-                "php-attribute-reader",
-                "reflection",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/php-attribute-reader/issues",
-                "source": "https://github.com/spatie/php-attribute-reader/tree/1.1.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-02-23T09:01:55+00:00"
+            "time": "2025-05-20T08:39:19+00:00"
         },
         {
             "name": "spatie/shiki-php",

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer show *)",
+      "PowerShell(composer show spatie/laravel-responsecache 2>&1)",
+      "PowerShell(composer install 2>&1)",
+      "PowerShell(composer show spatie/laravel-responsecache --available 2>&1)"
+    ]
+  }
+}

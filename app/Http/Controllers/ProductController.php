@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Category;
-use App\Models\LapakProfile;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -19,8 +18,7 @@ class ProductController extends Controller
         $categoryId = $request->query('category');
         $condition  = $request->query('condition');
 
-        // ✅ Dapat dari cache, hanya rebuild tiap 60 detik
-        $eligibleProductIds = \App\Services\ProductScheduleService::getEligibleProductIds();
+        $eligibleProductIds = ProductScheduleService::getEligibleProductIds();
 
         $products = Product::with([
             'media',

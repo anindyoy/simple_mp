@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Product;
+use App\Models\LapakProfile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class ProductScheduleService
@@ -20,18 +22,12 @@ class ProductScheduleService
 
     public static function rebuild(int $lapakId): void
     {
-        $products = Product::where('lapak_id', $lapakId)
+        $products = Product::query()
+            ->where('lapak_id', $lapakId)
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $schedule = [];
-
-        foreach ($products as $index => $product) {
-            $publishAt = Carbon::parse($product->created_at)
-                ->addHours($index * self::DELAY_HOURS);
-
-            $schedule[$product->id] = $publishAt;
-        }
+        $schedule = self::buildSchedule($products);
 
         Cache::put(
             self::cacheKey($lapakId),
@@ -115,19 +111,29 @@ class ProductScheduleService
 
     private static function resolveEligibleProductIds(): \Illuminate\Support\Collection
     {
-        $activeLapakIds = \App\Models\LapakProfile::where('is_active', true)->pluck('id');
+        $activeLapakIds = LapakProfile::query()
+            ->where('is_active', true)
+            ->pluck('id');
+
+        if ($activeLapakIds->isEmpty()) {
+            return collect();
+        }
 
         $now = now();
         $eligible = collect();
+        $productsByLapak = Product::query()
+            ->whereIn('lapak_id', $activeLapakIds)
+            ->orderBy('lapak_id')
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('lapak_id');
 
         foreach ($activeLapakIds as $lapakId) {
-            $schedule = self::get($lapakId);
+            $schedule = self::buildSchedule(
+                $productsByLapak->get($lapakId, collect())
+            );
 
-            // Rebuild kalau kosong — ikuti logic asli
-            if (empty($schedule)) {
-                self::rebuild($lapakId);
-                $schedule = self::get($lapakId);
-            }
+            Cache::put(self::cacheKey($lapakId), $schedule, now()->addDays(1));
 
             $lapakEligible = collect($schedule)
                 ->filter(fn($publishAt) => Carbon::parse($publishAt) <= $now)
@@ -137,5 +143,17 @@ class ProductScheduleService
         }
 
         return $eligible->unique()->values();
+    }
+
+    private static function buildSchedule(Collection $products): array
+    {
+        $schedule = [];
+
+        foreach ($products as $index => $product) {
+            $schedule[$product->id] = Carbon::parse($product->created_at)
+                ->addHours($index * self::DELAY_HOURS);
+        }
+
+        return $schedule;
     }
 }

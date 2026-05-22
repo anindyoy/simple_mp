@@ -30,6 +30,6 @@ test-results.php
 /storage/*
 /storage/*
 !/storage/app/
- /storage/app/*
+/storage/app/*
 !/storage/app/seed-samples/
 !/storage/app/seed-samples/**

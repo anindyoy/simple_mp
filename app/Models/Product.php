@@ -10,7 +10,6 @@ use App\Models\LapakProfile;
 use App\Models\ProductModeration;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Activitylog\LogOptions;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ProductScheduleService;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -195,17 +194,37 @@ class Product extends Model implements HasMedia
         }
 
         $fullPath = $files[array_rand($files)];
+        $tempPath = null;
 
         try {
+            $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
+            $randomName = 'product-seed-' . bin2hex(random_bytes(8));
+            $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
+
+            if ($extension !== '') {
+                $tempPath .= '.' . $extension;
+            }
+
+            if (file_exists($tempPath)) {
+                throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
+            }
+
+            if (! copy($fullPath, $tempPath)) {
+                throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
+            }
+
             $this
-                ->addMedia($fullPath)
-                ->preservingOriginal()
+                ->addMedia($tempPath)
                 ->toMediaCollection('products');
         } catch (\Throwable $e) {
             logger()->error('MEDIA FAILED', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+        } finally {
+            if ($tempPath && is_file($tempPath)) {
+                @unlink($tempPath);
+            }
         }
     }
 }

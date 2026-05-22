@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\LapakProfile;
-use App\Services\ProductScheduleService;
 use Illuminate\Database\Seeder;
+use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ProductSeeder extends Seeder

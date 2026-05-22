@@ -20,7 +20,6 @@ class ProductController extends Controller
 
         $eligibleProductIds = ProductScheduleService::getEligibleProductIds();
 
-
         $products = Product::with([
             'media',
             'lapak:id,name,slug,address_raw',

@@ -11,6 +11,7 @@ use App\Models\TokenPurchase;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
 use Illuminate\Support\Facades\Storage;
+use Database\Seeders\WhatsappAgentSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
@@ -127,6 +128,9 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Membuat pembelian token yang dikonfirmasi...');
         $this->createConfirmedTokenPurchases();
+
+        $this->command->info('Membuat agent WhatsApp default...');
+        $this->call([WhatsappAgentSeeder::class]);
     }
 
     /**

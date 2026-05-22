@@ -9,6 +9,7 @@ use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
+use JeffersonGoncalves\Filament\WhatsappWidget\WhatsappWidgetPlugin;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -41,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             );
 
         $plugins[] = FilamentTourPlugin::make()->enableCssSelector(app()->environment('local'));
+        $plugins[] = WhatsappWidgetPlugin::make();
 
         if (
             app()->environment('local') &&

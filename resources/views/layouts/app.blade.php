@@ -13,6 +13,7 @@
 @endphp@yield('title', $siteTitle . ' ' . $defaultRegion)</title>
 
     @include('partials.meta')
+    @include('whatsapp-widget::whatsapp-widget-head')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -36,6 +37,8 @@
     @endguest
 
     @include('partials.footer', ['region' => $defaultRegion, 'siteTitle' => $siteTitle])
+
+    @include('whatsapp-widget::whatsapp-widget-body')
 
     @unless (app()->environment('local'))
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>

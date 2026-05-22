@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use App\Services\ProductScheduleService;
 
 class ProductController extends Controller
@@ -20,12 +21,15 @@ class ProductController extends Controller
 
         $eligibleProductIds = ProductScheduleService::getEligibleProductIds();
 
+        if ($eligibleProductIds->count() > 900) {
+            rescue(fn() => $this->notifyEligibleThreshold($eligibleProductIds->count()), report: false);
+        }
+
         $products = Product::with([
             'media',
             'lapak:id,name,slug,address_raw',
             'category:id,category_name',
         ])
-
             ->whereIn('id', $eligibleProductIds)
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
@@ -52,6 +56,34 @@ class ProductController extends Controller
                 'description' => Setting::getValue('site_description', '...'),
                 'keywords'    => Setting::getValue('site_keywords', '...'),
             ],
+        ]);
+    }
+
+    private function notifyEligibleThreshold(int $count): void
+    {
+        // Kirim notif Telegram max sekali per hari agar tidak spam
+        if (! Cache::add('products.eligible_threshold_notified', true, now()->addDay())) {
+            return;
+        }
+
+        $token  = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+
+        if (blank($token) || blank($chatId)) {
+            return;
+        }
+
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id'    => $chatId,
+            'parse_mode' => 'HTML',
+            'text'       => implode("\n", [
+                '⚠️ <b>Peringatan Kapasitas eligible_ids</b>',
+                '',
+                "<code>eligibleProductIds</code> telah mencapai <b>{$count}</b> produk (batas rekomendasi: 900).",
+                'Pertimbangkan refactor <code>resolveEligibleProductIds()</code> dan <code>whereIn</code> di ProductController.',
+                '',
+                'Domain: ' . config('app.url'),
+            ]),
         ]);
     }
 

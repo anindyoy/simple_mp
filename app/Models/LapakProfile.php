@@ -94,6 +94,11 @@ class LapakProfile extends Model
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 
+    public function getAddressShortAttribute(): string
+    {
+        return Str::limit($this->address_raw ?? '', 12);
+    }
+
     public function getJoinedAtLabelAttribute(): string
     {
         return $this->created_at

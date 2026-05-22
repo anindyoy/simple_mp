@@ -13,7 +13,8 @@
         <img
             class="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-500"
             src="{{ $imageUrl }}"
-            alt="{{ $product->title }}" />
+            alt="{{ $product->title }}"
+            onerror="this.onerror=null;this.src='{{ asset('img/no-product-image.png') }}';" />
 
         @php
             $isNew = $product->created_at->diffInHours(now()) < 24;
@@ -75,7 +76,7 @@
             </div>
 
             <div class="font-semibold text-gray-600">
-                {{ \Illuminate\Support\Str::limit($product->lapak->address_raw, 12) }}
+                {{ $product->lapak->address_short }}
             </div>
         </div>
     </div>

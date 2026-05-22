@@ -4,7 +4,12 @@
       "PowerShell(composer require spatie/laravel-responsecache:\"^7.7\" 2>&1)",
       "PowerShell(php artisan config:clear)",
       "PowerShell(php artisan cache:clear 2>&1)",
-      "PowerShell(php artisan config:clear 2>&1)"
+      "PowerShell(php artisan config:clear 2>&1)",
+      "Bash(php artisan *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")"
+    ],
+    "additionalDirectories": [
+      "d:\\Repo\\simple_mp\\resources\\img"
     ]
   }
 }

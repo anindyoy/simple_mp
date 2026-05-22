@@ -169,62 +169,11 @@ class Product extends Model implements HasMedia
         $media = $this->getFirstMedia('products');
 
         if (! $media) {
-            return asset('img/default-lapak-image.png');
+            return asset('img/no-product-image.png');
         }
 
         return $media->hasGeneratedConversion('thumb')
             ? $media->getUrl('thumb')
             : $media->getUrl();
-    }
-
-    public function addRandomImage(array $files = []): void
-    {
-        if (empty($files)) {
-            $seedDir = storage_path('app/seed-samples');
-            $files = collect(scandir($seedDir))
-                ->reject(fn($f) => in_array($f, ['.', '..']))
-                ->map(fn($f) => $seedDir . '/' . $f)
-                ->values()
-                ->toArray();
-        }
-
-        if (empty($files)) {
-            logger()->error('NO FILES FOUND');
-            return;
-        }
-
-        $fullPath = $files[array_rand($files)];
-        $tempPath = null;
-
-        try {
-            $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
-            $randomName = 'product-seed-' . bin2hex(random_bytes(8));
-            $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
-
-            if ($extension !== '') {
-                $tempPath .= '.' . $extension;
-            }
-
-            if (file_exists($tempPath)) {
-                throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
-            }
-
-            if (! copy($fullPath, $tempPath)) {
-                throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
-            }
-
-            $this
-                ->addMedia($tempPath)
-                ->toMediaCollection('products');
-        } catch (\Throwable $e) {
-            logger()->error('MEDIA FAILED', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        } finally {
-            if ($tempPath && is_file($tempPath)) {
-                @unlink($tempPath);
-            }
-        }
     }
 }

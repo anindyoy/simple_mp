@@ -24,7 +24,8 @@ class ProductController extends Controller
 
         $products = Product::with([
             'media',
-            'lapak:id,name,slug',
+            'lapak:id,name,slug,address_raw',
+            'category:id,category_name',
         ])
 
             ->whereIn('id', $eligibleProductIds)

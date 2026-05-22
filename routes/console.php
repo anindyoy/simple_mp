@@ -17,3 +17,7 @@ Schedule::command('tokens:refill-weekly')
     ->fridays()
     ->at('00:00')
     ->withoutOverlapping();
+
+Schedule::command('products:notify-eligible-threshold')
+    ->cron('0 0,8,16 * * *')
+    ->withoutOverlapping();

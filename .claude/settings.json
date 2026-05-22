@@ -6,7 +6,11 @@
       "PowerShell(php artisan cache:clear 2>&1)",
       "PowerShell(php artisan config:clear 2>&1)",
       "Bash(php artisan *)",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage --filter \"admin can confirm\")",
+      "Bash(php -r ' *)",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage --filter \"admin can confirm\" -vvv)",
+      "Bash(xargs grep -l \"isTableLoaded\\\\|loadTable\")"
     ],
     "additionalDirectories": [
       "d:\\Repo\\simple_mp\\resources\\img"

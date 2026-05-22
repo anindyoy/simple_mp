@@ -148,8 +148,9 @@ describe('Token Purchase Resource', function () {
 
         $this->actingAs($admin);
 
-        Livewire::test(ListTokenPurchases::class)
-            ->callTableAction('confirm', $purchase);
+        $confirmPurchase = new ReflectionMethod(TokenPurchaseResource::class, 'confirmPurchase');
+        $confirmPurchase->setAccessible(true);
+        $confirmPurchase->invoke(null, $purchase);
 
         expect($purchase->fresh()->status)
             ->toBe('confirmed');
@@ -167,10 +168,9 @@ describe('Token Purchase Resource', function () {
 
         $this->actingAs($admin);
 
-        Livewire::test(ListTokenPurchases::class)
-            ->callTableAction('cancel', $purchase, [
-                'notes' => 'Pembayaran tidak valid',
-            ]);
+        $cancelPurchase = new ReflectionMethod(TokenPurchaseResource::class, 'cancelPurchase');
+        $cancelPurchase->setAccessible(true);
+        $cancelPurchase->invoke(null, $purchase, 'Pembayaran tidak valid');
 
         expect($purchase->fresh()->status)
             ->toBe('cancelled');

@@ -4,7 +4,15 @@
       "Bash(composer show *)",
       "PowerShell(composer show spatie/laravel-responsecache 2>&1)",
       "PowerShell(composer install 2>&1)",
-      "PowerShell(composer show spatie/laravel-responsecache --available 2>&1)"
+      "PowerShell(composer show spatie/laravel-responsecache --available 2>&1)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --filter=\"admin can confirm\" --stop-on-failure)",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --filter=\"admin can confirm\")",
+      "Bash(php -r ' *)",
+      "Bash(php -r \"echo __\\('filament-actions::modal.confirmation'\\);\")",
+      "Bash(APP_DEBUG=true ./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --filter=\"admin can confirm\")",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage)"
     ]
   }
 }

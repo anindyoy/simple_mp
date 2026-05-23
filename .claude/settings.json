@@ -10,7 +10,10 @@
       "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage --filter \"admin can confirm\")",
       "Bash(php -r ' *)",
       "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage --filter \"admin can confirm\" -vvv)",
-      "Bash(xargs grep -l \"isTableLoaded\\\\|loadTable\")"
+      "Bash(xargs grep -l \"isTableLoaded\\\\|loadTable\")",
+      "PowerShell(composer show jefferson-goncalves/filament-whatsapp-widget 2>&1)",
+      "PowerShell(composer install --no-scripts 2>&1)",
+      "PowerShell(composer install --ignore-platform-reqs --no-scripts 2>&1)"
     ],
     "additionalDirectories": [
       "d:\\Repo\\simple_mp\\resources\\img"

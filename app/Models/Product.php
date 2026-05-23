@@ -31,7 +31,7 @@ class Product extends Model implements HasMedia
         'pushed_at' => 'datetime',
         'is_active' => 'boolean',
         'price' => 'integer',
-
+        'can_be_delivered' => 'boolean',
     ];
 
     protected static function boot()
@@ -47,6 +47,12 @@ class Product extends Model implements HasMedia
             // Set lapak_id dari auth user hanya jika belum ada
             if (is_null($product->lapak_id) && auth()->check()) {
                 $product->lapak_id = auth()->user()?->lapak?->id;
+            }
+
+            // Inherit can_be_delivered dari lapak jika belum di-set secara eksplisit
+            if (is_null($product->can_be_delivered)) {
+                $lapak = $product->lapak ?? (auth()->check() ? auth()->user()?->lapak : null);
+                $product->can_be_delivered = $lapak?->can_be_delivered ?? false;
             }
 
             $product->pushed_at = now()->subHours(2);

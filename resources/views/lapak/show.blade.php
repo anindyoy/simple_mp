@@ -32,6 +32,13 @@
                     <p class="text-xs text-gray-400">
                         Bergabung sejak {{ $lapak->joined_at_label }}
                     </p>
+
+                    @if ($lapak->can_be_delivered)
+                        <p class="text-xs font-semibold text-blue-600 flex items-center gap-1 mt-1">
+                            <x-heroicon-o-truck class="w-3 h-3" />
+                            Melayani Pengiriman
+                        </p>
+                    @endif
                 </div>
             </div>
 

@@ -3,17 +3,18 @@
 namespace App\Filament\Pages;
 
 use BackedEnum;
+use App\Models\Setting;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\Textarea;
-use App\Models\Setting;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\FileUpload;
@@ -189,6 +190,11 @@ class LapakProfile extends Page implements HasForms
                             ignoreRecord: true
                         )
                         ->prefix('@'),
+
+                    Toggle::make('can_be_delivered')
+                        ->label('Bisa Antar')
+                        ->helperText('Aktifkan jika lapak Anda menyediakan layanan antar ke pembeli')
+                        ->default(false),
 
                     Repeater::make('external_links')
                         ->label('Link External Toko')

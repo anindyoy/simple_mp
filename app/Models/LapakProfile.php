@@ -23,6 +23,7 @@ class LapakProfile extends Model
 
     protected $casts = [
         'external_links' => 'array',
+        'can_be_delivered' => 'boolean',
     ];
 
     protected static function booted()

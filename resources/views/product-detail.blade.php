@@ -70,15 +70,22 @@
             <div>
                 <h1 class="text-4xl font-extrabold text-gray-900">{{ $product->title }}</h1>
                 <p class="text-2xl font-bold text-blue-600 mt-2">Rp {{ number_format($product->price) }}</p>
-                @if ($product->hasCondition())
-                    <div class="mt-2">
+                <div class="mt-2 flex flex-wrap gap-2">
+                    @if ($product->hasCondition())
                         <span
                             class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
             {{ $product->condition === 'baru' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                             {{ $product->conditionLabel() }}
                         </span>
-                    </div>
-                @endif
+                    @endif
+
+                    @if ($product->can_be_delivered)
+                        <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                            <x-heroicon-o-truck class="w-3 h-3" />
+                            Bisa Diantar
+                        </span>
+                    @endif
+                </div>
 
                 <div class="mt-6">
                     <h3 class="font-bold text-gray-500 uppercase text-xs">Deskripsi</h3>

@@ -65,6 +65,11 @@ class ProductForm
                             ->label('Aktifkan Produk')
                             ->disabled(fn($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
                             ->default(true),
+
+                        Forms\Components\Toggle::make('can_be_delivered')
+                            ->label('Bisa Diantar')
+                            ->helperText('Centang jika produk ini bisa diantarkan ke pembeli')
+                            ->default(fn() => auth()->user()?->lapak?->can_be_delivered ?? false),
                     ])
                     ->columns(2),
 

@@ -62,7 +62,7 @@ class ProductsTable
                     TextColumn::make('category.category_name')
                         ->label('Kategori')
                         ->sortable()
-                        ->badge()P
+                        ->badge()
                         ->color('gray'),
 
                     TextColumn::make('condition')

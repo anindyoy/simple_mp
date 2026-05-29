@@ -62,8 +62,30 @@ class ProductsTable
                     TextColumn::make('category.category_name')
                         ->label('Kategori')
                         ->sortable()
-                        ->badge()
+                        ->badge()P
                         ->color('gray'),
+
+                    TextColumn::make('condition')
+                        ->label('Kondisi')
+                        ->badge(fn(?string $state) => filled($state))
+                        ->sortable()
+                        ->formatStateUsing(fn(?string $state) => match ($state) {
+                            'baru' => 'Kondisi Baru',
+                            'seken' => 'Kondisi Bekas',
+                            default => null,
+                        })
+                        ->color(fn(?string $state) => match ($state) {
+                            'baru' => 'success',
+                            'seken' => 'warning',
+                            default => null,
+                        }),
+
+                    TextColumn::make('can_be_delivered')
+                        ->label('Bisa Diantar')
+                        ->badge(fn(bool $state) => $state)
+                        ->sortable()
+                        ->formatStateUsing(fn(bool $state) => $state ? 'Bisa Diantar' : null)
+                        ->color(fn(bool $state) => $state ? 'success' : null),
 
                     TextColumn::make('lapak.name')
                         ->label('Lapak')

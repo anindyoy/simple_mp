@@ -196,6 +196,14 @@ class LapakProfile extends Page implements HasForms
                         ->helperText('Aktifkan jika lapak Anda menyediakan layanan antar ke pembeli')
                         ->default(false),
 
+                    FileUpload::make('profile_image')
+                        ->label('Foto Lapak')
+                        ->image()
+                        ->disk('public')
+                        ->directory('lapak-profiles')
+                        ->imagePreviewHeight('150')
+                        ->maxSize(2048),
+
                     Repeater::make('external_links')
                         ->label('Link External Toko')
                         ->schema([
@@ -214,14 +222,6 @@ class LapakProfile extends Page implements HasForms
                         ->default([])
                         ->reorderable(false)
                         ->addActionLabel('Tambah Link'),
-
-                    FileUpload::make('profile_image')
-                        ->label('Foto Lapak')
-                        ->image()
-                        ->disk('public')
-                        ->directory('lapak-profiles')
-                        ->imagePreviewHeight('150')
-                        ->maxSize(2048),
                 ]),
             ])
             ->model($this->lapak)
@@ -281,11 +281,11 @@ class LapakProfile extends Page implements HasForms
 
         $labels = is_array($decoded)
             ? collect($decoded)
-                ->map(fn($label): string => trim((string) $label))
-                ->filter()
-                ->unique()
-                ->values()
-                ->all()
+            ->map(fn($label): string => trim((string) $label))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all()
             : $default;
 
         if ($labels === []) {

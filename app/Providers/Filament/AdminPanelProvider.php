@@ -9,7 +9,6 @@ use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
-use JeffersonGoncalves\Filament\WhatsappWidget\WhatsappWidgetPlugin;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -26,6 +25,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use JeffersonGoncalves\Filament\WhatsappWidget\WhatsappWidgetPlugin;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 
 class AdminPanelProvider extends PanelProvider

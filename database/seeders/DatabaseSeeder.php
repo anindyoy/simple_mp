@@ -55,38 +55,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('Membuat setting default...');
-        $externalLinkLabels = Setting::factory()->externalLinkLabels()->make();
-        $userRulesContent = Setting::factory()->userRulesContent()->make();
-
-        $settings = [
-            ['key' => 'lapak_external_link_labels', 'value' => $externalLinkLabels->value],
-            ['key' => 'user_rules_content', 'value' => $userRulesContent->value],
-            ['key' => 'weekly_minimum_push_tokens', 'value' => '3'],
-            ['key' => 'initial_push_tokens', 'value' => '10'],
-            ['key' => 'token_price', 'value' => '2000'],
-            ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
-            ['key' => 'token_purchase_whatsapp', 'value' => '62812345678'],
-            [
-                'key' => 'token_bank_accounts',
-                'value' => json_encode([
-                    [
-                        'bank_name' => 'BCA',
-                        'account_number' => '1234567890',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                    [
-                        'bank_name' => 'Mandiri',
-                        'account_number' => '9876543210',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                    [
-                        'bank_name' => 'BNI',
-                        'account_number' => '1122334455',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                ], JSON_UNESCAPED_UNICODE),
-            ],
-        ];
+        $settings = $this->buildDefaultSettings();
 
         $now = now();
 
@@ -131,6 +100,47 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Membuat agent WhatsApp default...');
         $this->call([WhatsappAgentSeeder::class]);
+    }
+
+    /**
+     * Build default settings array used by the seeder.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildDefaultSettings(): array
+    {
+        $externalLinkLabels = Setting::factory()->externalLinkLabels()->make();
+        $userRulesContent = Setting::factory()->userRulesContent()->make();
+
+        return [
+            ['key' => 'lapak_external_link_labels', 'value' => $externalLinkLabels->value],
+            ['key' => 'user_rules_content', 'value' => $userRulesContent->value],
+            ['key' => 'weekly_minimum_push_tokens', 'value' => '3'],
+            ['key' => 'initial_push_tokens', 'value' => '10'],
+            ['key' => 'token_price', 'value' => '2000'],
+            ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
+            ['key' => 'token_purchase_whatsapp', 'value' => '62812345678'],
+            [
+                'key' => 'token_bank_accounts',
+                'value' => json_encode([
+                    [
+                        'bank_name' => 'BCA',
+                        'account_number' => '1234567890',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                    [
+                        'bank_name' => 'Mandiri',
+                        'account_number' => '9876543210',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                    [
+                        'bank_name' => 'BNI',
+                        'account_number' => '1122334455',
+                        'account_holder' => 'PT SimpleMP',
+                    ],
+                ], JSON_UNESCAPED_UNICODE),
+            ],
+        ];
     }
 
     /**

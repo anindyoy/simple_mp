@@ -45,12 +45,21 @@
             Rp {{ number_format($product->price) }}
         </p>
 
-        @if ($product->hasCondition())
-            <span class="inline-block mb-1 text-[10px] font-bold px-2 py-0.5 rounded-full
-                {{ $product->condition === 'baru' ? 'text-green-700' : 'text-yellow-700' }}">
-                Kondisi {{ $product->conditionLabel() }}
-            </span>
-        @endif
+        <div class="mb-1 flex flex-wrap gap-1">
+            @if ($product->hasCondition())
+                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+                    {{ $product->condition === 'baru' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    Kondisi {{ $product->conditionLabel() }}
+                </span>
+            @endif
+
+            @if ($product->can_be_delivered)
+                <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                    <x-heroicon-o-truck class="w-3 h-3" />
+                    Bisa Diantar
+                </span>
+            @endif
+        </div>
 
         @if ($showLapakName ?? false)
             <div class="flex items-center gap-1 text-sm text-gray-500 font-semibold">

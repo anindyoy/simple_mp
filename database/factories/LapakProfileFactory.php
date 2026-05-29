@@ -49,6 +49,7 @@ class LapakProfileFactory extends Factory
             'telegram_username' => $this->faker->userName(),
             'external_links' => $externalLinks,
             'address_raw' => "Desa " . $this->faker->randomElement($lokasiCimanglid) . ", Ciapus, Bogor",
+            'can_be_delivered' => $this->faker->boolean(70), // 70% kemungkinan bisa diantar
         ];
     }
 }

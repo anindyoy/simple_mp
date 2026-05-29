@@ -31,6 +31,7 @@ class ProductFactory extends Factory
 
             'is_active' => true,
             'pushed_at' => $this->faker->dateTimeBetween('-3 days', 'now'),
+            'can_be_delivered' => $this->faker->boolean(50), // 50% kemungkinan bisa diantar
         ];
     }
 

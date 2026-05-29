@@ -11,6 +11,8 @@ use Filament\Support\Assets\Js;
 use App\Observers\ProductObserver;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Policies\WhatsappAgentPolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
@@ -20,6 +22,7 @@ use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
+use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Product::observe(ProductObserver::class);
         LapakProfile::observe(LapakProfileObserver::class);
+        Gate::policy(WhatsappAgent::class, WhatsappAgentPolicy::class);
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::GLOBAL_SEARCH_AFTER,

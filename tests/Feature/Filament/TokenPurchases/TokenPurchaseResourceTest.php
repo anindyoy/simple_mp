@@ -53,6 +53,7 @@ describe('Token Purchase Resource', function () {
         $this->actingAs($user);
 
         Livewire::test(ListTokenPurchases::class)
+            ->loadTable()
             ->assertCanSeeTableRecords([$ownPurchase])
             ->assertCanNotSeeTableRecords([$otherPurchase]);
     });
@@ -66,6 +67,7 @@ describe('Token Purchase Resource', function () {
         $this->actingAs($admin);
 
         Livewire::test(ListTokenPurchases::class)
+            ->loadTable()
             ->assertCanSeeTableRecords([
                 $purchase1,
                 $purchase2,
@@ -193,6 +195,7 @@ describe('Token Purchase Resource', function () {
         $this->actingAs($admin);
 
         Livewire::test(ListTokenPurchases::class)
+            ->loadTable()
             ->assertTableActionVisible('confirm', $pendingPurchase)
             ->assertTableActionHidden('confirm', $confirmedPurchase);
     });
@@ -211,6 +214,7 @@ describe('Token Purchase Resource', function () {
         $this->actingAs($admin);
 
         Livewire::test(ListTokenPurchases::class)
+            ->loadTable()
             ->assertTableActionVisible('cancel', $pendingPurchase)
             ->assertTableActionHidden('cancel', $cancelledPurchase);
     });

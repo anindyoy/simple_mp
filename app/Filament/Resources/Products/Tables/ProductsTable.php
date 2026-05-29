@@ -17,13 +17,13 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\ProductModerationService;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class ProductsTable
 {
@@ -33,15 +33,15 @@ class ProductsTable
             ->columns([
                 Stack::make([
                     Split::make([
-                        SpatieMediaLibraryImageColumn::make('products')
-                            ->collection('products')
+                        ImageColumn::make('thumbnail_urls')
                             ->circular()
                             ->stacked()
                             ->limit(3)
                             ->overlap(4)
                             ->remainingTextBadge(true)
-                            ->height(120)
-                            ->width(120),
+                            ->height(100)
+                            ->width(100)
+                            ->grow(false),
 
                         TextColumn::make('is_active')
                             ->label('Aktif')

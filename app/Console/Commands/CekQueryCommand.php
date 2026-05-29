@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Report;
+use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class CekQueryCommand extends Command
      */
     protected $signature = 'cek:query';
 
-    /**
+    /**s
      * The console command description.
      *
      * @var string
@@ -32,7 +33,21 @@ class CekQueryCommand extends Command
     public function handle()
     {
         // Get nama user yang memiliki lapak dengan can_be_delivered = 1
-        $data = User::whereHas('lapak', fn($query) => $query->where('can_be_delivered', 1))->first()->name;
-        dd($data);
+        // $userName = User::whereHas('lapak', fn($query) => $query->where('can_be_delivered', 1))->first()->name;
+
+        // Get nama user yang memiliki lapak dengan produk yang memiliki media lebih dari 1
+        $user = User::whereHas('lapak.products', fn($q) => $q->has('media', '>', 1))->first();
+        $userName = $user->name ?? 'Tidak ditemukan';
+
+        // Tampilkan list produk ids yang memiliki media lebih dari 1 milik user di atas
+        if (! $user) {
+            dd($userName, collect());
+        }
+
+        $productIds = Product::has('media', '>', 1)
+            ->whereHas('lapak', fn($q) => $q->where('user_id', $user->id))
+            ->pluck('id');
+
+        dd($userName, $productIds);
     }
 }

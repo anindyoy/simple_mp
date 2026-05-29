@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Database\Seeder;
 use App\Services\ProductScheduleService;
@@ -135,37 +136,55 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        $fullPath = $files[array_rand($files)];
-        $tempPath = null;
+        $count = 1; // Restore single-image seeding flow
+        $tempPaths = [];
 
-        try {
-            $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
-            $randomName = 'product-seed-' . bin2hex(random_bytes(8));
-            $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
+        for ($i = 0; $i < $count; $i++) {
+            $fullPath = $files[array_rand($files)];
+            $tempPath = null;
 
-            if ($extension !== '') {
-                $tempPath .= '.' . $extension;
+            try {
+                $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
+                $randomName = 'product-seed-' . bin2hex(random_bytes(8)) . '-' . $i;
+                $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
+
+                if ($extension !== '') {
+                    $tempPath .= '.' . $extension;
+                }
+
+                if (file_exists($tempPath)) {
+                    throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
+                }
+
+                if (! copy($fullPath, $tempPath)) {
+                    throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
+                }
+
+                $media = $product
+                    ->addMedia($tempPath)
+                    ->toMediaCollection('products');
+
+                if (blank($media->uuid)) {
+                    $media->forceFill([
+                        'uuid' => (string) Str::uuid(),
+                    ])->save();
+                }
+
+                $tempPaths[] = $tempPath;
+            } catch (\Throwable $e) {
+                logger()->error('MEDIA FAILED', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                if ($tempPath && is_file($tempPath)) {
+                    @unlink($tempPath);
+                }
             }
+        }
 
-            if (file_exists($tempPath)) {
-                throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
-            }
-
-            if (! copy($fullPath, $tempPath)) {
-                throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
-            }
-
-            $product
-                ->addMedia($tempPath)
-                ->toMediaCollection('products');
-        } catch (\Throwable $e) {
-            logger()->error('MEDIA FAILED', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        } finally {
-            if ($tempPath && is_file($tempPath)) {
-                @unlink($tempPath);
+        foreach ($tempPaths as $p) {
+            if (is_file($p)) {
+                @unlink($p);
             }
         }
     }

@@ -170,6 +170,12 @@ class Product extends Model implements HasMedia
             ->quality(80);
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('products')
+            ->useDisk('public');
+    }
+
     public function getThumbnailUrlAttribute(): string
     {
         $media = $this->getFirstMedia('products');
@@ -181,5 +187,18 @@ class Product extends Model implements HasMedia
         return $media->hasGeneratedConversion('thumb')
             ? $media->getUrl('thumb')
             : $media->getUrl();
+    }
+
+    public function getThumbnailUrlsAttribute(): array
+    {
+        $mediaItems = $this->getMedia('products');
+
+        if ($mediaItems->isEmpty()) {
+            return [asset('img/no-product-image.png')];
+        }
+
+        return $mediaItems->map(function (Media $m) {
+            return $m->hasGeneratedConversion('thumb') ? $m->getUrl('thumb') : $m->getUrl();
+        })->toArray();
     }
 }

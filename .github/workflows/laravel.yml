@@ -9,6 +9,8 @@ on:
 jobs:
   laravel-tests:
 
+    environment: Telegram
+
     runs-on: ubuntu-latest
 
     services:

@@ -10,20 +10,26 @@ Aplikasi ini mendukung katalog produk publik, profil lapak, autentikasi user den
 - Melihat detail produk dan daftar produk lain dari lapak yang sama.
 - Melihat halaman profil lapak.
 - Melihat halaman peraturan pengguna.
+- Menghubungi lapak via widget WhatsApp yang tampil di halaman produk dan lapak.
 
 ### Member (setelah login)
 - Registrasi dan login publik.
 - Wajib verifikasi email sebelum bisa mengakses panel member/admin.
+- Mengelola profil akun (nama, email, password, avatar).
+- Mengaktifkan Two-Factor Authentication (2FA) untuk keamanan akun.
 - Mengelola profil lapak sendiri.
 - Mengelola produk milik lapak sendiri.
 - Melakukan report produk/lapak.
 - Membeli token angkat produk (request pembelian + upload bukti transfer).
-- Melihat riwayat pembelian token.
+- Melihat riwayat pembelian token beserta status konfirmasi per transaksi.
 
 ### Admin
 - Moderasi laporan (report) dari pengguna.
+- Moderasi produk dari semua lapak (tambah, edit, nonaktifkan).
 - Konfirmasi atau pembatalan pembelian token user.
 - Kelola pengguna dan aktivitas log.
+- Kelola halaman tutorial beserta gambar ilustrasi per URL.
+- Kelola WhatsApp agent untuk widget kontak yang tampil di halaman publik.
 - Atur konfigurasi aplikasi dari panel (judul situs, SEO, wilayah, token, rekening bank, konten peraturan, label link external lapak).
 
 ## Stack Teknologi

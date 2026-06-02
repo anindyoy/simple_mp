@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
 
         if (!Category::exists()) {
             $this->command->info('Membuat kategori produk...');
-            $categories = ['Makanan', 'Fashion', 'Elektronik', 'Otomotif', 'Jasa'];
+            $categories = ['Makanan', 'Minuman', 'Pakaian', 'Elektronik', 'Otomotif', 'Jasa', 'Otomotif', 'Properti', 'Buah & Sayuran', 'Gadget', 'Suplemen', 'Lainnya'];
 
             Category::insert(
                 collect($categories)

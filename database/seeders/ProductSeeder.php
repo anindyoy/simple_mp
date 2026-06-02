@@ -15,6 +15,15 @@ class ProductSeeder extends Seeder
     protected ?int $count;
     protected ?string $mode;
 
+    /** @var array<string, array<string>> */
+    private array $productNames = [];
+
+    /** @var array<string, array<string>> */
+    private array $productSifat = [];
+
+    /** @var array<string, array<string>> */
+    private array $categoryImages = [];
+
     /**
      * @param int|null $count
      * @param string|null $mode
@@ -37,6 +46,9 @@ class ProductSeeder extends Seeder
             return;
         }
 
+        $this->loadJsonData();
+        $this->loadCategoryImages();
+
         if ($this->count !== null) {
             $this->runTestingSeeder($this->count);
             return;
@@ -52,12 +64,17 @@ class ProductSeeder extends Seeder
     {
         $categories = Category::all();
         $existingLapaks = LapakProfile::all();
-        $files = $this->getSeedFiles();
 
-        Product::withoutEvents(function () use ($categories, $existingLapaks, $files) {
-            Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks, $files) {
+        Product::withoutEvents(function () use ($categories, $existingLapaks) {
+            Product::factory(50)->make()->each(function ($product) use ($categories, $existingLapaks) {
                 $category = $categories->random();
+                $categoryName = $category->category_name;
+
                 $product->category_id = $category->id;
+
+                [$title, $slug] = $this->generateTitleAndSlug($categoryName);
+                $product->title = $title;
+                $product->slug = $slug;
 
                 $product->condition = $category->supportsCondition()
                     ? fake()->randomElement(['baru', 'seken'])
@@ -69,7 +86,7 @@ class ProductSeeder extends Seeder
                 $product->created_at = now()->subHours(rand(1, 24));
                 $product->save();
 
-                $this->addRandomImage($product, $files);
+                $this->addRandomImage($product, $this->getImagesForCategory($categoryName));
             });
         });
 
@@ -87,14 +104,18 @@ class ProductSeeder extends Seeder
         if ($categories->isEmpty()) return;
 
         $lapak = LapakProfile::first() ?? LapakProfile::factory()->create();
-        $files = $this->getSeedFiles();
 
-        Product::withoutEvents(function () use ($total, $categories, $lapak, $files) {
-            Product::factory($total)->make()->each(function ($product) use ($categories, $lapak, $files) {
+        Product::withoutEvents(function () use ($total, $categories, $lapak) {
+            Product::factory($total)->make()->each(function ($product) use ($categories, $lapak) {
                 $category = $categories->random();
+                $categoryName = $category->category_name;
 
                 $product->category_id = $category->id;
                 $product->lapak_id = $lapak->id;
+
+                [$title, $slug] = $this->generateTitleAndSlug($categoryName);
+                $product->title = $title;
+                $product->slug = $slug;
 
                 $product->condition = $category->supportsCondition()
                     ? fake()->randomElement(['baru', 'seken'])
@@ -105,16 +126,90 @@ class ProductSeeder extends Seeder
                 $product->pushed_at = $time;
 
                 $product->save();
-                $this->addRandomImage($product, $files);
+                $this->addRandomImage($product, $this->getImagesForCategory($categoryName));
             });
         });
     }
 
-    protected function getSeedFiles(): array
+    private function loadJsonData(): void
+    {
+        $seedDir = storage_path('app/seed-samples');
+
+        $namesPath = $seedDir . '/item_nama_produk.json';
+        $sifatPath = $seedDir . '/item_sifat_produk.json';
+
+        if (file_exists($namesPath)) {
+            $data = json_decode(file_get_contents($namesPath), true) ?? [];
+            foreach ($data as $kategori => $names) {
+                $this->productNames[mb_strtolower($kategori)] = $names;
+            }
+        }
+
+        if (file_exists($sifatPath)) {
+            $data = json_decode(file_get_contents($sifatPath), true) ?? [];
+            foreach ($data as $kategori => $sifat) {
+                $this->productSifat[mb_strtolower($kategori)] = $sifat;
+            }
+        }
+    }
+
+    private function loadCategoryImages(): void
+    {
+        $seedDir = storage_path('app/seed-samples');
+
+        $subfolders = collect(scandir($seedDir))
+            ->reject(fn($f) => in_array($f, ['.', '..']) || !is_dir($seedDir . DIRECTORY_SEPARATOR . $f));
+
+        foreach ($subfolders as $folder) {
+            $folderPath = $seedDir . DIRECTORY_SEPARATOR . $folder;
+            $images = collect(scandir($folderPath))
+                ->reject(fn($f) => in_array($f, ['.', '..']) || is_dir($folderPath . DIRECTORY_SEPARATOR . $f))
+                ->map(fn($f) => $folderPath . DIRECTORY_SEPARATOR . $f)
+                ->values()
+                ->toArray();
+
+            if (!empty($images)) {
+                $this->categoryImages[mb_strtolower($folder)] = $images;
+            }
+        }
+    }
+
+    private function generateTitleAndSlug(string $categoryName): array
+    {
+        $key = mb_strtolower($categoryName);
+
+        $names = $this->productNames[$key] ?? [];
+        $sifat = $this->productSifat[$key] ?? [];
+
+        if (!empty($names) && !empty($sifat)) {
+            $nama = $names[array_rand($names)];
+            $sif = $sifat[array_rand($sifat)];
+            $title = "{$nama} {$sif}";
+        } elseif (!empty($names)) {
+            $title = $names[array_rand($names)];
+        } else {
+            $title = fake()->words(3, true);
+        }
+
+        $slug = Str::slug($title) . '-' . rand(100, 999);
+
+        return [$title, $slug];
+    }
+
+    private function getImagesForCategory(string $categoryName): array
+    {
+        $key = mb_strtolower($categoryName);
+
+        return $this->categoryImages[$key]
+            ?? $this->getFallbackFiles();
+    }
+
+    private function getFallbackFiles(): array
     {
         $seedDir = storage_path('app/seed-samples');
         return collect(scandir($seedDir))
-            ->reject(fn($f) => in_array($f, ['.', '..']))
+            ->reject(fn($f) => in_array($f, ['.', '..']) || is_dir($seedDir . DIRECTORY_SEPARATOR . $f))
+            ->filter(fn($f) => !str_ends_with($f, '.json'))
             ->map(fn($f) => $seedDir . DIRECTORY_SEPARATOR . $f)
             ->values()
             ->toArray();
@@ -123,12 +218,7 @@ class ProductSeeder extends Seeder
     protected function addRandomImage(Product $product, array $files = []): void
     {
         if (empty($files)) {
-            $seedDir = storage_path('app/seed-samples');
-            $files = collect(scandir($seedDir))
-                ->reject(fn($f) => in_array($f, ['.', '..']))
-                ->map(fn($f) => $seedDir . '/' . $f)
-                ->values()
-                ->toArray();
+            $files = $this->getFallbackFiles();
         }
 
         if (empty($files)) {
@@ -136,55 +226,42 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        $count = 1; // Restore single-image seeding flow
-        $tempPaths = [];
+        $fullPath = $files[array_rand($files)];
+        $tempPath = null;
 
-        for ($i = 0; $i < $count; $i++) {
-            $fullPath = $files[array_rand($files)];
-            $tempPath = null;
+        try {
+            $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
+            $randomName = 'product-seed-' . bin2hex(random_bytes(8));
+            $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
 
-            try {
-                $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
-                $randomName = 'product-seed-' . bin2hex(random_bytes(8)) . '-' . $i;
-                $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
-
-                if ($extension !== '') {
-                    $tempPath .= '.' . $extension;
-                }
-
-                if (file_exists($tempPath)) {
-                    throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
-                }
-
-                if (! copy($fullPath, $tempPath)) {
-                    throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
-                }
-
-                $media = $product
-                    ->addMedia($tempPath)
-                    ->toMediaCollection('products');
-
-                if (blank($media->uuid)) {
-                    $media->forceFill([
-                        'uuid' => (string) Str::uuid(),
-                    ])->save();
-                }
-
-                $tempPaths[] = $tempPath;
-            } catch (\Throwable $e) {
-                logger()->error('MEDIA FAILED', [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-                if ($tempPath && is_file($tempPath)) {
-                    @unlink($tempPath);
-                }
+            if ($extension !== '') {
+                $tempPath .= '.' . $extension;
             }
-        }
 
-        foreach ($tempPaths as $p) {
-            if (is_file($p)) {
-                @unlink($p);
+            if (file_exists($tempPath)) {
+                throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
+            }
+
+            if (! copy($fullPath, $tempPath)) {
+                throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
+            }
+
+            $media = $product
+                ->addMedia($tempPath)
+                ->toMediaCollection('products');
+
+            if (blank($media->uuid)) {
+                $media->forceFill([
+                    'uuid' => (string) Str::uuid(),
+                ])->save();
+            }
+        } catch (\Throwable $e) {
+            logger()->error('MEDIA FAILED', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            if ($tempPath && is_file($tempPath)) {
+                @unlink($tempPath);
             }
         }
     }

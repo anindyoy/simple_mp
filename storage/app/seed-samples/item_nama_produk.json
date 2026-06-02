@@ -1,0 +1,123 @@
+{
+    "Makanan": [
+        "Mie Ayam",
+        "Nasi Goreng",
+        "Bakso Sapi",
+        "Sate Ayam",
+        "Rendang",
+        "Ayam Geprek",
+        "Gado-Gado",
+        "Ketoprak",
+        "Nasi Padang",
+        "Bubur Ayam",
+        "Gorengan",
+        "Seblak"
+    ],
+    "Minuman": [
+        "Es Teh Manis",
+        "Kopi Susu",
+        "Jus Alpukat",
+        "Thai Tea",
+        "Air Mineral",
+        "Teh Tarik",
+        "Matcha Latte",
+        "Coklat Panas",
+        "Susu Segar",
+        "Lemon Tea"
+    ],
+    "Pakaian": [
+        "Baju Koko",
+        "Kaos",
+        "Kerudung",
+        "Celana",
+        "Jaket",
+        "Kemeja",
+        "Gamis",
+        "Sweater",
+        "Rompi Pria"
+    ],
+    "Elektronik": [
+        "Televisi LED",
+        "Mesin Cuci",
+        "Kulkas",
+        "Air Conditioner",
+        "Blender",
+        "Kipas Angin",
+        "Rice Cooker",
+        "Setrika",
+        "Microwave",
+        "Lampu LED"
+    ],
+    "Otomotif": [
+        "Motor",
+        "Mobil",
+        "Sepeda"
+    ],
+    "Jasa": [
+        "Jasa Cuci AC",
+        "Jasa Desain Logo",
+        "Jasa Service HP",
+        "Potong Rambut",
+        "Jasa Laundry",
+        "Jasa Cat Rumah",
+        "Jasa Pindahan",
+        "Ojek Online",
+        "Jasa Fotografi",
+        "Jasa Las"
+    ],
+    "Properti": [
+        "Rumah",
+        "Kontrakan",
+        "Tanah Kavling",
+        "Ruko",
+        "Kios"
+    ],
+    "Buah & Sayuran": [
+        "Apel",
+        "Brokoli",
+        "Pisang",
+        "Wortel",
+        "Bayam",
+        "Mangga",
+        "Semangka",
+        "Jeruk",
+        "Tomat",
+        "Kangkung"
+    ],
+    "Gadget": [
+        "Handphone Android",
+        "Smartwatch",
+        "Earphone Wireless",
+        "Tablet",
+        "Powerbank",
+        "Laptop Gaming",
+        "Kamera Mirrorless",
+        "Speaker Bluetooth",
+        "Router WiFi",
+        "Flash Disk"
+    ],
+    "Suplemen": [
+        "Vitamin C",
+        "Minyak Ikan",
+        "Whey Protein",
+        "Madu Murni",
+        "Suplemen Kolagen",
+        "Zinc Tablet",
+        "Probiotik",
+        "Vitamin D3",
+        "Multivitamin",
+        "Herbal Stamina"
+    ],
+    "Lainnya": [
+        "Kardus Packing",
+        "Lakban Bening",
+        "Gantungan Kunci",
+        "Payung Lipat",
+        "Botol Tumbler",
+        "Buku Catatan",
+        "Pulpen Premium",
+        "Tempat Pensil",
+        "Staples",
+        "Gunting"
+    ]
+}

@@ -12,7 +12,10 @@
       "Bash(php -r ' *)",
       "Bash(php -r \"echo __\\('filament-actions::modal.confirmation'\\);\")",
       "Bash(APP_DEBUG=true ./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --filter=\"admin can confirm\")",
-      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage)"
+      "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage)",
+      "Bash(Get-ChildItem \"d:\\\\Repo\\\\simple_mp\\\\storage\\\\app\\\\seed-samples\" -Recurse)",
+      "Bash(Select-Object FullName, Name)",
+      "Bash(Format-Table -AutoSize)"
     ]
   }
 }

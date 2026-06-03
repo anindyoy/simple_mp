@@ -10,6 +10,7 @@ use Filament\Facades\Filament;
 use Filament\Support\Assets\Js;
 use App\Observers\ProductObserver;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Policies\WhatsappAgentPolicy;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         Product::observe(ProductObserver::class);
         LapakProfile::observe(LapakProfileObserver::class);
         Gate::policy(WhatsappAgent::class, WhatsappAgentPolicy::class);
+        App::setLocale('id');
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::GLOBAL_SEARCH_AFTER,

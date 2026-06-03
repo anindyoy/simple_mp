@@ -36,18 +36,20 @@ class CekQueryCommand extends Command
         // $userName = User::whereHas('lapak', fn($query) => $query->where('can_be_delivered', 1))->first()->name;
 
         // Get nama user yang memiliki lapak dengan produk yang memiliki media lebih dari 1
-        $user = User::whereHas('lapak.products', fn($q) => $q->has('media', '>', 1))->first();
-        $userName = $user->name ?? 'Tidak ditemukan';
+        // $user = User::whereHas('lapak.products', fn($q) => $q->has('media', '>', 1))->first();
+        // $userName = $user->name ?? 'Tidak ditemukan';
 
-        // Tampilkan list produk ids yang memiliki media lebih dari 1 milik user di atas
-        if (! $user) {
-            dd($userName, collect());
-        }
+        // // Tampilkan list produk ids yang memiliki media lebih dari 1 milik user di atas
+        // if (! $user) {
+        //     dd($userName, collect());
+        // }
 
-        $productIds = Product::has('media', '>', 1)
-            ->whereHas('lapak', fn($q) => $q->where('user_id', $user->id))
-            ->pluck('id');
+        // $productIds = Product::has('media', '>', 1)
+        //     ->whereHas('lapak', fn($q) => $q->where('user_id', $user->id))
+        //     ->pluck('id');
 
-        dd($userName, $productIds);
+        // dd($userName, $productIds);
+
+        echo trans('pagination.previous');
     }
 }

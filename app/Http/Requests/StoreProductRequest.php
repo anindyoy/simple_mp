@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Http\Requests;
+
 use App\Models\Category;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;

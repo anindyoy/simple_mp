@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
 
         if (!Category::exists()) {
             $this->command->info('Membuat kategori produk...');
-            $categories = ['Makanan', 'Minuman', 'Pakaian', 'Elektronik', 'Otomotif', 'Jasa', 'Otomotif', 'Properti', 'Buah & Sayuran', 'Gadget', 'Suplemen', 'Lainnya'];
+            $categories = ['Makanan', 'Minuman', 'Pakaian', 'Elektronik', 'Otomotif', 'Jasa', 'Properti', 'Buah & Sayuran', 'Gadget', 'Suplemen', 'Lainnya'];
 
             Category::insert(
                 collect($categories)
@@ -119,7 +119,7 @@ class DatabaseSeeder extends Seeder
             ['key' => 'initial_push_tokens', 'value' => '10'],
             ['key' => 'token_price', 'value' => '2000'],
             ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
-            ['key' => 'token_purchase_whatsapp', 'value' => '62812345678'],
+            ['key' => 'token_purchase_whatsapp', 'value' => config('app.hp_admin')],
             [
                 'key' => 'token_bank_accounts',
                 'value' => json_encode([

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Models\Product;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Category extends Model
 {
@@ -22,12 +22,7 @@ class Category extends Model
 
     public function supportsCondition(): bool
     {
-        // contoh kategori barang fisik
-        return in_array($this->id, [
-            2, // Fashion
-            3, // Elektronik
-            4 // Otomotif
-        ]);
+        return (bool) $this->supports_condition;
     }
 
     public function getActivitylogOptions(): LogOptions

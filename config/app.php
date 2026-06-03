@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'hp_admin' => env('HP_ADMIN', null),
+
 ];

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Category extends Model
 {
     use HasFactory, LogsActivity;
-    protected $fillable = ['category_name'];
+    protected $guarded = [];
     public $timestamps = false;
 
     public function products(): HasMany

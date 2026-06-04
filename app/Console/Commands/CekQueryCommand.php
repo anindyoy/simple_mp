@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,6 @@ class CekQueryCommand extends Command
 
         // dd($userName, $productIds);
 
-        echo trans('pagination.previous');
+        Category::whereIn('id', [3, 4, 5, 7, 10])->update(['supports_condition' => true]);
     }
 }

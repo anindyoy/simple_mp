@@ -52,6 +52,8 @@ class DatabaseSeeder extends Seeder
                     ->map(fn(string $categoryName) => ['category_name' => $categoryName])
                     ->all()
             );
+
+            Category::whereIn('id', [3, 4, 5, 7, 10])->update(['supports_condition' => true]);
         }
 
         $this->command->info('Membuat setting default...');

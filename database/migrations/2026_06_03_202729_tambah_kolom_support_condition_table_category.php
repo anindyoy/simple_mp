@@ -15,8 +15,6 @@ return new class extends Migration
         Schema::table('categories', function (Blueprint $table) {
             $table->boolean('supports_condition')->default(false);
         });
-
-        Category::whereIn('id', [3, 4, 5, 7, 10])->update(['supports_condition' => true]);
     }
 
     /**

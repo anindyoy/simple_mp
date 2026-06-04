@@ -47,6 +47,7 @@ return [
 
     'filament' => [
         'two_factor_enabled' => env('FILAMENT_2FA_ENABLED', true),
+        'developer_logins' => env('FILAMENT_DEVELOPER_LOGINS', false),
     ],
 
 ];

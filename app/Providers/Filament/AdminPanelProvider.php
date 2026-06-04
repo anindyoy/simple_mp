@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
         if (
             app()->environment('local') &&
             !app()->runningUnitTests() &&
+            config('services.filament.developer_logins', false) &&
             Schema::hasTable('users') &&
             Schema::hasColumn('users', 'is_admin')
         ) {

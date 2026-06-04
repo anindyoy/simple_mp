@@ -14,9 +14,10 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search     = $request->query('search');
-        $categoryId = $request->query('category');
-        $condition  = $request->query('condition');
+        $search       = $request->query('search');
+        $categoryId   = $request->query('category');
+        $condition    = $request->query('condition');
+        $deliverable  = $request->boolean('deliverable');
 
         $eligibleProductIds = ProductScheduleService::getEligibleProductIds();
 
@@ -28,9 +29,10 @@ class ProductController extends Controller
             ->whereIn('id', $eligibleProductIds)
             ->whereHas('lapak', fn($q) => $q->where('is_active', true))
             ->where('is_active', true)
-            ->when($search,     fn($q) => $q->where('title', 'like', "%$search%"))
-            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
-            ->when($condition,  fn($q) => $q->where('condition', $condition))
+            ->when($search,       fn($q) => $q->where('title', 'like', "%$search%"))
+            ->when($categoryId,   fn($q) => $q->where('category_id', $categoryId))
+            ->when($condition,    fn($q) => $q->where('condition', $condition))
+            ->when($deliverable,  fn($q) => $q->where('can_be_delivered', true))
             ->orderBy('pushed_at', 'desc')
             ->paginate(16);
 
@@ -46,6 +48,7 @@ class ProductController extends Controller
             'search'            => $search,
             'selectedCategory'  => $categoryId,
             'selectedCondition' => $condition,
+            'deliverable'       => $deliverable,
             'meta' => [
                 'title'       => Setting::getValue('site_title', 'Lapak Warga'),
                 'description' => Setting::getValue('site_description', '...'),

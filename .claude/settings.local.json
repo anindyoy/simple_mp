@@ -37,7 +37,12 @@
       "Bash(Remove-Item \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\ListCategories.php\", \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\CreateCategory.php\", \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\EditCategory.php\")",
       "Read(//c/Users/DFR IT/.claude/memory/**)",
       "Bash(composer test *)",
-      "Read(//c/Users/DFR IT/Downloads/Telegram Desktop/**)"
+      "Read(//c/Users/DFR IT/Downloads/Telegram Desktop/**)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\" -Recurse | Select-Object -Property FullName | ForEach-Object { $_.FullName.Replace\\('d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources', ''\\) } | Sort-Object)",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/Resources/CategoryRequestResourceTest.php --colors=never)",
+      "Bash(xargs grep -l \"DatabaseNotification\\\\|toDatabase\\\\|FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\")",
+      "Bash(xargs grep -l \"->notify\\\\b\")",
+      "Bash(grep -rn \"FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\\\\\\\\\\\\\\\\DatabaseNotification\\\\|Notification::send\" d:/Repo/simple_mp/app --include=\"*.php\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

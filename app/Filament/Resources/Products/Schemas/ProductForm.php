@@ -5,7 +5,10 @@ namespace App\Filament\Resources\Products\Schemas;
 use Filament\Forms;
 use App\Models\Category;
 use Filament\Schemas\Schema;
+use App\Models\CategoryRequest;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Filament\Actions\Action as FormAction;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProductForm
@@ -32,7 +35,38 @@ class ProductForm
                         Forms\Components\Select::make('category_id')
                             ->label('Kategori')
                             ->relationship('category', 'category_name')
-                            ->required(),
+                            ->required()
+                            ->suffixAction(
+                                FormAction::make('requestCategory')
+                                    ->label('Ajukan kategori baru')
+                                    ->icon('heroicon-o-plus-circle')
+                                    ->modalHeading('Ajukan Kategori Baru')
+                                    ->modalDescription('Tidak menemukan kategori yang sesuai? Ajukan ke admin dan kami akan meninjaunya.')
+                                    ->modalWidth('md')
+                                    ->form([
+                                        Forms\Components\TextInput::make('category_name')
+                                            ->label('Nama Kategori')
+                                            ->required()
+                                            ->maxLength(50),
+                                        Forms\Components\Textarea::make('reason')
+                                            ->label('Alasan')
+                                            ->helperText('Jelaskan mengapa kategori ini dibutuhkan')
+                                            ->rows(3),
+                                    ])
+                                    ->action(function (array $data): void {
+                                        CategoryRequest::create([
+                                            'user_id'       => auth()->id(),
+                                            'category_name' => $data['category_name'],
+                                            'reason'        => $data['reason'] ?? null,
+                                        ]);
+
+                                        Notification::make()
+                                            ->title('Ajuan terkirim')
+                                            ->body('Ajuan kategori baru Anda telah dikirim ke admin.')
+                                            ->success()
+                                            ->send();
+                                    })
+                            ),
 
                         Forms\Components\TextInput::make('title')
                             ->label('Judul Produk')

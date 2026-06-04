@@ -17,11 +17,14 @@ use App\Policies\WhatsappAgentPolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use App\Observers\LapakProfileObserver;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Console\Events\CommandFinished;
 use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
 
@@ -47,6 +50,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(CommandFinished::class, function (CommandFinished $event) {
+            if ($event->command === 'optimize:clear') {
+                Artisan::call('responsecache:clear', [], $event->output);
+            }
+        });
+
         Product::observe(ProductObserver::class);
         LapakProfile::observe(LapakProfileObserver::class);
         Gate::policy(WhatsappAgent::class, WhatsappAgentPolicy::class);

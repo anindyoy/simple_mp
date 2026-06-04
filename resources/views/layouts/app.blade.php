@@ -8,9 +8,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32x32.png') }}">
 
     <title>@php
-    $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Warga');
-    $defaultRegion = App\Models\Setting::getValue('site_region', 'Cimanglid');
-@endphp@yield('title', $siteTitle . ' ' . $defaultRegion)</title>
+        $siteTitle = App\Models\Setting::getValue('site_title', 'Lapak Warga');
+        $defaultRegion = App\Models\Setting::getValue('site_region', 'Cimanglid');
+    @endphp@yield('title', $siteTitle . ' ' . $defaultRegion)</title>
 
     @include('partials.meta')
     @include('whatsapp-widget::whatsapp-widget-head')

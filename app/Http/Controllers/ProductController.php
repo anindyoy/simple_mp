@@ -12,43 +12,9 @@ use App\Services\ProductScheduleService;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $search       = $request->query('search');
-        $categoryId   = $request->query('category');
-        $condition    = $request->query('condition');
-        $deliverable  = $request->boolean('deliverable');
-
-        $eligibleProductIds = ProductScheduleService::getEligibleProductIds();
-
-        $products = Product::with([
-            'media',
-            'lapak:id,name,slug,address_raw',
-            'category:id,category_name',
-        ])
-            ->whereIn('id', $eligibleProductIds)
-            ->whereHas('lapak', fn($q) => $q->where('is_active', true))
-            ->where('is_active', true)
-            ->when($search,       fn($q) => $q->where('title', 'like', "%$search%"))
-            ->when($categoryId,   fn($q) => $q->where('category_id', $categoryId))
-            ->when($condition,    fn($q) => $q->where('condition', $condition))
-            ->when($deliverable,  fn($q) => $q->where('can_be_delivered', true))
-            ->orderBy('pushed_at', 'desc')
-            ->paginate(16);
-
-        $categories = Cache::remember(
-            'categories_list',
-            3600,
-            fn() => Category::orderBy('category_name')->get()
-        );
-
         return view('main', [
-            'products'          => $products,
-            'categories'        => $categories,
-            'search'            => $search,
-            'selectedCategory'  => $categoryId,
-            'selectedCondition' => $condition,
-            'deliverable'       => $deliverable,
             'meta' => [
                 'title'       => Setting::getValue('site_title', 'Lapak Warga'),
                 'description' => Setting::getValue('site_description', '...'),
@@ -56,7 +22,6 @@ class ProductController extends Controller
             ],
         ]);
     }
-
 
     public function show(Product $product)
     {

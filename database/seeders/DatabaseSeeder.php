@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
         if (!app()->isProduction()) {
             $this->seedDevelopmentData();
         }
+
+        Artisan::call('optimize:clear');
     }
 
     private function seedDevelopmentData(): void

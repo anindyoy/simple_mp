@@ -96,3 +96,15 @@ Route::get('/api/tutorial-images', function () {
         'images' => $images
     ]);
 });
+
+Route::get('/vite-debug', function () {
+    return [
+        'hot_exists' => file_exists(public_path('hot')),
+        'hot_content' => file_exists(public_path('hot'))
+            ? file_get_contents(public_path('hot'))
+            : null,
+
+        'css' => Vite::asset('resources/css/app.css'),
+        'js' => Vite::asset('resources/js/app.js'),
+    ];
+});

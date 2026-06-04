@@ -13,9 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            \Spatie\ResponseCache\Middlewares\CacheResponse::class,
-        ]);
+        $isLocal = ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'production') === 'local';
+
+        if (!$isLocal) {
+            $middleware->web(append: [
+                \Spatie\ResponseCache\Middlewares\CacheResponse::class,
+            ]);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (HttpExceptionInterface $exception, $request) {

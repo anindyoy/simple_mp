@@ -15,7 +15,25 @@
       "Bash(./vendor/bin/pest tests/Feature/Filament/TokenPurchases/TokenPurchaseResourceTest.php --no-coverage)",
       "Bash(Get-ChildItem \"d:\\\\Repo\\\\simple_mp\\\\storage\\\\app\\\\seed-samples\" -Recurse)",
       "Bash(Select-Object FullName, Name)",
-      "Bash(Format-Table -AutoSize)"
+      "Bash(Format-Table -AutoSize)",
+      "Bash(npm run *)",
+      "Bash(grep -o \"sm\\\\\\\\\\\\\\\\:block\" \"d:\\\\Repo\\\\simple_mp\\\\public\\\\build\\\\assets\\\\app-BWkzdhtm.css\")",
+      "Bash(node -e \"const fs=require\\('fs'\\); const css=fs.readFileSync\\('public/build/assets/app-BWkzdhtm.css','utf8'\\); const matches=css.match\\(/\\\\.sm.{0,20}block.{0,10}/g\\); console.log\\(matches ? matches.slice\\(0,10\\) : 'NOT FOUND'\\);\")",
+      "Bash(node -e \"const fs=require\\('fs'\\); const css=fs.readFileSync\\('public/build/assets/app-BWkzdhtm.css','utf8'\\); const idx=css.indexOf\\('sm:\\\\\\\\\\\\\\\\:\\\\\\\\\\\\\\\\!block'\\); console.log\\(css.substring\\(idx, idx+100\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8765)",
+      "Bash(npx playwright *)",
+      "Bash(npm list *)",
+      "Bash(curl -s http://127.0.0.1:8765)",
+      "Bash(where chrome *)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Google/Chrome/Application/**)",
+      "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --screenshot=d:/Repo/simple_mp/verify_mobile.png --window-size=390,844 --virtual-time-budget=3000 http://127.0.0.1:8765)",
+      "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --screenshot=d:/Repo/simple_mp/verify_desktop.png --window-size=1280,800 --virtual-time-budget=3000 http://127.0.0.1:8765)",
+      "Bash(curl -s http://localhost:9222/json)",
+      "Bash(python3 -c \"import json,sys; tabs=[t for t in json.load\\(sys.stdin\\) if t.get\\('type'\\)=='page' and 'localhost' in t.get\\('url',''\\)]; print\\(tabs[0]['id'] if tabs else 'none'\\)\")",
+      "Bash(curl -s --max-time 2 http://localhost:5173/@vite/client -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s --max-time 2 \"http://[::1]:5173/@vite/client\" -o /dev/null -w \"%{http_code}\")"
     ]
   }
 }

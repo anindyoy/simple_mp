@@ -9,6 +9,11 @@ class WhatsappAgentSeeder extends Seeder
 {
     public function run(): void
     {
+        if (!config('app.hp_admin')) {
+            $this->command->warn('Nomor HP admin belum diatur di .env, lewati seeding WhatsappAgent.');
+            return;
+        }
+
         WhatsappAgent::query()->updateOrCreate(
             ['phone' => config('app.hp_admin')],
             [

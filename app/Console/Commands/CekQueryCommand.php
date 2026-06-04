@@ -33,24 +33,32 @@ class CekQueryCommand extends Command
      */
     public function handle()
     {
-        // Get nama user yang memiliki lapak dengan can_be_delivered = 1
-        // $userName = User::whereHas('lapak', fn($query) => $query->where('can_be_delivered', 1))->first()->name;
+        dd($this->getUserNameAndProductIds());
+    }
 
-        // Get nama user yang memiliki lapak dengan produk yang memiliki media lebih dari 1
-        // $user = User::whereHas('lapak.products', fn($q) => $q->has('media', '>', 1))->first();
-        // $userName = $user->name ?? 'Tidak ditemukan';
+    private function getUserCanDeliveredInLapak()
+    {
+        return User::whereHas('lapak', fn($query) => $query->where('can_be_delivered', 1))->first();
+    }
 
-        // // Tampilkan list produk ids yang memiliki media lebih dari 1 milik user di atas
-        // if (! $user) {
-        //     dd($userName, collect());
-        // }
+    private function getUserWithProductHavingMediaMoreThanOne()
+    {
+        return User::whereHas('lapak.products', fn($q) => $q->has('media', '>', 1))->first();
+    }
 
-        // $productIds = Product::has('media', '>', 1)
-        //     ->whereHas('lapak', fn($q) => $q->where('user_id', $user->id))
-        //     ->pluck('id');
+    private function getUserNameAndProductIds()
+    {
+        $user = $this->getUserWithProductHavingMediaMoreThanOne();
+        $userName = $user->name ?? 'Tidak ditemukan';
 
-        // dd($userName, $productIds);
+        if (! $user) {
+            return [$userName, collect()];
+        }
 
-        Category::whereIn('id', [3, 4, 5, 7, 10])->update(['supports_condition' => true]);
+        $productIds = Product::has('media', '>', 1)
+            ->whereHas('lapak', fn($q) => $q->where('user_id', $user->id))
+            ->pluck('id');
+
+        return [$userName, $productIds];
     }
 }

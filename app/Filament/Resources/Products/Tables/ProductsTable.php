@@ -34,6 +34,8 @@ class ProductsTable
                 Stack::make([
                     Split::make([
                         ImageColumn::make('thumbnail_urls')
+                            ->disk('public')
+                            ->defaultImageUrl(asset('img/no-product-image.png'))
                             ->circular()
                             ->stacked()
                             ->limit(3)
@@ -142,6 +144,7 @@ class ProductsTable
                     'latestDeactivation',
                     'latestReactivationRequest',
                     'pendingReactivationRequest',
+                    'media',
                 ])
                     ->when(
                         !auth()->user()->is_admin,

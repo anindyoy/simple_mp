@@ -11,6 +11,7 @@ use App\Models\ProductModeration;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use App\Services\ProductScheduleService;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -194,11 +195,16 @@ class Product extends Model implements HasMedia
         $mediaItems = $this->getMedia('products');
 
         if ($mediaItems->isEmpty()) {
-            return [asset('img/no-product-image.png')];
+            return [];
         }
 
-        return $mediaItems->map(function (Media $m) {
-            return $m->hasGeneratedConversion('thumb') ? $m->getUrl('thumb') : $m->getUrl();
+        $diskRoot = rtrim(str_replace('\\', '/', Storage::disk('public')->path('')), '/');
+
+        return $mediaItems->map(function (Media $m) use ($diskRoot): string {
+            $path = str_replace('\\', '/',
+                $m->hasGeneratedConversion('thumb') ? $m->getPath('thumb') : $m->getPath()
+            );
+            return ltrim(str_replace($diskRoot, '', $path), '/');
         })->toArray();
     }
 }

@@ -45,15 +45,19 @@ class DatabaseSeeder extends Seeder
 
         if (!Category::exists()) {
             $this->command->info('Membuat kategori produk...');
-            $categories = ['Makanan', 'Minuman', 'Pakaian', 'Elektronik', 'Otomotif', 'Jasa', 'Properti', 'Buah & Sayuran', 'Gadget', 'Suplemen', 'Lainnya'];
-
-            Category::insert(
-                collect($categories)
-                    ->map(fn(string $categoryName) => ['category_name' => $categoryName])
-                    ->all()
-            );
-
-            Category::whereIn('id', [3, 4, 5, 7, 10])->update(['supports_condition' => true]);
+            Category::insert([
+                ['category_name' => 'Makanan',        'supports_condition' => false],
+                ['category_name' => 'Minuman',        'supports_condition' => false],
+                ['category_name' => 'Pakaian',        'supports_condition' => true],
+                ['category_name' => 'Elektronik',     'supports_condition' => true],
+                ['category_name' => 'Otomotif',       'supports_condition' => true],
+                ['category_name' => 'Jasa',           'supports_condition' => false],
+                ['category_name' => 'Properti',       'supports_condition' => true],
+                ['category_name' => 'Buah & Sayuran', 'supports_condition' => false],
+                ['category_name' => 'Gadget',         'supports_condition' => false],
+                ['category_name' => 'Suplemen',       'supports_condition' => true],
+                ['category_name' => 'Lainnya',        'supports_condition' => false],
+            ]);
         }
 
         $this->command->info('Membuat setting default...');

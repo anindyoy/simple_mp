@@ -33,47 +33,21 @@ class DatabaseSeeder extends Seeder
             Storage::disk('public')->deleteDirectory($dir);
         }
 
-        if (!User::whereIsAdmin(true)->exists()) {
-            $this->command->info('Membuat user admin default...');
-            User::factory()->create([
-                'name' => 'Admin',
-                'email' => 'admin@lapak.com',
-                'password' => bcrypt('password'),
-                'is_admin' => true
-            ]);
+        $this->seedAdminUser();
+        $this->seedCategories();
+        $this->seedSettings();
+
+        $this->command->info('Membuat agent WhatsApp default...');
+        $this->call([WhatsappAgentSeeder::class]);
+
+        if (!app()->isProduction()) {
+            $this->seedDevelopmentData();
         }
+    }
 
-        if (!Category::exists()) {
-            $this->command->info('Membuat kategori produk...');
-            Category::insert([
-                ['category_name' => 'Makanan',        'supports_condition' => false],
-                ['category_name' => 'Minuman',        'supports_condition' => false],
-                ['category_name' => 'Pakaian',        'supports_condition' => true],
-                ['category_name' => 'Elektronik',     'supports_condition' => true],
-                ['category_name' => 'Otomotif',       'supports_condition' => true],
-                ['category_name' => 'Jasa',           'supports_condition' => false],
-                ['category_name' => 'Properti',       'supports_condition' => true],
-                ['category_name' => 'Buah & Sayuran', 'supports_condition' => false],
-                ['category_name' => 'Gadget',         'supports_condition' => false],
-                ['category_name' => 'Suplemen',       'supports_condition' => true],
-                ['category_name' => 'Lainnya',        'supports_condition' => false],
-            ]);
-        }
-
-        $this->command->info('Membuat setting default...');
-        $settings = $this->buildDefaultSettings();
-
-        $now = now();
-
-        Setting::query()->upsert(
-            array_map(fn(array $setting) => [
-                ...$setting,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ], $settings),
-            ['key'],
-            ['value', 'updated_at']
-        );
+    private function seedDevelopmentData(): void
+    {
+        $this->command->info('Seed data untuk lingkungan non-produksi...');
 
         $this->command->info('Membuat user non admin...');
         $users = User::factory(10)->create();
@@ -103,50 +77,79 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Membuat pembelian token yang dikonfirmasi...');
         $this->createConfirmedTokenPurchases();
-
-        $this->command->info('Membuat agent WhatsApp default...');
-        $this->call([WhatsappAgentSeeder::class]);
     }
 
-    /**
-     * Build default settings array used by the seeder.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function buildDefaultSettings(): array
+    private function seedAdminUser(): void
     {
+        if (User::whereIsAdmin(true)->exists()) {
+            return;
+        }
+
+        $this->command->info('Membuat user admin default...');
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@lapak.com',
+            'password' => bcrypt('password'),
+            'is_admin' => true,
+        ]);
+    }
+
+    private function seedCategories(): void
+    {
+        if (Category::exists()) {
+            return;
+        }
+
+        $this->command->info('Membuat kategori produk...');
+        Category::insert([
+            ['category_name' => 'Makanan',        'supports_condition' => false],
+            ['category_name' => 'Minuman',        'supports_condition' => false],
+            ['category_name' => 'Pakaian',        'supports_condition' => true],
+            ['category_name' => 'Elektronik',     'supports_condition' => true],
+            ['category_name' => 'Otomotif',       'supports_condition' => true],
+            ['category_name' => 'Jasa',           'supports_condition' => false],
+            ['category_name' => 'Properti',       'supports_condition' => true],
+            ['category_name' => 'Buah & Sayuran', 'supports_condition' => false],
+            ['category_name' => 'Gadget',         'supports_condition' => false],
+            ['category_name' => 'Suplemen',       'supports_condition' => true],
+            ['category_name' => 'Lainnya',        'supports_condition' => false],
+        ]);
+    }
+
+    private function seedSettings(): void
+    {
+        $this->command->info('Membuat setting default...');
+
         $externalLinkLabels = Setting::factory()->externalLinkLabels()->make();
         $userRulesContent = Setting::factory()->userRulesContent()->make();
 
-        return [
-            ['key' => 'lapak_external_link_labels', 'value' => $externalLinkLabels->value],
-            ['key' => 'user_rules_content', 'value' => $userRulesContent->value],
-            ['key' => 'weekly_minimum_push_tokens', 'value' => '3'],
-            ['key' => 'initial_push_tokens', 'value' => '10'],
-            ['key' => 'token_price', 'value' => '2000'],
-            ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
-            ['key' => 'token_purchase_whatsapp', 'value' => config('app.hp_admin')],
-            [
-                'key' => 'token_bank_accounts',
-                'value' => json_encode([
-                    [
-                        'bank_name' => 'BCA',
-                        'account_number' => '1234567890',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                    [
-                        'bank_name' => 'Mandiri',
-                        'account_number' => '9876543210',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                    [
-                        'bank_name' => 'BNI',
-                        'account_number' => '1122334455',
-                        'account_holder' => 'PT SimpleMP',
-                    ],
-                ], JSON_UNESCAPED_UNICODE),
-            ],
-        ];
+        $now = now();
+
+        Setting::query()->upsert(
+            array_map(fn(array $setting) => [
+                ...$setting,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], [
+                ['key' => 'lapak_external_link_labels', 'value' => $externalLinkLabels->value],
+                ['key' => 'user_rules_content', 'value' => $userRulesContent->value],
+                ['key' => 'weekly_minimum_push_tokens', 'value' => '3'],
+                ['key' => 'initial_push_tokens', 'value' => '10'],
+                ['key' => 'token_price', 'value' => '2000'],
+                ['key' => 'min_tokens_for_normal_price', 'value' => '5'],
+                ['key' => 'token_purchase_whatsapp', 'value' => config('app.hp_admin')],
+                [
+                    'key' => 'token_bank_accounts',
+                    'value' => json_encode([
+                        ['bank_name' => 'BCA',     'account_number' => '1234567890', 'account_holder' => 'PT SimpleMP'],
+                        ['bank_name' => 'Mandiri', 'account_number' => '9876543210', 'account_holder' => 'PT SimpleMP'],
+                        ['bank_name' => 'BNI',     'account_number' => '1122334455', 'account_holder' => 'PT SimpleMP'],
+                    ], JSON_UNESCAPED_UNICODE),
+                ],
+            ]),
+            ['key'],
+            ['value', 'updated_at']
+        );
     }
 
     /**

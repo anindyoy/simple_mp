@@ -36,7 +36,8 @@
       "Bash(curl -s --max-time 2 \"http://[::1]:5173/@vite/client\" -o /dev/null -w \"%{http_code}\")",
       "Bash(Remove-Item \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\ListCategories.php\", \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\CreateCategory.php\", \"d:\\\\Repo\\\\simple_mp\\\\app\\\\Filament\\\\Resources\\\\Categories\\\\Pages\\\\EditCategory.php\")",
       "Read(//c/Users/DFR IT/.claude/memory/**)",
-      "Bash(composer test *)"
+      "Bash(composer test *)",
+      "Read(//c/Users/DFR IT/Downloads/Telegram Desktop/**)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

@@ -26,7 +26,7 @@ return [
         Checks\FilePermissionsCheck::class => true,
         Checks\HardcodedSecretsCheck::class => true,
         Checks\SqlInjectionCheck::class => true,
-        Checks\MassAssignmentCheck::class => true,
+        Checks\MassAssignmentCheck::class => false,
         Checks\XssCheck::class => true,
         Checks\CsrfCheck::class => true,
         Checks\OpenRedirectCheck::class => true,

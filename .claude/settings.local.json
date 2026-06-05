@@ -42,7 +42,8 @@
       "Bash(./vendor/bin/pest tests/Feature/Filament/Resources/CategoryRequestResourceTest.php --colors=never)",
       "Bash(xargs grep -l \"DatabaseNotification\\\\|toDatabase\\\\|FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\")",
       "Bash(xargs grep -l \"->notify\\\\b\")",
-      "Bash(grep -rn \"FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\\\\\\\\\\\\\\\\DatabaseNotification\\\\|Notification::send\" d:/Repo/simple_mp/app --include=\"*.php\")"
+      "Bash(grep -rn \"FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\\\\\\\\\\\\\\\\DatabaseNotification\\\\|Notification::send\" d:/Repo/simple_mp/app --include=\"*.php\")",
+      "Bash(vendor/bin/pest)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

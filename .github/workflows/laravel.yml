@@ -132,6 +132,38 @@ jobs:
           -F "document=@test-results.txt;filename=test-results.txt" \
           -F "caption=📄 Full test output — ${GITHUB_REF_NAME} @ ${GITHUB_SHA:0:7}"
 
+    - name: Send Telegram Notification on step failure
+      if: failure() && steps.tests.outcome != 'failure'
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+          echo "⚠️ Telegram secrets not configured, skipping notification."
+          exit 0
+        fi
+
+        PAYLOAD=$(jq -n \
+          --arg chat_id "${TELEGRAM_CHAT_ID}" \
+          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\n\n⚠️ Sebuah step workflow gagal. Lihat <a href="https://github.com/%s/actions/runs/%s">log run</a> untuk detail.' \
+            "${GITHUB_REPOSITORY}" \
+            "${GITHUB_REPOSITORY}" \
+            "${GITHUB_REF_NAME}" \
+            "${GITHUB_REPOSITORY}" \
+            "${GITHUB_SHA}" \
+            "${GITHUB_SHA:0:7}" \
+            "${GITHUB_REPOSITORY}" \
+            "${GITHUB_RUN_ID}")" \
+          '{
+            chat_id: $chat_id,
+            parse_mode: "HTML",
+            text: $text
+          }')
+
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+          -H "Content-Type: application/json" \
+          -d "${PAYLOAD}"
+
     - name: Fail job if tests failed
       if: steps.tests.outcome == 'failure'
       run: exit 1

@@ -148,8 +148,15 @@ return [
 
     'suppressed' => [
         'e139cf01f8af',
-        '9c1241bc6dfb', // CekQueryCommand.php — dd() intentional debug command
+        '9c1241bc6dfb', // CekQueryCommand.php — dump-and-die intentional, debug-only command
         'd31b3e0cb7e9', // rules/index.blade.php — {!! !!} safe: content only writable by admin
+        'fc44fc869c16', // .env perms 666 — Windows NTFS, not real Unix permissions
+        'ea61233e43a4', // .env world-writable — Windows NTFS, not real Unix permissions
+        'd3fe1df47182', // storage/ 777 — Windows NTFS, not real Unix permissions
+        '11237ebcced3', // Supply chain tooling — Socket CLI installed in CI workflow
+        'ef474f32494e', // Supply chain tooling — install Safe-Chain recommendation
+        '2e20e774eab1', // Supply chain tooling — safe-chain setup instruction
+        '32cc17ad5d23', // Supply chain tooling — alternative Socket CLI recommendation
     ],
 
 ];

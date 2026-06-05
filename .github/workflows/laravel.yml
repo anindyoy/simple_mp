@@ -44,7 +44,9 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      run: |
+        php -r "file_exists('.env') || copy('.env.example', '.env');"
+        chmod 600 .env
 
     - name: Install Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
@@ -52,7 +54,7 @@ jobs:
     - name: Directory Permissions
       run: |
         mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache
-        chmod -R 777 storage bootstrap/cache
+        chmod -R 775 storage bootstrap/cache
 
     - name: Generate key
       run: php artisan key:generate
@@ -60,7 +62,21 @@ jobs:
     - name: Run Migrations
       run: php artisan migrate --force
 
+    - name: Install Socket CLI
+      run: npm install -g socket
+
+    - name: Install NPM Dependencies
+      run: npm ci
+
+    - name: Build Frontend Assets
+      run: npm run build
+
     - name: Security audit
+      env:
+        APP_ENV: production
+        APP_DEBUG: "false"
+        APP_URL: https://example.com
+        SESSION_SECURE_COOKIE: "true"
       run: php artisan checkpoint:scan --json | tee checkpoint-report.json
 
     - name: Upload security audit report

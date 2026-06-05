@@ -63,6 +63,14 @@ jobs:
     - name: Security audit
       run: php artisan checkpoint:scan --json | tee checkpoint-report.json
 
+    - name: Upload security audit report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-report
+        path: checkpoint-report.json
+        retention-days: 7
+
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       id: tests
       continue-on-error: true

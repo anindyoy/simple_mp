@@ -43,7 +43,10 @@
       "Bash(xargs grep -l \"DatabaseNotification\\\\|toDatabase\\\\|FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\")",
       "Bash(xargs grep -l \"->notify\\\\b\")",
       "Bash(grep -rn \"FilamentNotification\\\\|Filament\\\\\\\\\\\\\\\\Notifications\\\\\\\\\\\\\\\\DatabaseNotification\\\\|Notification::send\" d:/Repo/simple_mp/app --include=\"*.php\")",
-      "Bash(vendor/bin/pest)"
+      "Bash(vendor/bin/pest)",
+      "Bash(npm audit *)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\(0,'utf8'\\); const j=JSON.parse\\(d\\); Object.entries\\(j.vulnerabilities||{}\\).forEach\\(\\([k,v]\\)=>{ if\\(['axios','picomatch','rollup','vite'].includes\\(k\\)\\) console.log\\(k,v.severity,v.fixAvailable,JSON.stringify\\(v.range\\)\\) }\\)\")",
+      "Bash(git -C \"d:\\\\Repo\\\\simple_mp\" diff HEAD -- .github/workflows/laravel.yml)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

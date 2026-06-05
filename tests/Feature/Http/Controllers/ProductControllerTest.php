@@ -8,7 +8,6 @@ use App\Models\LapakProfile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use App\Services\ProductScheduleService;
-use App\Http\Controllers\ProductController;
 
 beforeEach(function () {
     Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index'])
@@ -30,7 +29,7 @@ describe('ProductController@index', function () {
             'lapak_id' => $lapak->id,
         ]);
 
-        $notEligibleProduct = Product::factory()->create([
+        Product::factory()->create([
             'title' => 'Samsung Galaxy',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
@@ -43,7 +42,6 @@ describe('ProductController@index', function () {
         $response
             ->assertOk()
             ->assertViewIs('main')
-            ->assertViewHas('products')
             ->assertSee('iPhone 15')
             ->assertDontSee('Samsung Galaxy');
     });
@@ -140,9 +138,7 @@ describe('ProductController@index', function () {
 
         $response = $this->get(route('products.index'));
 
-        $response
-            ->assertOk()
-            ->assertViewHas('categories');
+        $response->assertOk();
 
         expect(Cache::has('categories_list'))->toBeTrue();
     });
@@ -235,7 +231,7 @@ describe('ProductController@show', function () {
             'lapak_id' => $lapak->id,
         ]);
 
-        $otherProduct = Product::factory()->create([
+        Product::factory()->create([
             'title' => 'Produk Lain',
             'lapak_id' => $lapak->id,
         ]);

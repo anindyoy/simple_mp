@@ -10,6 +10,7 @@ use App\Models\LapakProfile;
 use App\Models\TokenPurchase;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Database\Seeders\WhatsappAgentSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

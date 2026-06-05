@@ -42,18 +42,27 @@ jobs:
         extensions: mbstring, bcmath, exif, pcntl, gd, intl, zip, pdo_mysql
         coverage: none
     - uses: actions/checkout@v4
+
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
     - name: Install Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
     - name: Directory Permissions
       run: |
         mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache
         chmod -R 777 storage bootstrap/cache
-    - name: Generate key
+
+      - name: Generate key
       run: php artisan key:generate
+
     - name: Run Migrations
       run: php artisan migrate --force
+
+    - name: Security audit
+      run: php artisan checkpoint:scan --json | tee checkpoint-report.json
+
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       id: tests
       continue-on-error: true
@@ -65,7 +74,7 @@ jobs:
         echo "test_exit_code=${EXIT_CODE}" >> $GITHUB_OUTPUT
         exit $EXIT_CODE
 
-    - name: Upload test results
+      - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
       with:
@@ -73,7 +82,7 @@ jobs:
         path: test-results.txt
         retention-days: 7
 
-    - name: Check Telegram Config
+      - name: Check Telegram Config
       id: check-telegram
       if: steps.tests.outcome == 'failure'
       env:
@@ -87,7 +96,7 @@ jobs:
           echo "⚠️ Telegram secrets not configured, skipping notification."
         fi
 
-    - name: Send Telegram Notification on Failure
+      - name: Send Telegram Notification on Failure
       if: steps.tests.outcome == 'failure' && steps.check-telegram.outputs.configured == 'true'
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -123,6 +132,7 @@ jobs:
           -F "document=@test-results.txt;filename=test-results.txt" \
           -F "caption=📄 Full test output — ${GITHUB_REF_NAME} @ ${GITHUB_SHA:0:7}"
 
-    - name: Fail job if tests failed
+
+        - name: Fail job if tests failed
       if: steps.tests.outcome == 'failure'
       run: exit 1

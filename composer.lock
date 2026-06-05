@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49bb6fda82abbf7b380f212c7f21b2e9",
+    "content-hash": "dd0fe003edebca07f93fb55aa932a193",
     "packages": [
         {
             "name": "al-saloul/filament-image-gallery",
@@ -10992,6 +10992,53 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "andreapollastri/checkpoint",
+            "version": "1.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreapollastri/checkpoint.git",
+                "reference": "56178398bece032b482ce9221204c0b678cddc2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreapollastri/checkpoint/zipball/56178398bece032b482ce9221204c0b678cddc2a",
+                "reference": "56178398bece032b482ce9221204c0b678cddc2a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/support": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
+                "phpunit/phpunit": "^9.5.10 || ^10.0 || ^11.0 || ^12.0 || ^13.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Checkpoint\\CheckpointServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Checkpoint\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Laravel security scanner — checks CVEs, hardcoded secrets, SQL injection, XSS and more via a single Artisan command.",
+            "support": {
+                "issues": "https://github.com/andreapollastri/checkpoint/issues",
+                "source": "https://github.com/andreapollastri/checkpoint/tree/1.0.10"
+            },
+            "time": "2026-05-30T17:15:39+00:00"
+        },
         {
             "name": "brianium/paratest",
             "version": "v7.20.0",

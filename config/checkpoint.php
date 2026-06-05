@@ -91,9 +91,41 @@ return [
 
     'suspicious_autoload' => [
         'whitelist' => [
-            // 'my-org/internal-helpers',
-            // 'acme/*',
-        ],
+            'blade-ui-kit/blade-icons',
+            'danharrin/date-format-converter',
+            'filament/notifications',
+            'fruitcake/laravel-debugbar',
+            'lab404/laravel-impersonate',
+            'laravel/prompts',
+            'league/csv',
+            'mockery/mockery',
+            'myclabs/deep-copy',
+            'nunomaduro/collision',
+            'nunomaduro/termwind',
+            'pestphp/pest',
+            'pestphp/pest-plugin-arch',
+            'pestphp/pest-plugin-livewire',
+            'phpunit/phpunit',
+            'pragmarx/google2fa',
+            'propaganistas/laravel-phone',
+            'psy/psysh',
+            'ralouphie/getallheaders',
+            'scrivo/highlight.php',
+            'sebastian/global-state',
+            'sebastian/type',
+            'spatie/image-optimizer',
+            'spatie/invade',
+            'symfony/clock',
+            'symfony/var-dumper',
+            'filament/filament',
+            'filament/forms',
+            'filament/support',
+            'livewire/livewire',
+            'symfony/string',
+            'symfony/translation',
+            'spatie/laravel-activitylog',
+
+        ]
     ],
 
     /*
@@ -116,6 +148,8 @@ return [
 
     'suppressed' => [
         'e139cf01f8af',
+        '9c1241bc6dfb', // CekQueryCommand.php — dd() intentional debug command
+        'd31b3e0cb7e9', // rules/index.blade.php — {!! !!} safe: content only writable by admin
     ],
 
 ];

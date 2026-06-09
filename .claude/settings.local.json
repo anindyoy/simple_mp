@@ -48,7 +48,9 @@
       "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\(0,'utf8'\\); const j=JSON.parse\\(d\\); Object.entries\\(j.vulnerabilities||{}\\).forEach\\(\\([k,v]\\)=>{ if\\(['axios','picomatch','rollup','vite'].includes\\(k\\)\\) console.log\\(k,v.severity,v.fixAvailable,JSON.stringify\\(v.range\\)\\) }\\)\")",
       "Bash(git -C \"d:\\\\Repo\\\\simple_mp\" diff HEAD -- .github/workflows/laravel.yml)",
       "Bash(findstr /R \"PASS FAIL WARN\")",
-      "Bash(Select-String -Pattern \"PASS|FAIL|WARN\")"
+      "Bash(Select-String -Pattern \"PASS|FAIL|WARN\")",
+      "Bash(xargs grep -l \"Product::create\\\\|->create\\(\")",
+      "Bash(Select-String \"versions\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

@@ -57,6 +57,14 @@ class Product extends Model implements HasMedia
             }
 
             $product->pushed_at = now()->subHours(2);
+
+            // Kurangi 1 token saat membuat produk
+            if (auth()->check()) {
+                $user = auth()->user();
+                if (! $user->deductTokens(1)) {
+                    throw new \RuntimeException('Token tidak cukup untuk membuat produk.');
+                }
+            }
         });
 
         static::created(function ($product) {

@@ -21,3 +21,7 @@ Schedule::command('tokens:refill-weekly')
 Schedule::command('products:notify-eligible-threshold')
     ->cron('0 0,8,16 * * *')
     ->withoutOverlapping();
+
+Schedule::command('telescope:prune', ['--hours' => 360])
+    ->daily()
+    ->at('03:00');

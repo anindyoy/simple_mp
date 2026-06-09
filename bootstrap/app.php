@@ -22,6 +22,18 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->report(function (Throwable $e): void {
+            if (!app()->isProduction() || $e instanceof HttpExceptionInterface) {
+                return;
+            }
+
+            try {
+                Log::channel('telegram')->error($e->getMessage(), ['exception' => $e]);
+            } catch (Throwable) {
+                // gagal diam-diam agar tidak menutupi exception asli
+            }
+        });
+
         $exceptions->render(function (HttpExceptionInterface $exception, $request) {
             if ($exception->getStatusCode() !== 403) {
                 return null;

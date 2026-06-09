@@ -7,10 +7,11 @@ use App\Models\LapakProfile;
 use App\Models\ProductModeration;
 
 if (! function_exists('makeUser')) {
-    function makeUser(bool $isAdmin = false): User
+    function makeUser(bool $isAdmin = false, int $tokens = 10): User
     {
         $user = User::factory()->create([
-            'is_admin' => $isAdmin,
+            'is_admin'    => $isAdmin,
+            'push_tokens' => $tokens,
         ]);
 
         $user->lapak()->save(

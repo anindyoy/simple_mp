@@ -50,7 +50,8 @@
       "Bash(findstr /R \"PASS FAIL WARN\")",
       "Bash(Select-String -Pattern \"PASS|FAIL|WARN\")",
       "Bash(xargs grep -l \"Product::create\\\\|->create\\(\")",
-      "Bash(Select-String \"versions\")"
+      "Bash(Select-String \"versions\")",
+      "Bash(./vendor/bin/pest tests/Feature/Filament/Products/CreateProductTest.php)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

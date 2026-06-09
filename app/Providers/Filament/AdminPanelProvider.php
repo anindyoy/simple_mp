@@ -26,6 +26,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use JeffersonGoncalves\Filament\WhatsappWidget\WhatsappWidgetPlugin;
+use App\Livewire\UpdatePassword;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -36,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
 
         $plugins[] = BreezyCore::make()
             ->myProfile()
+            ->myProfileComponents(['update_password' => UpdatePassword::class])
             ->enableTwoFactorAuthentication(
                 condition: (bool) config('services.filament.two_factor_enabled', true),
                 force: fn(): bool => app()->environment('production') && (bool) auth()->user()?->is_admin,

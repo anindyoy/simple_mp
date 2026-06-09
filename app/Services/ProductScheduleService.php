@@ -15,6 +15,7 @@ class ProductScheduleService
     // TTL eligible IDs — pendek karena schedule bisa "unlock" tiap menit
     private const ELIGIBLE_TTL = 60;
     private const ELIGIBLE_KEY = 'products.schedule.eligible_ids';
+    private static bool $bypassThrottle = false;
 
     // ─────────────────────────────────────────
     // Method asli (tidak diubah logicnya)
@@ -115,10 +116,6 @@ class ProductScheduleService
             ->where('is_active', true)
             ->pluck('id');
 
-        if ($activeLapakIds->isEmpty()) {
-            return collect();
-        }
-
         $now = now();
         $eligible = collect();
         $productsByLapak = Product::query()
@@ -133,11 +130,14 @@ class ProductScheduleService
                 $productsByLapak->get($lapakId, collect())
             );
 
-            Cache::put(self::cacheKey($lapakId), $schedule, now()->addDays(1));
+            \Log::debug('bypassThrottle flag', ['value' => self::$bypassThrottle]);
+            \Log::debug('Schedule lapak ' . $lapakId, $schedule);
 
             $lapakEligible = collect($schedule)
                 ->filter(fn($publishAt) => Carbon::parse($publishAt) <= $now)
-                ->keys(); // product_id
+                ->keys();
+
+            \Log::debug('Eligible lapak ' . $lapakId, $lapakEligible->toArray());
 
             $eligible = $eligible->merge($lapakEligible);
         }
@@ -145,13 +145,31 @@ class ProductScheduleService
         return $eligible->unique()->values();
     }
 
+    public static function withoutThrottle(callable $callback): void
+    {
+        self::$bypassThrottle = true;
+        try {
+            $callback();
+        } finally {
+            self::$bypassThrottle = false; // selalu reset meski exception
+        }
+    }
+
     private static function buildSchedule(Collection $products): array
     {
         $schedule = [];
 
         foreach ($products as $index => $product) {
-            $schedule[$product->id] = Carbon::parse($product->created_at)
+            $publishAt = Carbon::parse($product->created_at)
                 ->addHours($index * self::DELAY_HOURS);
+
+            // Jika pushed_at lebih awal dari jadwal throttle, pakai pushed_at
+            // Ini memungkinkan seeder/admin override tanpa bypass flag
+            if ($product->pushed_at && Carbon::parse($product->pushed_at)->lt($publishAt)) {
+                $publishAt = Carbon::parse($product->pushed_at);
+            }
+
+            $schedule[$product->id] = $publishAt;
         }
 
         return $schedule;

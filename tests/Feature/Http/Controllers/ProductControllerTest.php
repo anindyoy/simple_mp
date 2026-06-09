@@ -23,13 +23,13 @@ describe('ProductController@index', function () {
 
         $lapak = LapakProfile::factory()->create();
 
-        $eligibleProduct = Product::factory()->create([
+        $eligibleProduct = Product::factory()->withoutImages()->create([
             'title' => 'iPhone 15',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
         ]);
 
-        Product::factory()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Samsung Galaxy',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
@@ -49,12 +49,12 @@ describe('ProductController@index', function () {
     it('dapat filter berdasarkan search', function () {
         $lapak = LapakProfile::factory()->create();
 
-        $productA = Product::factory()->create([
+        $productA = Product::factory()->withoutImages()->create([
             'title' => 'Macbook Pro',
             'lapak_id' => $lapak->id,
         ]);
 
-        $productB = Product::factory()->create([
+        $productB = Product::factory()->withoutImages()->create([
             'title' => 'Asus ROG',
             'lapak_id' => $lapak->id,
         ]);
@@ -78,13 +78,13 @@ describe('ProductController@index', function () {
 
         $lapak = LapakProfile::factory()->create();
 
-        $productA = Product::factory()->create([
+        $productA = Product::factory()->withoutImages()->create([
             'title' => 'Produk A',
             'category_id' => $categoryA->id,
             'lapak_id' => $lapak->id,
         ]);
 
-        $productB = Product::factory()->create([
+        $productB = Product::factory()->withoutImages()->create([
             'title' => 'Produk B',
             'category_id' => $categoryB->id,
             'lapak_id' => $lapak->id,
@@ -108,7 +108,7 @@ describe('ProductController@index', function () {
             'is_active' => false,
         ]);
 
-        $product = Product::factory()->create([
+        $product = Product::factory()->withoutImages()->create([
             'title' => 'Produk Non Aktif',
             'lapak_id' => $lapak->id,
         ]);
@@ -128,7 +128,7 @@ describe('ProductController@index', function () {
 
         $lapak = LapakProfile::factory()->create();
 
-        Product::factory()->create([
+        Product::factory()->withoutImages()->create([
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
             'created_at' => now()->subHours(10),
@@ -159,7 +159,7 @@ describe('ProductController@show', function () {
             'name' => 'Toko Saya',
         ]);
 
-        $product = Product::factory()->create([
+        $product = Product::factory()->withoutImages()->create([
             'title' => 'Laptop Gaming',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
@@ -178,7 +178,7 @@ describe('ProductController@show', function () {
     it('mengembalikan 404 jika produk tidak aktif', function () {
         $lapak = LapakProfile::factory()->create();
 
-        $product = Product::factory()->create([
+        $product = Product::factory()->withoutImages()->create([
             'lapak_id' => $lapak->id,
             'is_active' => false,
         ]);
@@ -192,7 +192,7 @@ describe('ProductController@show', function () {
             'is_active' => false,
         ]);
 
-        $product = Product::factory()->create([
+        $product = Product::factory()->withoutImages()->create([
             'lapak_id' => $lapak->id,
         ]);
 
@@ -205,7 +205,7 @@ describe('ProductController@show', function () {
 
         $lapak = LapakProfile::factory()->create();
 
-        $product = Product::factory()->create([
+        $product = Product::factory()->withoutImages()->create([
             'lapak_id' => $lapak->id,
         ]);
 
@@ -226,17 +226,17 @@ describe('ProductController@show', function () {
     it('menampilkan produk lain dalam lapak yang sama', function () {
         $lapak = LapakProfile::factory()->create();
 
-        $mainProduct = Product::factory()->create([
+        $mainProduct = Product::factory()->withoutImages()->create([
             'title' => 'Produk Utama',
             'lapak_id' => $lapak->id,
         ]);
 
-        Product::factory()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Produk Lain',
             'lapak_id' => $lapak->id,
         ]);
 
-        Product::factory()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Produk Non Aktif',
             'lapak_id' => $lapak->id,
             'is_active' => false,

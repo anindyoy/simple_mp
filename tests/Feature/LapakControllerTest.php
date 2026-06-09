@@ -35,12 +35,12 @@ test('dapat memuat data lapak dengan benar', function () {
 });
 
 test('hanya menampilkan produk yang aktif', function () {
-    $productAktif = Product::factory()->create([
+    $productAktif = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => true,
     ]);
 
-    $productTidakAktif = Product::factory()->create([
+    $productTidakAktif = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => false,
     ]);
@@ -57,19 +57,19 @@ test('hanya menampilkan produk yang aktif', function () {
 });
 
 test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
-    $product1 = Product::factory()->create([
+    $product1 = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now()->subDays(2),
     ]);
 
-    $product2 = Product::factory()->create([
+    $product2 = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now()->subDay(),
     ]);
 
-    $product3 = Product::factory()->create([
+    $product3 = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'is_active' => true,
         'pushed_at' => now(),
@@ -89,7 +89,7 @@ test('mengurutkan produk berdasarkan pushed_at terbaru', function () {
 test('memuat relasi category dari produk', function () {
     $category = Category::factory()->create();
 
-    Product::factory()->create([
+    Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $category->id,
         'is_active' => true,

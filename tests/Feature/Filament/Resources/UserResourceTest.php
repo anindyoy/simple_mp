@@ -82,7 +82,7 @@ describe('table', function () {
             'user_id' => $user->id,
         ]);
 
-        Product::factory()
+        Product::factory()->withoutImages()
             ->count(3)
             ->create([
                 'lapak_id' => $lapak->id,

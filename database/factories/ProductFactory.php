@@ -2,9 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
+use App\Traits\AttachesProductImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +14,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ProductFactory extends Factory
 {
+    use AttachesProductImages;
+
     public function definition(): array
     {
         $title = $this->faker->words(3, true);
@@ -41,9 +45,16 @@ class ProductFactory extends Factory
             $this->syncCondition($product);
         })->afterCreating(function ($product) {
             $this->syncCondition($product);
-
             $product->saveQuietly();
+
+            // Generate gambar random 1-3
+            $this->attachRandomImages($product);
         });
+    }
+
+    public function withoutImages(): static
+    {
+        return $this->afterCreating(fn() => null); // no-op, skip image generation
     }
 
     protected function syncCondition($product): void

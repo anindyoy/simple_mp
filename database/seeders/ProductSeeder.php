@@ -7,11 +7,14 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Database\Seeder;
+use App\Traits\AttachesProductImages;
 use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ProductSeeder extends Seeder
 {
+    use AttachesProductImages;
+
     protected ?int $count;
     protected ?string $mode;
 
@@ -83,13 +86,11 @@ class ProductSeeder extends Seeder
                     ? $existingLapaks->random()->id
                     : LapakProfile::factory()->create()->id;
 
-                $product->created_at = now()->subHours(rand(1, 24));
+                $product->created_at = now()->subHours(rand(1, 48));
                 $product->save();
 
-                $categoryImages = $this->getImagesForCategory($categoryName);
-                foreach (range(1, rand(1, 3)) as $_) {
-                    $this->addRandomImage($product, $categoryImages);
-                }
+                $this->attachRandomImages($product);
+
             });
         });
 
@@ -124,16 +125,12 @@ class ProductSeeder extends Seeder
                     ? fake()->randomElement(['baru', 'seken'])
                     : null;
 
-                $time = now()->subHours(rand(1, 24));
+                $time = now()->subHours(rand(1, 48));
                 $product->created_at = $time;
                 $product->pushed_at = $time;
 
                 $product->save();
-
-                $categoryImages = $this->getImagesForCategory($categoryName);
-                foreach (range(1, rand(1, 3)) as $_) {
-                    $this->addRandomImage($product, $categoryImages);
-                }
+                $this->attachRandomImages($product);
             });
         });
     }
@@ -220,57 +217,6 @@ class ProductSeeder extends Seeder
             ->map(fn($f) => $seedDir . DIRECTORY_SEPARATOR . $f)
             ->values()
             ->toArray();
-    }
-
-    protected function addRandomImage(Product $product, array $files = []): void
-    {
-        if (empty($files)) {
-            $files = $this->getFallbackFiles();
-        }
-
-        if (empty($files)) {
-            logger()->error('NO FILES FOUND');
-            return;
-        }
-
-        $fullPath = $files[array_rand($files)];
-        $tempPath = null;
-
-        try {
-            $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
-            $randomName = 'product-seed-' . bin2hex(random_bytes(8));
-            $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $randomName;
-
-            if ($extension !== '') {
-                $tempPath .= '.' . $extension;
-            }
-
-            if (file_exists($tempPath)) {
-                throw new \RuntimeException('Tidak dapat membuat file sementara untuk gambar produk.');
-            }
-
-            if (! copy($fullPath, $tempPath)) {
-                throw new \RuntimeException('Tidak dapat menyalin gambar seed untuk produk.');
-            }
-
-            $media = $product
-                ->addMedia($tempPath)
-                ->toMediaCollection('products');
-
-            if (blank($media->uuid)) {
-                $media->forceFill([
-                    'uuid' => (string) Str::uuid(),
-                ])->save();
-            }
-        } catch (\Throwable $e) {
-            logger()->error('MEDIA FAILED', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            if ($tempPath && is_file($tempPath)) {
-                @unlink($tempPath);
-            }
-        }
     }
 
     /**

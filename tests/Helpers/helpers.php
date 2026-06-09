@@ -45,7 +45,7 @@ if (! function_exists('makeProduct')) {
             $data['condition'] = 'baru';
         }
 
-        return Product::factory()->create(array_merge($data, $overrides));
+        return Product::factory()->withoutImages()->create(array_merge($data, $overrides));
     }
 }
 

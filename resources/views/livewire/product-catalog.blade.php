@@ -26,7 +26,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
 
         {{-- Skeleton saat loading --}}
-        <div wire:loading wire:target="applyFilters, resetFilters" class="col-span-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div wire:loading.grid wire:target="applyFilters, resetFilters" class="col-span-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             @for ($i = 0; $i < 16; $i++)
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col animate-pulse">
                     <div class="h-48 w-full bg-gray-200 rounded-t-2xl"></div>

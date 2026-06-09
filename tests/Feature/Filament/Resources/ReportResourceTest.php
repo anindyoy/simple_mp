@@ -32,7 +32,7 @@ beforeEach(function () {
         'user_id' => $this->lapakOwner->id,
     ]);
 
-    $this->product = Product::factory()->create([
+    $this->product = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $this->category->id,
     ]);
@@ -205,7 +205,7 @@ it('mounts lapak report details with lapak target', function () {
 it('deactivates reported product and marks pending reports as reviewed', function () {
     $this->actingAs($this->adminUser);
 
-    $product = Product::factory()->create([
+    $product = Product::factory()->withoutImages()->create([
         'lapak_id' => $this->lapak->id,
         'category_id' => $this->category->id,
     ]);

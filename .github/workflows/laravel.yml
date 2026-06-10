@@ -106,78 +106,38 @@ jobs:
         path: test-results.txt
         retention-days: 7
 
-    - name: Check Telegram Config
-      id: check-telegram
-      if: steps.tests.outcome == 'failure'
-      env:
-        HAS_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN != '' }}
-        HAS_CHAT: ${{ secrets.TELEGRAM_CHAT_ID != '' }}
-      run: |
-        if [ "$HAS_TOKEN" = "true" ] && [ "$HAS_CHAT" = "true" ]; then
-          echo "configured=true" >> $GITHUB_OUTPUT
-        else
-          echo "configured=false" >> $GITHUB_OUTPUT
-          echo "⚠️ Telegram secrets not configured, skipping notification."
-        fi
-
-    - name: Send Telegram Notification on Failure
-      if: steps.tests.outcome == 'failure' && steps.check-telegram.outputs.configured == 'true'
+    - name: Send Telegram Notification
+      if: failure()
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        FAILED_TESTS=$(grep "FAILED" test-results.txt | head -20)
-        SUMMARY=$(grep -E "^\s*(Tests|Duration):" test-results.txt | tail -2)
-        TEST_OUTPUT="$(printf 'Test gagal:\n%s\n\n%s' "${FAILED_TESTS}" "${SUMMARY}")"
-        TEST_OUTPUT=$(printf '%s' "${TEST_OUTPUT}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-
-        PAYLOAD=$(jq -n \
-          --arg chat_id "${TELEGRAM_CHAT_ID}" \
-          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\n\n<pre>%s</pre>' \
-            "${GITHUB_REPOSITORY}" \
-            "${GITHUB_REPOSITORY}" \
-            "${GITHUB_REF_NAME}" \
-            "${GITHUB_REPOSITORY}" \
-            "${GITHUB_SHA}" \
-            "${GITHUB_SHA:0:7}" \
-            "${TEST_OUTPUT}")" \
-          '{
-            chat_id: $chat_id,
-            parse_mode: "HTML",
-            text: $text
-          }')
-
-        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-          -H "Content-Type: application/json" \
-          -d "${PAYLOAD}"
-
-        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-          -F "chat_id=${TELEGRAM_CHAT_ID}" \
-          -F "document=@test-results.txt;filename=test-results.txt" \
-          -F "caption=📄 Full test output — ${GITHUB_REF_NAME} @ ${GITHUB_SHA:0:7}"
-
-    - name: Send Telegram Notification on step failure
-      if: failure() && steps.tests.outcome != 'failure'
-      env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TESTS_FAILED: ${{ steps.tests.outcome == 'failure' }}
       run: |
         if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-          echo "⚠️ Telegram secrets not configured, skipping notification."
+          echo "⚠️ Telegram secrets not configured, skipping notification. Run ID: ${GITHUB_RUN_ID}"
           exit 0
         fi
 
+        if [ "$TESTS_FAILED" = "true" ]; then
+          FAILED_TESTS=$(grep "FAILED" test-results.txt | head -20)
+          SUMMARY=$(grep -E "^\s*(Tests|Duration):" test-results.txt | tail -2)
+          TEST_OUTPUT="$(printf 'Test gagal:\n%s\n\n%s' "${FAILED_TESTS}" "${SUMMARY}")"
+          TEST_OUTPUT=$(printf '%s' "${TEST_OUTPUT}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+          DETAIL="<pre>${TEST_OUTPUT}</pre>"
+        else
+          DETAIL="⚠️ Sebuah step workflow gagal. Lihat <a href=\"https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\">log run</a> untuk detail."
+        fi
+
         PAYLOAD=$(jq -n \
           --arg chat_id "${TELEGRAM_CHAT_ID}" \
-          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\n\n⚠️ Sebuah step workflow gagal. Lihat <a href="https://github.com/%s/actions/runs/%s">log run</a> untuk detail.' \
+          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\n\n%s' \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REF_NAME}" \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_SHA}" \
             "${GITHUB_SHA:0:7}" \
-            "${GITHUB_REPOSITORY}" \
-            "${GITHUB_RUN_ID}")" \
+            "${DETAIL}")" \
           '{
             chat_id: $chat_id,
             parse_mode: "HTML",
@@ -187,6 +147,13 @@ jobs:
         curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
           -H "Content-Type: application/json" \
           -d "${PAYLOAD}"
+
+        if [ "$TESTS_FAILED" = "true" ]; then
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+            -F "chat_id=${TELEGRAM_CHAT_ID}" \
+            -F "document=@test-results.txt;filename=test-results.txt" \
+            -F "caption=📄 Full test output — ${GITHUB_REF_NAME} @ ${GITHUB_SHA:0:7}"
+        fi
 
     - name: Fail job if tests failed
       if: steps.tests.outcome == 'failure'

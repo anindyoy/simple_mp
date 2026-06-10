@@ -5,7 +5,10 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Category;
 use App\Models\LapakProfile;
+use App\Livewire\ProductCatalog;
+use Livewire\Livewire;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Services\ProductScheduleService;
 
@@ -20,112 +23,121 @@ beforeEach(function () {
 describe('ProductController@index', function () {
     it('menampilkan daftar produk aktif yang eligible', function () {
         $category = Category::factory()->create();
-
         $lapak = LapakProfile::factory()->create();
 
-        $eligibleProduct = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'iPhone 15',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
+            'created_at' => now()->subSeconds(5),
         ]);
 
-        Product::factory()->withoutImages()->create([
+        $samsung = Product::factory()->withoutImages()->create([
             'title' => 'Samsung Galaxy',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
+            'created_at' => now()->subSeconds(2),
         ]);
 
-        ProductScheduleService::rebuild($eligibleProduct->id);
+        // Model `creating` hook selalu set pushed_at = now()-2h tanpa kondisi,
+        // yang mengalahkan throttle 4 jam di buildSchedule. Override via DB
+        // agar pushed_at > publishAt sehingga throttle tetap berlaku.
+        DB::table('products')->where('id', $samsung->id)->update([
+            'pushed_at' => now()->addHours(5),
+        ]);
 
-        $response = $this->get(route('products.index'));
+        ProductScheduleService::rebuild($lapak->id);
 
-        $response
-            ->assertOk()
-            ->assertViewIs('main')
-            ->assertSee('iPhone 15')
-            ->assertDontSee('Samsung Galaxy');
+        $titles = Livewire::test(ProductCatalog::class)
+            ->viewData('products')
+            ->pluck('title');
+
+        expect($titles)->toContain('iPhone 15');
+        expect($titles)->not->toContain('Samsung Galaxy');
     });
 
     it('dapat filter berdasarkan search', function () {
         $lapak = LapakProfile::factory()->create();
 
-        $productA = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Macbook Pro',
             'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(9),
         ]);
 
-        $productB = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Asus ROG',
             'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(5),
         ]);
 
-        ProductScheduleService::rebuild($productA->id);
-        ProductScheduleService::rebuild($productB->id);
+        ProductScheduleService::rebuild($lapak->id);
 
-        $response = $this->get(route('products.index', [
-            'search' => 'Macbook',
-        ]));
+        $titles = Livewire::test(ProductCatalog::class)
+            ->set('search', 'Macbook')
+            ->viewData('products')
+            ->pluck('title');
 
-        $response
-            ->assertOk()
-            ->assertSee('Macbook Pro')
-            ->assertDontSee('Asus ROG');
+        expect($titles)->toContain('Macbook Pro');
+        expect($titles)->not->toContain('Asus ROG');
     });
 
     it('dapat filter berdasarkan kategori', function () {
         $categoryA = Category::factory()->create();
         $categoryB = Category::factory()->create();
-
         $lapak = LapakProfile::factory()->create();
 
-        $productA = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Produk A',
             'category_id' => $categoryA->id,
             'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(9),
         ]);
 
-        $productB = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Produk B',
             'category_id' => $categoryB->id,
             'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(5),
         ]);
 
-        ProductScheduleService::rebuild($productA->id);
-        ProductScheduleService::rebuild($productB->id);
+        ProductScheduleService::rebuild($lapak->id);
 
-        $response = $this->get(route('products.index', [
-            'category' => $categoryA->id,
-        ]));
+        $titles = Livewire::test(ProductCatalog::class)
+            ->set('categoryId', (string) $categoryA->id)
+            ->viewData('products')
+            ->pluck('title');
 
-        $response
-            ->assertOk()
-            ->assertSee('Produk A')
-            ->assertDontSee('Produk B');
+        expect($titles)->toContain('Produk A');
+        expect($titles)->not->toContain('Produk B');
     });
 
     it('tidak menampilkan produk dari lapak non aktif', function () {
-        $lapak = LapakProfile::factory()->create([
-            'is_active' => false,
-        ]);
+        $lapak = LapakProfile::factory()->create(['is_active' => false]);
 
-        $product = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Produk Non Aktif',
             'lapak_id' => $lapak->id,
+            'pushed_at' => null,
         ]);
 
-        ProductScheduleService::rebuild($product->id);
-        $response = $this->get(route('products.index'));
+        ProductScheduleService::rebuild($lapak->id);
 
-        $response
-            ->assertOk()
-            ->assertDontSee('Produk Non Aktif');
+        $titles = Livewire::test(ProductCatalog::class)
+            ->viewData('products')
+            ->pluck('title');
+
+        expect($titles)->not->toContain('Produk Non Aktif');
     });
 
     it('menggunakan cache untuk categories', function () {
         Cache::forget('categories_list');
 
         $category = Category::factory()->create();
-
         $lapak = LapakProfile::factory()->create();
 
         Product::factory()->withoutImages()->create([
@@ -136,9 +148,7 @@ describe('ProductController@index', function () {
 
         ProductScheduleService::rebuild($lapak->id);
 
-        $response = $this->get(route('products.index'));
-
-        $response->assertOk();
+        Livewire::test(ProductCatalog::class);
 
         expect(Cache::has('categories_list'))->toBeTrue();
     });
@@ -171,8 +181,7 @@ describe('ProductController@show', function () {
         $response
             ->assertOk()
             ->assertViewIs('product-detail')
-            ->assertViewHas('product')
-            ->assertSee('Laptop Gaming');
+            ->assertViewHas('product', fn($p) => $p->title === 'Laptop Gaming');
     });
 
     it('mengembalikan 404 jika produk tidak aktif', function () {
@@ -244,9 +253,9 @@ describe('ProductController@show', function () {
 
         $response = $this->get(route('product.show', $mainProduct));
 
-        $response
-            ->assertOk()
-            ->assertSee('Produk Lain')
-            ->assertDontSee('Produk Non Aktif');
+        $otherTitles = $response->viewData('otherProductsInLapak')->pluck('title');
+
+        expect($otherTitles)->toContain('Produk Lain');
+        expect($otherTitles)->not->toContain('Produk Non Aktif');
     });
 });

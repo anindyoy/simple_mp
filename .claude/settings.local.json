@@ -55,7 +55,9 @@
       "Bash(cd /d \"d:\\\\Repo\\\\simple_mp\")",
       "Bash(./vendor/bin/pest tests/Feature/Listeners/SendTelegramOnEmailVerifiedTest.php --colors=never)",
       "Bash(./vendor/bin/pest tests/Feature/Http/Controllers/ProductControllerTest.php --no-coverage)",
-      "Bash(./vendor/bin/pest --no-coverage)"
+      "Bash(./vendor/bin/pest --no-coverage)",
+      "Bash(./vendor/bin/pest --no-coverage --fail-on-incomplete)",
+      "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Resources/UserResourceTest.php)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

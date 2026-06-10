@@ -4,13 +4,19 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\LapakProfile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class ProductScheduleService
 {
-    const DELAY_HOURS = 4;
+    private const DEFAULT_DELAY_HOURS = 4;
+
+    private static function delayHours(): int
+    {
+        return Setting::getIntValue('product_schedule_delay_hours', self::DEFAULT_DELAY_HOURS);
+    }
 
     // TTL eligible IDs — pendek karena schedule bisa "unlock" tiap menit
     private const ELIGIBLE_TTL = 60;
@@ -52,7 +58,7 @@ class ProductScheduleService
         if (! $lastPublish) {
             $publishAt = $createdAt;
         } else {
-            $next = Carbon::parse($lastPublish)->addHours(self::DELAY_HOURS);
+            $next = Carbon::parse($lastPublish)->addHours(self::delayHours());
             $publishAt = $next->gt($createdAt) ? $next : $createdAt;
         }
 
@@ -167,7 +173,7 @@ class ProductScheduleService
             if ($lastPublishAt === null) {
                 $publishAt = $createdAt;
             } else {
-                $next = $lastPublishAt->copy()->addHours(self::DELAY_HOURS);
+                $next = $lastPublishAt->copy()->addHours(self::delayHours());
                 $publishAt = $next->gt($createdAt) ? $next : $createdAt;
             }
 

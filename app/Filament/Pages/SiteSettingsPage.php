@@ -55,6 +55,7 @@ class SiteSettingsPage extends Page implements HasForms
             'site_description' => Setting::getValue('site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.'),
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
+            'product_schedule_delay_hours' => Setting::getIntValue('product_schedule_delay_hours', 4),
             'daily_minimum_push_tokens' => Setting::getIntValue('daily_minimum_push_tokens', 2),
             'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
             'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
@@ -105,6 +106,20 @@ class SiteSettingsPage extends Page implements HasForms
                             ->rows(3)
                             ->maxLength(500)
                             ->helperText('Kata kunci utama, pisahkan dengan koma.'),
+                    ]),
+
+                Section::make('Konfigurasi Antrian Produk')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        TextInput::make('product_schedule_delay_hours')
+                            ->label('Jeda Antar Produk (jam)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(4)
+                            ->suffix('jam')
+                            ->helperText('Produk kedua dari lapak yang sama baru muncul di halaman utama setelah jeda ini sejak produk sebelumnya ditampilkan.'),
                     ]),
 
                 Section::make('Konfigurasi Token Angkat Produk')
@@ -244,6 +259,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_description', $data['site_description'] ?? '');
         Setting::setValue('site_keywords', $data['site_keywords'] ?? '');
         Setting::setValue('site_region', $data['site_region'] ?? '');
+        Setting::setValue('product_schedule_delay_hours', (string) max(1, (int) ($data['product_schedule_delay_hours'] ?? 4)));
         Setting::setValue('daily_minimum_push_tokens', (string) max(0, (int) ($data['daily_minimum_push_tokens'] ?? 2)));
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
         Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));

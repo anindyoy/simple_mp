@@ -53,7 +53,9 @@
       "Bash(Select-String \"versions\")",
       "Bash(./vendor/bin/pest tests/Feature/Filament/Products/CreateProductTest.php)",
       "Bash(cd /d \"d:\\\\Repo\\\\simple_mp\")",
-      "Bash(./vendor/bin/pest tests/Feature/Listeners/SendTelegramOnEmailVerifiedTest.php --colors=never)"
+      "Bash(./vendor/bin/pest tests/Feature/Listeners/SendTelegramOnEmailVerifiedTest.php --colors=never)",
+      "Bash(./vendor/bin/pest tests/Feature/Http/Controllers/ProductControllerTest.php --no-coverage)",
+      "Bash(./vendor/bin/pest --no-coverage)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

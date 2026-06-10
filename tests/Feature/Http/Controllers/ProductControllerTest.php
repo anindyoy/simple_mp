@@ -8,7 +8,6 @@ use App\Models\LapakProfile;
 use App\Livewire\ProductCatalog;
 use Livewire\Livewire;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Services\ProductScheduleService;
 
@@ -32,18 +31,11 @@ describe('ProductController@index', function () {
             'created_at' => now()->subSeconds(5),
         ]);
 
-        $samsung = Product::factory()->withoutImages()->create([
+        Product::factory()->withoutImages()->create([
             'title' => 'Samsung Galaxy',
             'category_id' => $category->id,
             'lapak_id' => $lapak->id,
             'created_at' => now()->subSeconds(2),
-        ]);
-
-        // Model `creating` hook selalu set pushed_at = now()-2h tanpa kondisi,
-        // yang mengalahkan throttle 4 jam di buildSchedule. Override via DB
-        // agar pushed_at > publishAt sehingga throttle tetap berlaku.
-        DB::table('products')->where('id', $samsung->id)->update([
-            'pushed_at' => now()->addHours(5),
         ]);
 
         ProductScheduleService::rebuild($lapak->id);

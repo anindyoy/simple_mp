@@ -87,6 +87,19 @@
                     @endif
                 </div>
 
+                <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    <span>
+                        <span class="font-semibold text-gray-600">Dibuat:</span>
+                        {{ $product->created_at->diffForHumans() }}
+                    </span>
+                    @if ($product->pushed_at?->greaterThan($product->created_at))
+                        <span>
+                            <span class="font-semibold text-emerald-600">Diangkat:</span>
+                            {{ $product->pushed_at->diffForHumans() }}
+                        </span>
+                    @endif
+                </div>
+
                 <div class="mt-6">
                     <h3 class="font-bold text-gray-500 uppercase text-xs">Deskripsi</h3>
                     <p class="text-gray-600 mt-2">{{ $product->description }}</p>

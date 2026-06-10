@@ -47,7 +47,8 @@
 
         <div class="mb-1 flex flex-wrap gap-1">
             @if ($product->hasCondition())
-                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+                <span
+                    class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
                     {{ $product->condition === 'baru' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                     Kondisi {{ $product->conditionLabel() }}
                 </span>
@@ -75,13 +76,13 @@
 
         <div class="mt-auto pt-3 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-[10px] text-gray-400">
             <div>
-                @if ($product->pushed_at?->equalTo($product->created_at))
-                    <span class="text-gray-500">Dibuat</span>
-                @else
+                @if ($product->pushed_at?->greaterThan($product->created_at))
                     <span class="text-emerald-600 font-medium">Diangkat</span>
+                    {{ $product->pushed_at->diffForHumans() }}
+                @else
+                    <span class="text-gray-500">Dibuat</span>
+                    {{ $product->created_at->diffForHumans() }}
                 @endif
-
-                {{ $product->pushed_at?->diffForHumans() }}
             </div>
 
             <div class="font-semibold text-gray-600">

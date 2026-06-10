@@ -47,18 +47,19 @@ class ProductScheduleService
         $schedule = Cache::get(self::cacheKey($lapakId), []);
 
         $lastPublish = collect($schedule)->max();
+        $createdAt = Carbon::parse($product->created_at);
 
         if (! $lastPublish) {
-            $publishAt = $product->created_at;
+            $publishAt = $createdAt;
         } else {
-            $publishAt = Carbon::parse($lastPublish)->addHours(4);
+            $next = Carbon::parse($lastPublish)->addHours(self::DELAY_HOURS);
+            $publishAt = $next->gt($createdAt) ? $next : $createdAt;
         }
 
         $schedule[$product->id] = $publishAt;
 
         Cache::put(self::cacheKey($lapakId), $schedule, now()->addDays(1));
 
-        // Invalidate eligible cache setelah ada produk baru ditambah
         self::forgetEligible();
     }
 
@@ -158,18 +159,20 @@ class ProductScheduleService
     private static function buildSchedule(Collection $products): array
     {
         $schedule = [];
+        $lastPublishAt = null;
 
-        foreach ($products as $index => $product) {
-            $publishAt = Carbon::parse($product->created_at)
-                ->addHours($index * self::DELAY_HOURS);
+        foreach ($products as $product) {
+            $createdAt = Carbon::parse($product->created_at);
 
-            // Jika pushed_at lebih awal dari jadwal throttle, pakai pushed_at
-            // Ini memungkinkan seeder/admin override tanpa bypass flag
-            if ($product->pushed_at && Carbon::parse($product->pushed_at)->lt($publishAt)) {
-                $publishAt = Carbon::parse($product->pushed_at);
+            if ($lastPublishAt === null) {
+                $publishAt = $createdAt;
+            } else {
+                $next = $lastPublishAt->copy()->addHours(self::DELAY_HOURS);
+                $publishAt = $next->gt($createdAt) ? $next : $createdAt;
             }
 
             $schedule[$product->id] = $publishAt;
+            $lastPublishAt = $publishAt;
         }
 
         return $schedule;

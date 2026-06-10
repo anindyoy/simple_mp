@@ -33,7 +33,9 @@ class CekQueryCommand extends Command
      */
     public function handle()
     {
-        dd($this->getUserNameAndProductIds());
+        // dd($this->getUserNameAndProductIds());
+        $latest_lapak = Product::latest('pushed_at')->first();
+        dd($latest_lapak);
     }
 
     private function getUserCanDeliveredInLapak()

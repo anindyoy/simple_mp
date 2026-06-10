@@ -57,7 +57,8 @@
       "Bash(./vendor/bin/pest tests/Feature/Http/Controllers/ProductControllerTest.php --no-coverage)",
       "Bash(./vendor/bin/pest --no-coverage)",
       "Bash(./vendor/bin/pest --no-coverage --fail-on-incomplete)",
-      "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Resources/UserResourceTest.php)"
+      "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Resources/UserResourceTest.php)",
+      "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Products/)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

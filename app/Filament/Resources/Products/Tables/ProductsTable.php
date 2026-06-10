@@ -22,7 +22,9 @@ use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
 use App\Services\ProductModerationService;
+use App\Services\ProductScheduleService;
 use Filament\Tables\Filters\TernaryFilter;
 
 class ProductsTable
@@ -97,7 +99,7 @@ class ProductsTable
 
                     TextColumn::make('price')
                         ->label('Harga')
-                        ->money('IDR', locale: 'id')
+                        ->formatStateUsing(fn($state) => 'Rp ' . number_format((int) $state))
                         ->sortable()
                         ->weight(FontWeight::Bold)
                         ->color('success'),
@@ -112,6 +114,47 @@ class ProductsTable
                             return $record->pushed_at?->diffForHumans();
                         })
                         ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
+
+                    TextColumn::make('beranda_status')
+                        ->label('Status Beranda')
+                        ->badge(fn(?string $state) => filled($state))
+                        ->state(function ($record): ?string {
+                            if (! $record->is_active) {
+                                return null;
+                            }
+
+                            $eligibleIds = ProductScheduleService::getEligibleProductIds();
+
+                            if ($eligibleIds->contains($record->id)) {
+                                return 'tampil';
+                            }
+
+                            $schedule  = ProductScheduleService::getOrRebuild($record->lapak_id);
+                            $publishAt = isset($schedule[$record->id])
+                                ? Carbon::parse($schedule[$record->id])
+                                : null;
+
+                            if ($publishAt?->isFuture()) {
+                                return 'antri:' . $publishAt->diffForHumans();
+                            }
+
+                            return null;
+                        })
+                        ->formatStateUsing(fn(?string $state): ?string => match (true) {
+                            $state === 'tampil'                          => 'Tampil di Beranda',
+                            str_starts_with((string) $state, 'antri:')  => 'Antri — tampil ' . substr((string) $state, 6),
+                            default                                      => null,
+                        })
+                        ->color(fn(?string $state): ?string => match (true) {
+                            $state === 'tampil'                          => 'success',
+                            str_starts_with((string) $state, 'antri:')  => 'warning',
+                            default                                      => null,
+                        })
+                        ->icon(fn(?string $state): ?string => match (true) {
+                            $state === 'tampil'                          => 'heroicon-m-check-circle',
+                            str_starts_with((string) $state, 'antri:')  => 'heroicon-m-clock',
+                            default                                      => null,
+                        }),
 
                     TextColumn::make('latestReactivationRequest.status')
                         ->label('Aktivasi Ulang')

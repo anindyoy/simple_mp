@@ -23,7 +23,7 @@
                 }
             }">
             <div class="text-sm text-gray-700 dark:text-gray-200">
-                Token untuk angkat produk tersisa:
+                Jumlah Token:
                 <span @class([
                     'font-semibold',
                     'text-success-600 dark:text-success-400' => (int) $pushTokens > 0,
@@ -34,13 +34,13 @@
             <div class="mt-2 text-gray-600 dark:text-gray-300">
                 <template x-if="pushTokens === 0">
                     <div class="mb-2 font-semibold text-danger-600 dark:text-danger-400">
-                        Token habis. Isi token dulu untuk bisa mengangkat produk.
+                        Token habis. Isi token dulu untuk bisa membuat atau mengangkat produk.
                     </div>
                 </template>
 
                 <template x-if="remaining > 0 && pushTokens > 0">
                     <span>
-                        Sisa waktu untuk mengangkat produk selanjutnya:
+                        Sisa waktu untuk membuat atau mengangkat produk selanjutnya:
                         <span class="font-semibold" x-text="format(remaining)"></span>
 
                         @if ($nextPushAtLabel)
@@ -53,7 +53,7 @@
 
                 <template x-if="remaining === 0 && pushTokens > 0">
                     <span class="font-semibold text-success-600 dark:text-success-400">
-                        Kamu sudah bisa mengangkat produk sekarang.
+                        Kamu sudah bisa langsung membuat produk baru atau mengangkat produk sekarang.
                     </span>
                 </template>
             </div>

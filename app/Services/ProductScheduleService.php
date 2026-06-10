@@ -74,6 +74,23 @@ class ProductScheduleService
         return Cache::get(self::cacheKey($lapakId), []);
     }
 
+    /**
+     * Kembalikan schedule lapak dari cache; rebuild dari DB jika cache kosong.
+     * Aman dipanggil per-row di tabel karena rebuild di-cache 24 jam.
+     */
+    public static function getOrRebuild(int $lapakId): array
+    {
+        $cached = Cache::get(self::cacheKey($lapakId));
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        self::rebuild($lapakId);
+
+        return Cache::get(self::cacheKey($lapakId), []);
+    }
+
     public static function cacheKey(int $lapakId): string
     {
         return "products.schedule.{$lapakId}";

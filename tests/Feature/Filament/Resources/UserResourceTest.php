@@ -12,6 +12,7 @@ beforeEach(function () {
     $this->admin = User::factory()->create([
         'is_admin' => true,
         'email_verified_at' => now(),
+        'push_tokens' => 999,
     ]);
 
     $this->user = User::factory()->create([

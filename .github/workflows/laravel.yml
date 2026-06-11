@@ -107,7 +107,7 @@ jobs:
         retention-days: 7
 
     - name: Send Telegram Notification
-      if: failure()
+      if: failure() || steps.tests.outcome == 'failure'
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

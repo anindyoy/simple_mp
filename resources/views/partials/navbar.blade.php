@@ -10,6 +10,10 @@
             <a href="{{ route('rules.index') }}" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
                 Peraturan
             </a>
+
+            <a href="https://wa.me/{{ env('HP_ADMIN') }}" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
+                Hubungi Kami
+            </a>
         </div>
 
         {{-- Actions --}}

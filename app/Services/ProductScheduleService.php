@@ -154,14 +154,9 @@ class ProductScheduleService
                 $productsByLapak->get($lapakId, collect())
             );
 
-            \Log::debug('bypassThrottle flag', ['value' => self::$bypassThrottle]);
-            \Log::debug('Schedule lapak ' . $lapakId, $schedule);
-
             $lapakEligible = collect($schedule)
                 ->filter(fn($publishAt) => Carbon::parse($publishAt) <= $now)
                 ->keys();
-
-            \Log::debug('Eligible lapak ' . $lapakId, $lapakEligible->toArray());
 
             $eligible = $eligible->merge($lapakEligible);
         }

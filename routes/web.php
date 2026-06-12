@@ -37,7 +37,7 @@ Route::controller(PublicAuthController::class)->group(function () {
 
 Route::post('/report', [ReportController::class, 'store'])->name('report.store');
 
-Route::middleware('auth')->get('/debug/telegram-exception', function () {
+Route::get('/debug/telegram-exception', function () {
     throw new Exception('Simulasi exception dari route debug Telegram');
 })->name('debug.telegram-exception');
 

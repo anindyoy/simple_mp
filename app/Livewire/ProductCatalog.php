@@ -50,7 +50,7 @@ class ProductCatalog extends Component
             ->when($this->condition,   fn($q) => $q->where('condition', $this->condition))
             ->when($this->deliverable, fn($q) => $q->where('can_be_delivered', true))
             ->orderBy('pushed_at', 'desc')
-            ->paginate(16);
+            ->paginate(25);
 
         $categories = Cache::remember(
             'categories_list',

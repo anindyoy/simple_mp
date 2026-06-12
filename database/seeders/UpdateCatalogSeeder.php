@@ -27,8 +27,13 @@ class UpdateCatalogSeeder extends Seeder
         $createdCount     = 0;
         $updatedCount     = 0;
 
-        for ($i = 0; $i < 5; $i++) {
-            if (random_int(1, 3) === 1) {
+        $totalRuns = 6;
+
+        for ($i = 0; $i < $totalRuns; $i++) {
+            $isLast    = $i === $totalRuns - 1;
+            $mustUpdate = $isLast && $updatedCount === 0 && $products->isNotEmpty();
+
+            if (! $mustUpdate && random_int(1, 3) === 1) {
                 $lapak = $this->createRandomLapak();
                 $lapaks->push($lapak);
                 $createdLapakCount++;
@@ -36,7 +41,7 @@ class UpdateCatalogSeeder extends Seeder
                 continue;
             }
 
-            $action = $products->isNotEmpty() && random_int(0, 1) === 1
+            $action = ($mustUpdate || ($products->isNotEmpty() && random_int(0, 1) === 1))
                 ? 'update'
                 : 'create';
 
@@ -65,7 +70,7 @@ class UpdateCatalogSeeder extends Seeder
             $createdLapakCount,
             $createdCount,
             $updatedCount,
-            5,
+            $totalRuns,
         ));
     }
 

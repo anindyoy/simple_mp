@@ -6,7 +6,7 @@
 @section('og_description', $meta['description'])
 @section('content')
 
-    @if(env('APP_DEMO_MODE', false))
+    @if(config('app.demo_mode'))
         <div class="bg-yellow-50 border-b border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
             <div class="container mx-auto px-4 py-3 flex items-center gap-3 text-sm text-yellow-800 dark:text-yellow-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">

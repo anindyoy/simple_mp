@@ -18,7 +18,7 @@
         </div>
 
         {{-- Actions --}}
-        @php $demoMode = env('APP_DEMO_MODE', false); @endphp
+        @php $demoMode = config('app.demo_mode'); @endphp
         <div class="flex items-center gap-2 {{ $demoMode ? 'opacity-50 pointer-events-none select-none' : '' }}">
             @auth
                 {{-- Member Area --}}

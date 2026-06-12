@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
@@ -17,23 +18,39 @@ class UpdateCatalogSeeder extends Seeder
      */
     public function run(): void
     {
-        $changed = false;
-        $createdCount = 0;
-        $updatedCount = 0;
+        $lapaks      = LapakProfile::all();
+        $categories  = Category::all();
+        $products    = Product::all();
+
+        $changed          = false;
+        $createdLapakCount = 0;
+        $createdCount     = 0;
+        $updatedCount     = 0;
 
         for ($i = 0; $i < 5; $i++) {
-            $action = Product::query()->exists() && random_int(0, 1) === 1
+            if (random_int(1, 3) === 1) {
+                $lapak = $this->createRandomLapak();
+                $lapaks->push($lapak);
+                $createdLapakCount++;
+                $changed = true;
+                continue;
+            }
+
+            $action = $products->isNotEmpty() && random_int(0, 1) === 1
                 ? 'update'
                 : 'create';
 
             if ($action === 'create') {
-                $created = $this->createRandomProduct();
-                $createdCount += $created ? 1 : 0;
-                $changed = $created || $changed;
+                $product = $this->createRandomProduct($lapaks, $categories);
+                if ($product) {
+                    $products->push($product);
+                    $createdCount++;
+                    $changed = true;
+                }
                 continue;
             }
 
-            $updated = $this->updateRandomProductPushTime();
+            $updated = $this->updateRandomProductPushTime($products);
             $updatedCount += $updated ? 1 : 0;
             $changed = $updated || $changed;
         }
@@ -44,7 +61,8 @@ class UpdateCatalogSeeder extends Seeder
         }
 
         $this->info(sprintf(
-            'UpdateCatalogSeeder summary: created=%d, updated=%d, total_runs=%d',
+            'UpdateCatalogSeeder summary: created_lapak=%d, created=%d, updated=%d, total_runs=%d',
+            $createdLapakCount,
             $createdCount,
             $updatedCount,
             5,
@@ -56,13 +74,18 @@ class UpdateCatalogSeeder extends Seeder
         fwrite(STDOUT, $message . PHP_EOL);
     }
 
-    private function createRandomProduct(): bool
+    private function createRandomLapak(): LapakProfile
     {
-        $lapak = LapakProfile::query()->inRandomOrder()->first();
-        $category = Category::query()->inRandomOrder()->first();
+        return LapakProfile::factory()->create();
+    }
+
+    private function createRandomProduct(Collection $lapaks, Collection $categories): ?Product
+    {
+        $lapak    = $lapaks->random();
+        $category = $categories->random();
 
         if (! $lapak || ! $category) {
-            return false;
+            return null;
         }
 
         $title = $this->makeProductTitle($category->category_name);
@@ -80,18 +103,16 @@ class UpdateCatalogSeeder extends Seeder
 
         ProductScheduleService::rebuild($lapak->id);
 
-        return true;
+        return $product;
     }
 
-    private function updateRandomProductPushTime(): bool
+    private function updateRandomProductPushTime(Collection $products): bool
     {
-        $product = Product::query()->inRandomOrder()->first();
-
-        if (! $product) {
+        if ($products->isEmpty()) {
             return false;
         }
 
-        $product->updateQuietly([
+        $products->random()->updateQuietly([
             'pushed_at' => now()->subHours(random_int(1, 5)),
         ]);
 

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Services\ProductScheduleService;
 
 class NotifyEligibleProductThresholdCommand extends Command
@@ -16,6 +17,8 @@ class NotifyEligibleProductThresholdCommand extends Command
     public function handle(): int
     {
         $count = ProductScheduleService::getEligibleProductIds()->count();
+
+        Log::info('products:notify-eligible-threshold dijalankan', ['eligible_count' => $count]);
 
         if ($count <= 900) {
             $this->info("Jumlah eligible produk aman: {$count}.");
@@ -56,6 +59,7 @@ class NotifyEligibleProductThresholdCommand extends Command
             ->throw();
 
         $this->info("Notifikasi ambang batas berhasil dikirim (jumlah: {$count}).");
+        Log::warning('products:notify-eligible-threshold — ambang batas terlampaui, notifikasi Telegram dikirim', ['eligible_count' => $count]);
 
         return 0;
     }

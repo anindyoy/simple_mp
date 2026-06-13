@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
@@ -65,6 +66,13 @@ class UpdateCatalogSeeder extends Seeder
             ProductScheduleService::forgetEligible();
         }
 
+        $summary = [
+            'created_lapak' => $createdLapakCount,
+            'created'       => $createdCount,
+            'updated'       => $updatedCount,
+            'total_runs'    => $totalRuns,
+        ];
+
         $this->info(sprintf(
             'UpdateCatalogSeeder summary: created_lapak=%d, created=%d, updated=%d, total_runs=%d',
             $createdLapakCount,
@@ -72,6 +80,7 @@ class UpdateCatalogSeeder extends Seeder
             $updatedCount,
             $totalRuns,
         ));
+        Log::info('UpdateCatalogSeeder selesai', $summary);
     }
 
     protected function info(string $message): void

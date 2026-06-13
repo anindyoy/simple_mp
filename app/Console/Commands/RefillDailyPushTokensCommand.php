@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RefillDailyPushTokensCommand extends Command
 {
@@ -37,6 +38,7 @@ class RefillDailyPushTokensCommand extends Command
             ]);
 
         $this->info("Refill token angkat produk harian selesai (minimum: {$minimumDailyTokens}). User diperbarui: {$affectedUsers}.");
+        Log::info('tokens:refill-daily selesai', ['minimum' => $minimumDailyTokens, 'affected_users' => $affectedUsers]);
 
         return self::SUCCESS;
     }

@@ -12,6 +12,7 @@
     <div
         wire:loading
         wire:target="applyFilters, resetFilters"
+        style="display: none"
         class="fixed inset-0 z-40 flex items-center justify-center bg-black/20">
         <div class="bg-white rounded-xl px-6 py-4 flex items-center gap-3 shadow-lg">
             <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -26,7 +27,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
 
         {{-- Skeleton saat loading --}}
-        <div wire:loading.grid wire:target="applyFilters, resetFilters" class="col-span-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div wire:loading.grid wire:target="applyFilters, resetFilters" style="display: none" class="col-span-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             @for ($i = 0; $i < 16; $i++)
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col animate-pulse">
                     <div class="h-48 w-full bg-gray-200 rounded-t-2xl"></div>

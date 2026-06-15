@@ -442,7 +442,7 @@ describe('UserTokenController@history', function () {
             ->pending()
             ->create(['user_id' => $user->id, 'quantity' => 5]);
 
-        expect(TokenPurchase::where('user_id', $user->id)->where('status', 'confirmed')->sum('quantity'))->toBe(30);
+        expect(TokenPurchase::where('user_id', $user->id)->where('status', 'confirmed')->sum('quantity'))->toEqual(30);
         expect(TokenPurchase::where('user_id', $user->id)->where('status', 'confirmed')->sum('total_price'))->toBeGreaterThan(0);
     });
 

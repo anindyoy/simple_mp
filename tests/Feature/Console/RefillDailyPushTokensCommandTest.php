@@ -2,11 +2,9 @@
 
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-beforeEach(function () {
-    Setting::truncate();
-    User::truncate();
-});
+uses(RefreshDatabase::class);
 
 it('mengisi ulang token user yang di bawah minimum harian', function () {
     Setting::setValue('daily_minimum_push_tokens', '5');

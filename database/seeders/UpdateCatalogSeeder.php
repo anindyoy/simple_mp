@@ -28,18 +28,27 @@ class UpdateCatalogSeeder extends Seeder
         $createdCount     = 0;
         $updatedCount     = 0;
 
-        $totalRuns = 6;
+        $totalRuns = 3;
 
         for ($i = 0; $i < $totalRuns; $i++) {
             $isLast    = $i === $totalRuns - 1;
             $mustUpdate = $isLast && $updatedCount === 0 && $products->isNotEmpty();
 
+            // Kondisi buat lapak baru
             if (! $mustUpdate && random_int(1, 3) === 1) {
-                $lapak = $this->createRandomLapak();
-                $lapaks->push($lapak);
-                $createdLapakCount++;
-                $changed = true;
-                continue;
+                // Cek apakah hari ini sudah ada lapak yang baru dibuat
+                $newLapakToday = LapakProfile::query()
+                    ->whereDate('created_at', today())
+                    ->exists();
+
+                if (! $newLapakToday) {
+                    // Belum ada lapak baru hari ini — skip, lanjut ke kode update/create product
+                    $lapak = $this->createRandomLapak();
+                    $lapaks->push($lapak);
+                    $createdLapakCount++;
+                    $changed = true;
+                    continue;
+                }
             }
 
             $action = ($mustUpdate || ($products->isNotEmpty() && random_int(0, 1) === 1))

@@ -22,7 +22,6 @@ Schedule::command('telescope:prune', ['--hours' => 360])
 
 if (config('app.demo_mode')) {
     Schedule::command('db:seed', ['--class' => 'UpdateCatalogSeeder'])
-        ->daily()
-        ->at('06:00')
+        ->twiceDaily(6, 18)
         ->withoutOverlapping();
 }

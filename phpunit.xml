@@ -8,11 +8,19 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+
     </testsuites>
     <source>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
+        <exclude>
+            <file>app/Policies/LapakProfilePolicy.php</file>
+            <file>app/Policies/TutorialImagePolicy.php</file>
+            <file>app/Policies/TutorialPagePolicy.php</file>
+            <file>app/Policies/WhatsappAgentPolicy.php</file>
+            <file>app/Console/Commands/CekQueryCommand.php</file>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>

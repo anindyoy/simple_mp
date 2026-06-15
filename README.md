@@ -16,10 +16,11 @@ Aplikasi ini mendukung katalog produk publik, profil lapak, autentikasi user den
 - Registrasi dan login publik.
 - Wajib verifikasi email sebelum bisa mengakses panel member/admin.
 - Mengelola profil akun (nama, email, password, avatar).
-- Mengaktifkan Two-Factor Authentication (2FA) untuk keamanan akun.
+- Mengaktifkan Two-Factor Authentication (2FA) untuk keamanan akun (opsional).
 - Mengelola profil lapak sendiri.
 - Mengelola produk milik lapak sendiri.
 - Melakukan report produk/lapak.
+- Menggunakan token untuk membuat produk baru atau mengangkat produk yang sudah ada.
 - Membeli token angkat produk (request pembelian + upload bukti transfer).
 - Melihat riwayat pembelian token beserta status konfirmasi per transaksi.
 

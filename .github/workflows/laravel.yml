@@ -36,6 +36,9 @@ jobs:
       DB_PASSWORD: password
 
     steps:
+    - name: Record start time
+      run: echo "START_EPOCH=$(date +%s)" >> $GITHUB_ENV
+
     - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
       with:
         php-version: '8.4'
@@ -118,6 +121,10 @@ jobs:
           exit 0
         fi
 
+        END_TIME=$(date +%s)
+        DURATION=$((END_TIME - START_EPOCH))
+        RUNTIME="$((DURATION / 60))m $((DURATION % 60))s"
+
         if [ "$TESTS_FAILED" = "true" ]; then
           FAILED_TESTS=$(grep "FAILED" test-results.txt | head -20)
           SUMMARY=$(grep -E "^\s*(Tests|Duration):" test-results.txt | tail -2)
@@ -130,13 +137,14 @@ jobs:
 
         PAYLOAD=$(jq -n \
           --arg chat_id "${TELEGRAM_CHAT_ID}" \
-          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\n\n%s' \
+          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\nDurasi: <code>%s</code>\n\n%s' \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REF_NAME}" \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_SHA}" \
             "${GITHUB_SHA:0:7}" \
+            "${RUNTIME}" \
             "${DETAIL}")" \
           '{
             chat_id: $chat_id,

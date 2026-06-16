@@ -166,6 +166,10 @@ describe('register', function () {
 
     it('fails when captcha verification fails in non local environment', function () {
         config()->set('app.env', 'production');
+        config()->set('services.turnstile', [
+            'site_key' => '1x00000000000000000000AA',
+            'secret_key' => '1x0000000000000000000000000000000AA',
+        ]);
 
         Http::fake([
             'https://challenges.cloudflare.com/*' => Http::response([

@@ -2,6 +2,7 @@
 
 use App\Livewire\UpdatePassword;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -33,7 +34,7 @@ it('current_password is required when password update requires current', functio
             'new_password' => 'newPassword123',
             'new_password_confirmation' => 'newPassword123',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['current_password' => 'required']);
 });
 
@@ -44,7 +45,7 @@ it('new_password is required', function () {
             'new_password' => '',
             'new_password_confirmation' => 'newPassword123',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['new_password' => 'required']);
 });
 
@@ -55,7 +56,7 @@ it('new_password_confirmation must match new_password', function () {
             'new_password' => 'newPassword123',
             'new_password_confirmation' => 'differentPassword',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['new_password_confirmation' => 'same']);
 });
 
@@ -72,11 +73,11 @@ it('updates password successfully with valid current password', function () {
             'new_password' => 'newPassword456',
             'new_password_confirmation' => 'newPassword456',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasNoFormErrors();
 
     $this->assertTrue(
-        $user->fresh()->checkPassword('newPassword456')
+        Hash::check('newPassword456', $user->fresh()->password)
     );
 });
 
@@ -93,7 +94,7 @@ it('fails to update password with incorrect current password', function () {
             'new_password' => 'newPassword456',
             'new_password_confirmation' => 'newPassword456',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['current_password' => 'current_password']);
 });
 
@@ -106,7 +107,7 @@ it('applies password validation rules from config', function () {
             'new_password' => 'short',
             'new_password_confirmation' => 'short',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['new_password']);
 });
 
@@ -129,6 +130,6 @@ it('new_password field uses configured validation rules', function () {
             'new_password' => '1234567', // too short
             'new_password_confirmation' => '1234567',
         ])
-        ->call('save')
+        ->call('submit')
         ->assertHasFormErrors(['new_password']);
 });

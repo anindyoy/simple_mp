@@ -40,7 +40,7 @@
 
     {{-- @include('whatsapp-widget::whatsapp-widget-body') --}}
 
-    @unless (app()->environment('local'))
+    @if (! app()->environment('local') && filled(config('services.turnstile.site_key')))
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
         <script>
@@ -111,7 +111,7 @@
                 }
             });
         </script>
-    @endunless
+    @endif
 </body>
 
 </html>

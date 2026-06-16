@@ -3,7 +3,7 @@
 use Spatie\ResponseCache\Hasher\DefaultHasher;
 use Spatie\ResponseCache\Replacers\CsrfTokenReplacer;
 use Spatie\ResponseCache\Serializers\DefaultSerializer;
-use Spatie\ResponseCache\CacheProfiles\CacheAllSuccessfulGetRequests;
+use App\Http\CacheProfiles\SkipWhenFlashData;
 
 return [
     /*
@@ -15,7 +15,7 @@ return [
      *  The given class will determine if a request should be cached. The
      *  default class will cache all successful GET-requests.
      */
-    'cache_profile' => CacheAllSuccessfulGetRequests::class,
+    'cache_profile' => SkipWhenFlashData::class,
 
     /*
      *  Optionally, you can specify a header that will force a cache bypass.

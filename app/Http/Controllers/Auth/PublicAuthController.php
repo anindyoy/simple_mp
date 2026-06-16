@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
@@ -75,12 +76,12 @@ class PublicAuthController extends Controller
 
     public function register(Request $request)
     {
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name'                  => ['required', 'string', 'max:255'],
             'email'                 => ['required', 'email:rfc,dns', 'regex:/^[^@\s]+@[^@\s]+\.[^@\s]+$/', 'unique:users,email'],
             'password'              => ['required', 'min:8', 'confirmed'],
             'cf-turnstile-response' => [
-                app()->environment('local') ? 'nullable' : 'required'
+                (app()->environment('local') || blank(config('services.turnstile.site_key'))) ? 'nullable' : 'required'
             ],
         ], [
             'name.required'                  => 'Nama lengkap wajib diisi.',
@@ -96,7 +97,16 @@ class PublicAuthController extends Controller
             'cf-turnstile-response.required' => 'Captcha wajib diisi.',
         ]);
 
-        if (! app()->environment('local')) {
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput($request->only('name', 'email'))
+                ->with('open_auth_modal', 'register');
+        }
+
+        $data = $validator->validated();
+
+        if (! app()->environment('local') && filled(config('services.turnstile.secret_key'))) {
             // 🔐 Verifikasi Turnstile ke Cloudflare
             $verify = Http::asForm()->post(
                 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -120,7 +130,8 @@ class PublicAuthController extends Controller
 
                 return back()
                     ->withErrors(['cf-turnstile-response' => 'Verifikasi captcha gagal.'])
-                    ->withInput();
+                    ->withInput($request->only('name', 'email'))
+                    ->with('open_auth_modal', 'register');
             }
         }
 

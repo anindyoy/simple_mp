@@ -3,6 +3,7 @@
 @php
     $isLogin = $type === 'login';
     $shouldOpenLoginModal = $isLogin && session('open_auth_modal') === 'login';
+    $shouldOpenRegisterModal = ! $isLogin && session('open_auth_modal') === 'register';
     $unverifiedEmail = $isLogin ? session('unverified_email') : null;
 @endphp
 
@@ -68,7 +69,7 @@
                         type="password"
                         autocomplete="new-password"
                         minlength="8" />
-                    @unless (app()->environment('local'))
+                    @if (! app()->environment('local') && filled(config('services.turnstile.site_key')))
                         <div class="mt-4 flex justify-center">
                             <div id="turnstile-register"></div>
                         </div>
@@ -77,7 +78,7 @@
                                 {{ $message }}
                             </div>
                         @enderror
-                    @endunless
+                    @endif
                 @endunless
 
                 <button class="w-full bg-blue-600 text-white py-2 rounded-lg">
@@ -121,6 +122,19 @@
 
                         loginModal.classList.remove('hidden');
                         loginModal.setAttribute('aria-hidden', 'false');
+                    });
+                </script>
+            @endif
+
+            @if ($shouldOpenRegisterModal)
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const registerModal = document.getElementById('registerModal');
+
+                        if (!registerModal) return;
+
+                        registerModal.classList.remove('hidden');
+                        registerModal.setAttribute('aria-hidden', 'false');
                     });
                 </script>
             @endif

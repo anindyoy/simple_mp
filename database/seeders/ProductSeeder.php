@@ -89,8 +89,8 @@ class ProductSeeder extends Seeder
                 $product->created_at = now()->subHours(rand(1, 48));
                 $product->save();
 
+                $product->unsetRelation('category');
                 $this->attachRandomImages($product);
-
             });
         });
 
@@ -130,6 +130,7 @@ class ProductSeeder extends Seeder
                 $product->pushed_at = $time;
 
                 $product->save();
+                $product->unsetRelation('category');
                 $this->attachRandomImages($product);
             });
         });

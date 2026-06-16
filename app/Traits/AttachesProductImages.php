@@ -18,9 +18,10 @@ trait AttachesProductImages
         $categoryName = mb_strtolower($product->category?->category_name ?? '');
         $categoryDir  = $seedDir . DIRECTORY_SEPARATOR . $categoryName;
 
-        $files = $this->scanImageFiles(
-            is_dir($categoryDir) ? $categoryDir : $seedDir
-        );
+        $isFromCategoryDir = is_dir($categoryDir);
+        $sourceDir = $isFromCategoryDir ? $categoryDir : $seedDir;
+
+        $files = $this->scanImageFiles($sourceDir);
 
         if (empty($files)) {
             return;

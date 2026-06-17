@@ -23,7 +23,8 @@ class PublicAuthController extends Controller
         abort_if(blank($email), 404);
 
         return view('auth.verify-email', [
-            'email' => $email,
+            'email'     => $email,
+            'whatsapp'  => Setting::getValue('token_purchase_whatsapp'),
         ]);
     }
 
@@ -147,8 +148,7 @@ class PublicAuthController extends Controller
 
         event(new Registered($user));
 
-        return redirect('/')
-            ->with('success', 'Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun sebelum login.');
+        return redirect()->route('verification.notice', ['email' => $user->email]);
     }
 
     public function logTurnstileClientError(Request $request)

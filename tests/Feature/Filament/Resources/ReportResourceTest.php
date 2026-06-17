@@ -20,6 +20,7 @@ beforeEach(function () {
 
     $this->adminUser = User::factory()->create([
         'is_admin' => true,
+        'push_tokens' => 10,
     ]);
 
     $this->category = Category::factory()->create();

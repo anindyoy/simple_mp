@@ -59,7 +59,8 @@
       "Bash(./vendor/bin/pest --no-coverage --fail-on-incomplete)",
       "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Resources/UserResourceTest.php)",
       "Bash(./vendor/bin/pest --no-coverage tests/Feature/Filament/Products/)",
-      "Bash(git -C \"d:/Repo/simple_mp\" diff)"
+      "Bash(git -C \"d:/Repo/simple_mp\" diff)",
+      "Bash(php -r \"echo \\\\Carbon\\\\Carbon::VERSION . PHP_EOL;\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

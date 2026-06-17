@@ -148,11 +148,7 @@ describe('register', function () {
         ]);
 
         $response
-            ->assertRedirect('/')
-            ->assertSessionHas(
-                'success',
-                'Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun sebelum login.'
-            );
+            ->assertRedirect(route('verification.notice', ['email' => 'john@gmail.com']));
 
         expect(User::where('email', 'john@gmail.com')->exists())
             ->toBeTrue();
@@ -217,7 +213,7 @@ describe('register', function () {
             'cf-turnstile-response' => 'valid-token',
         ]);
 
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('verification.notice', ['email' => 'john@gmail.com']));
 
         expect(User::where('email', 'john@gmail.com')->exists())
             ->toBeTrue();

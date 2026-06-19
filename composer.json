@@ -35,6 +35,7 @@
         "andreapollastri/checkpoint": "^1.0",
         "fakerphp/faker": "^1.23",
         "fruitcake/laravel-debugbar": "^4.2",
+        "laramint/laravel-brain": "^2.3",
         "laravel/boost": "^2.4",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",

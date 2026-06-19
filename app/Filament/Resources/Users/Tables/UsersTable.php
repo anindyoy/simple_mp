@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Tables\Table;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -37,7 +38,6 @@ class UsersTable
                     ->sortable(),
 
                 BadgeColumn::make('email_verified_at')
-                    ->label('Email')
                     ->formatStateUsing(fn($state) => $state ? 'Terverifikasi' : 'Belum')
                     ->colors([
                         'success' => fn($state) => $state !== null,
@@ -119,53 +119,73 @@ class UsersTable
                 ]);
             })
             ->recordActions([
-                Impersonate::make()->hiddenLabel()->redirectTo('/admin'),
-
-                Action::make('addPushToken')
-                    ->label('Tambah Token')
-                    ->icon('heroicon-o-plus-circle')
+                Action::make('verifyEmail')
+                    ->label('Verifikasi Email')
+                    ->icon('heroicon-o-check-badge')
                     ->color('success')
-                    ->schema([
-                        TextInput::make('amount')
-                            ->label('Jumlah Token')
-                            ->numeric()
-                            ->minValue(1)
-                            ->required(),
-                    ])
-                    ->action(function ($record, array $data): void {
-                        $record->increment('push_tokens', (int) $data['amount']);
+                    ->visible(fn($record) => $record->email_verified_at === null)
+                    ->action(function ($record): void {
+                        $record->update(['email_verified_at' => now()]);
 
                         Notification::make()
-                            ->title('Token berhasil ditambahkan')
-                            ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                            ->title('Email berhasil diverifikasi')
                             ->success()
                             ->send();
                     }),
 
-                Action::make('setPushToken')
-                    ->label('Atur Token')
-                    ->icon('heroicon-o-adjustments-horizontal')
-                    ->color('warning')
-                    ->schema([
-                        TextInput::make('amount')
-                            ->label('Saldo Token Baru')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),
-                    ])
-                    ->action(function ($record, array $data): void {
-                        $record->update([
-                            'push_tokens' => (int) $data['amount'],
-                        ]);
+                Impersonate::make()->redirectTo('/admin'),
 
-                        Notification::make()
-                            ->title('Saldo token angkat produk diperbarui')
-                            ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
-                            ->success()
-                            ->send();
-                    }),
+                ActionGroup::make([
 
-                EditAction::make()->hiddenLabel(),
+                    EditAction::make(),
+
+                    Action::make('addPushToken')
+                        ->label('Tambah Token')
+                        ->icon('heroicon-o-plus-circle')
+                        ->color('success')
+                        ->schema([
+                            TextInput::make('amount')
+                                ->label('Jumlah Token')
+                                ->numeric()
+                                ->minValue(1)
+                                ->required(),
+                        ])
+                        ->action(function ($record, array $data): void {
+                            $record->increment('push_tokens', (int) $data['amount']);
+
+                            Notification::make()
+                                ->title('Token berhasil ditambahkan')
+                                ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
+                                ->success()
+                                ->send();
+                        }),
+
+                    Action::make('setPushToken')
+                        ->label('Atur Token')
+                        ->icon('heroicon-o-adjustments-horizontal')
+                        ->color('warning')
+                        ->schema([
+                            TextInput::make('amount')
+                                ->label('Saldo Token Baru')
+                                ->numeric()
+                                ->minValue(0)
+                                ->required(),
+                        ])
+                        ->action(function ($record, array $data): void {
+                            $record->update([
+                                'push_tokens' => (int) $data['amount'],
+                            ]);
+
+                            Notification::make()
+                                ->title('Saldo token angkat produk diperbarui')
+                                ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
+                                ->success()
+                                ->send();
+                        }),
+
+                ])
+                    ->color('gray'),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

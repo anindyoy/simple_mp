@@ -9,6 +9,7 @@ use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
+use Filament\Navigation\NavigationItem;
 use Illuminate\Support\Facades\Schema;
 use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -25,7 +26,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use JeffersonGoncalves\Filament\WhatsappWidget\WhatsappWidgetPlugin;
+use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
 use App\Livewire\UpdatePassword;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 
@@ -44,8 +45,6 @@ class AdminPanelProvider extends PanelProvider
             );
 
         $plugins[] = FilamentTourPlugin::make()->enableCssSelector(app()->environment('local'));
-        $plugins[] = WhatsappWidgetPlugin::make();
-
         if (
             app()->environment('local') &&
             !app()->runningUnitTests() &&
@@ -77,6 +76,13 @@ class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling('15s')
+            ->navigationItems([
+                NavigationItem::make('Hubungi Admin')
+                    ->url(fn (): string => 'https://wa.me/' . (WhatsappAgent::where('active', true)->first()?->phone ?? env('HP_ADMIN')), shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-chat-bubble-left')
+                    ->group('Lainnya')
+                    ->sort(99),
+            ])
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn() => view('filament.topbar.scripts')

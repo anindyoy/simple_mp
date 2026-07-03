@@ -10,7 +10,6 @@ use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Support\Facades\Schema;
-use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use App\Filament\Widgets\PushCountdownWidget;
@@ -99,7 +98,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 PushCountdownWidget::class,
                 AccountWidget::class,
-                FilamentInfoWidget::class,
             ])
             ->plugins($plugins)
             ->middleware([

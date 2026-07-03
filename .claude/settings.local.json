@@ -81,7 +81,11 @@
       "PowerShell(php -r \"echo ini_get\\('output_handler'\\) . PHP_EOL; echo ini_get\\('mbstring.encoding_translation'\\) . PHP_EOL; echo ini_get\\('mbstring.output_encoding'\\) . PHP_EOL; echo ini_get\\('default_charset'\\) . PHP_EOL;\")",
       "PowerShell(php --ini 2>&1)",
       "Read(//c/Users/DFR IT/.config/herd/bin/php83/**)",
-      "PowerShell($wc = New-Object System.Net.WebClient; $bytes = $wc.DownloadData\\(\"http://simple_mp.test/vendor/livewire/livewire.js?id=4735e441\"\\); Write-Output \"Size: $\\($bytes.Length\\)\"; Write-Output \"First 3 bytes: $\\($bytes[0..2] -join ', '\\)\"; Write-Output \"Last 3 bytes: $\\($bytes[\\($bytes.Length-3\\)..\\($bytes.Length-1\\)] -join ', '\\)\")"
+      "PowerShell($wc = New-Object System.Net.WebClient; $bytes = $wc.DownloadData\\(\"http://simple_mp.test/vendor/livewire/livewire.js?id=4735e441\"\\); Write-Output \"Size: $\\($bytes.Length\\)\"; Write-Output \"First 3 bytes: $\\($bytes[0..2] -join ', '\\)\"; Write-Output \"Last 3 bytes: $\\($bytes[\\($bytes.Length-3\\)..\\($bytes.Length-1\\)] -join ', '\\)\")",
+      "Bash(php artisan *)",
+      "PowerShell(composer test 2>&1)",
+      "Bash(git status *)",
+      "Bash(git restore *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\DFR IT\\.claude\\memory"

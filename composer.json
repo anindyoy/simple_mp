@@ -99,7 +99,10 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "jeffersongoncalves/laravel-whatsapp-widget",
+                "jeffersongoncalves/filament-whatsapp-widget"
+            ]
         }
     },
     "config": {

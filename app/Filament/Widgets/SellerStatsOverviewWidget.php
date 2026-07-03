@@ -13,6 +13,8 @@ class SellerStatsOverviewWidget extends StatsOverviewWidget
 {
     protected static ?int $sort = 2;
 
+    protected int|string|array $columnSpan = 2;
+
     protected int|array|null $columns = 2;
 
     public static function canView(): bool
@@ -42,15 +44,15 @@ class SellerStatsOverviewWidget extends StatsOverviewWidget
             ->first();
 
         return [
-            Stat::make('Produk Tayang Sekarang', $liveNow)
+            Stat::make('Jumlah Produk Tayang Sekarang', $liveNow)
                 ->icon('heroicon-o-eye')
                 ->color('success')
                 ->url(ProductResource::getUrl('index')),
 
             Stat::make(
                 new HtmlString(view('filament.widgets.stat-info-label', [
-                    'label' => 'Produk Menunggu Jadwal',
-                    'heading' => 'Apa itu Produk Menunggu Jadwal?',
+                    'label' => 'Jumlah Produk Menunggu Antrean',
+                    'heading' => 'Apa itu Produk Menunggu Antrean?',
                     'description' => 'Produk yang sudah dibuat tapi belum tayang di halaman publik. '
                         . 'Agar beranda tidak dibanjiri banyak produk sekaligus dari satu lapak, sistem '
                         . 'menayangkan produk baru secara bertahap dengan jeda beberapa jam dari produk sebelumnya.',

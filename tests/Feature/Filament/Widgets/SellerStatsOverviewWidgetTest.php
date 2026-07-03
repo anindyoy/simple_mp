@@ -43,8 +43,8 @@ describe('getStats', function () {
         $stats = getWidgetStats(new SellerStatsOverviewWidget());
 
         expect(findStat($stats, 'Produk Tayang Sekarang')->getValue())->toBe(1)
-            ->and(findStat($stats, 'Produk Menunggu Jadwal')->getValue())->toBe(2)
-            ->and(findStat($stats, 'Produk Menunggu Jadwal')->getDescription())->toContain('Tayang berikutnya');
+            ->and(findStat($stats, 'Produk Menunggu Antrean')->getValue())->toBe(2)
+            ->and(findStat($stats, 'Produk Menunggu Antrean')->getDescription())->toContain('Tayang berikutnya');
     });
 
     it('shows no queue description when nothing is scheduled', function () {
@@ -54,7 +54,7 @@ describe('getStats', function () {
 
         $stats = getWidgetStats(new SellerStatsOverviewWidget());
 
-        expect(findStat($stats, 'Produk Menunggu Jadwal')->getValue())->toBe(0)
-            ->and(findStat($stats, 'Produk Menunggu Jadwal')->getDescription())->toBe('Tidak ada antrean');
+        expect(findStat($stats, 'Produk Menunggu Antrean')->getValue())->toBe(0)
+            ->and(findStat($stats, 'Produk Menunggu Antrean')->getDescription())->toBe('Tidak ada antrean');
     });
 });

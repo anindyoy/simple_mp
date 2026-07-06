@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,19 @@ use Spatie\ResponseCache\Facades\ResponseCache;
 
 class UpdateCatalogSeeder extends Seeder
 {
+    /**
+     * Jumlah total iterasi create/update yang dijalankan, didistribusikan
+     * merata ke tiap hari dalam range tanggal (lihat $fromDate).
+     */
+    public int $totalRuns = 3;
+
+    /**
+     * Tanggal awal range pembuatan data. Default null = hari ini saja.
+     * Jika diisi (mis. 3 hari sebelum hari ini), seeder membuat data
+     * untuk tiap hari dari tanggal ini sampai hari ini.
+     */
+    public Carbon|string|null $fromDate = null;
+
     /**
      * Run the database seeds.
      */
@@ -28,46 +42,52 @@ class UpdateCatalogSeeder extends Seeder
         $createdCount     = 0;
         $updatedCount     = 0;
 
-        $totalRuns = 3;
+        $days        = $this->resolveDays();
+        $runsPerDay  = $this->distributeRuns($this->totalRuns, count($days));
+        $totalIterations = array_sum($runsPerDay);
+        $iteration   = 0;
 
-        for ($i = 0; $i < $totalRuns; $i++) {
-            $isLast    = $i === $totalRuns - 1;
-            $mustUpdate = $isLast && $updatedCount === 0 && $products->isNotEmpty();
+        foreach ($days as $dayIndex => $day) {
+            for ($j = 0; $j < $runsPerDay[$dayIndex]; $j++) {
+                $iteration++;
+                $isLast     = $iteration === $totalIterations;
+                $mustUpdate = $isLast && $updatedCount === 0 && $products->isNotEmpty();
 
-            // Kondisi buat lapak baru
-            if (! $mustUpdate && random_int(1, 3) === 1) {
-                // Cek apakah hari ini sudah ada lapak yang baru dibuat
-                $newLapakToday = LapakProfile::query()
-                    ->whereDate('created_at', today())
-                    ->exists();
+                // Kondisi buat lapak baru
+                if (! $mustUpdate && random_int(1, 3) === 1) {
+                    // Cek apakah pada tanggal ini sudah ada lapak yang baru dibuat
+                    $newLapakOnDay = LapakProfile::query()
+                        ->whereDate('created_at', $day)
+                        ->exists();
 
-                if (! $newLapakToday) {
-                    // Belum ada lapak baru hari ini — skip, lanjut ke kode update/create product
-                    $lapak = $this->createRandomLapak();
-                    $lapaks->push($lapak);
-                    $createdLapakCount++;
-                    $changed = true;
+                    if (! $newLapakOnDay) {
+                        // Belum ada lapak baru pada tanggal ini — skip, lanjut ke kode update/create product
+                        $lapak = $this->createRandomLapak($day);
+                        $lapaks->push($lapak);
+                        $createdLapakCount++;
+                        $changed = true;
+                        continue;
+                    }
+                }
+
+                $action = ($mustUpdate || ($products->isNotEmpty() && random_int(0, 1) === 1))
+                    ? 'update'
+                    : 'create';
+
+                if ($action === 'create') {
+                    $product = $this->createRandomProduct($lapaks, $categories, $day);
+                    if ($product) {
+                        $products->push($product);
+                        $createdCount++;
+                        $changed = true;
+                    }
                     continue;
                 }
+
+                $updated = $this->updateRandomProductPushTime($products, $day);
+                $updatedCount += $updated ? 1 : 0;
+                $changed = $updated || $changed;
             }
-
-            $action = ($mustUpdate || ($products->isNotEmpty() && random_int(0, 1) === 1))
-                ? 'update'
-                : 'create';
-
-            if ($action === 'create') {
-                $product = $this->createRandomProduct($lapaks, $categories);
-                if ($product) {
-                    $products->push($product);
-                    $createdCount++;
-                    $changed = true;
-                }
-                continue;
-            }
-
-            $updated = $this->updateRandomProductPushTime($products);
-            $updatedCount += $updated ? 1 : 0;
-            $changed = $updated || $changed;
         }
 
         if ($changed) {
@@ -79,15 +99,19 @@ class UpdateCatalogSeeder extends Seeder
             'created_lapak' => $createdLapakCount,
             'created'       => $createdCount,
             'updated'       => $updatedCount,
-            'total_runs'    => $totalRuns,
+            'total_runs'    => $totalIterations,
+            'date_from'     => $days[0]->toDateString(),
+            'date_to'       => $days[count($days) - 1]->toDateString(),
         ];
 
         $this->info(sprintf(
-            'UpdateCatalogSeeder summary: created_lapak=%d, created=%d, updated=%d, total_runs=%d',
+            'UpdateCatalogSeeder summary: created_lapak=%d, created=%d, updated=%d, total_runs=%d, date_from=%s, date_to=%s',
             $createdLapakCount,
             $createdCount,
             $updatedCount,
-            $totalRuns,
+            $totalIterations,
+            $summary['date_from'],
+            $summary['date_to'],
         ));
         Log::info('UpdateCatalogSeeder selesai', $summary);
     }
@@ -97,12 +121,74 @@ class UpdateCatalogSeeder extends Seeder
         fwrite(STDOUT, $message . PHP_EOL);
     }
 
-    private function createRandomLapak(): LapakProfile
+    /**
+     * @return array<int, Carbon> Daftar tanggal dari $fromDate sampai hari ini (inklusif).
+     */
+    private function resolveDays(): array
     {
-        return LapakProfile::factory()->create();
+        $to   = today();
+        $from = $this->fromDate ? Carbon::parse($this->fromDate)->startOfDay() : $to->copy();
+
+        if ($from->greaterThan($to)) {
+            $from = $to->copy();
+        }
+
+        $days = [];
+        for ($cursor = $from->copy(); $cursor->lte($to); $cursor->addDay()) {
+            $days[] = $cursor->copy();
+        }
+
+        return $days;
     }
 
-    private function createRandomProduct(Collection $lapaks, Collection $categories): ?Product
+    /**
+     * Bagi $totalRuns merata ke $dayCount hari; sisa pembagian dibagikan
+     * secara acak ke sebagian hari agar totalnya tetap sama dengan $totalRuns.
+     *
+     * @return array<int, int>
+     */
+    private function distributeRuns(int $totalRuns, int $dayCount): array
+    {
+        if ($dayCount <= 0) {
+            return [];
+        }
+
+        $base      = intdiv($totalRuns, $dayCount);
+        $remainder = $totalRuns % $dayCount;
+
+        $runs = array_fill(0, $dayCount, $base);
+
+        foreach (collect(range(0, $dayCount - 1))->shuffle()->take($remainder) as $index) {
+            $runs[$index]++;
+        }
+
+        return $runs;
+    }
+
+    /**
+     * Timestamp acak pada $day. Jika $day adalah hari ini, dibatasi
+     * agar tidak melebihi waktu sekarang (hindari timestamp masa depan).
+     */
+    private function randomTimestampOn(Carbon $day): Carbon
+    {
+        $maxSeconds = $day->isToday()
+            ? now()->diffInSeconds($day->copy()->startOfDay())
+            : 86399;
+
+        return $day->copy()->startOfDay()->addSeconds(random_int(0, max($maxSeconds, 0)));
+    }
+
+    private function createRandomLapak(Carbon $day): LapakProfile
+    {
+        $createdAt = $this->randomTimestampOn($day);
+
+        return LapakProfile::factory()->create([
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+        ]);
+    }
+
+    private function createRandomProduct(Collection $lapaks, Collection $categories, Carbon $day): ?Product
     {
         $lapak    = $lapaks->random();
         $category = $categories->random();
@@ -111,7 +197,8 @@ class UpdateCatalogSeeder extends Seeder
             return null;
         }
 
-        $title = $this->makeProductTitle($category->category_name);
+        $title     = $this->makeProductTitle($category->category_name);
+        $createdAt = $this->randomTimestampOn($day);
 
         // withoutEvents agar observer creating tidak overwrite pushed_at
         $product = Product::withoutEvents(
@@ -120,7 +207,9 @@ class UpdateCatalogSeeder extends Seeder
                 'title'       => $title,
                 'category_id' => $category->id,
                 'lapak_id'    => $lapak->id,
-                'pushed_at'   => now()->subHours(rand(1, 5)),
+                'created_at'  => $createdAt,
+                'updated_at'  => $createdAt,
+                'pushed_at'   => $createdAt->copy()->subHours(random_int(1, 5)),
             ])
         );
 
@@ -129,14 +218,16 @@ class UpdateCatalogSeeder extends Seeder
         return $product;
     }
 
-    private function updateRandomProductPushTime(Collection $products): bool
+    private function updateRandomProductPushTime(Collection $products, Carbon $day): bool
     {
         if ($products->isEmpty()) {
             return false;
         }
 
+        $pushedAt = $this->randomTimestampOn($day)->subHours(random_int(1, 5));
+
         $products->random()->updateQuietly([
-            'pushed_at' => now()->subHours(random_int(1, 5)),
+            'pushed_at' => $pushedAt,
         ]);
 
         return true;

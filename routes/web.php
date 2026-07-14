@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserRulesController;
 use App\Http\Controllers\UserTokenController;
 use App\Http\Controllers\Auth\PublicAuthController;
+use Spatie\ResponseCache\Middlewares\DoNotCacheResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +17,11 @@ use App\Http\Controllers\Auth\PublicAuthController;
 */
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
-Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+
+// DoNotCacheResponse: halaman ini menghitung views_count tiap request, jadi tidak boleh full-page cached
+Route::get('/product/{product:slug}', [ProductController::class, 'show'])
+    ->middleware(DoNotCacheResponse::class)
+    ->name('product.show');
 
 Route::get('/peraturan-pengguna', [UserRulesController::class, 'index'])->name('rules.index');
 Route::get('/lapak/{lapak}', [LapakController::class, 'show'])->name('lapak.show');

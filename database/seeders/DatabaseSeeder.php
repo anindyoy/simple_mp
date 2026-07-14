@@ -113,9 +113,9 @@ class DatabaseSeeder extends Seeder
             ['category_name' => 'Jasa',           'supports_condition' => false],
             ['category_name' => 'Properti',       'supports_condition' => true],
             ['category_name' => 'Buah & Sayuran', 'supports_condition' => false],
-            ['category_name' => 'Gadget',         'supports_condition' => false],
-            ['category_name' => 'Suplemen',       'supports_condition' => true],
-            ['category_name' => 'Lainnya',        'supports_condition' => false],
+            ['category_name' => 'Gadget',         'supports_condition' => true],
+            ['category_name' => 'Suplemen',       'supports_condition' => false],
+            ['category_name' => 'Lainnya',        'supports_condition' => true],
         ]);
     }
 

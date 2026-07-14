@@ -56,6 +56,7 @@ class SiteSettingsPage extends Page implements HasForms
             'site_keywords' => Setting::getValue('site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online'),
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
             'product_schedule_delay_hours' => Setting::getIntValue('product_schedule_delay_hours', 4),
+            'product_view_guard_hours' => Setting::getIntValue('product_view_guard_hours', 6),
             'daily_minimum_push_tokens' => Setting::getIntValue('daily_minimum_push_tokens', 2),
             'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
             'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
@@ -120,6 +121,15 @@ class SiteSettingsPage extends Page implements HasForms
                             ->default(4)
                             ->suffix('jam')
                             ->helperText('Produk kedua dari lapak yang sama baru muncul di halaman utama setelah jeda ini sejak produk sebelumnya ditampilkan.'),
+
+                        TextInput::make('product_view_guard_hours')
+                            ->label('Jeda Hitung Klik Produk (jam)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(6)
+                            ->suffix('jam')
+                            ->helperText('Klik produk dari IP yang sama hanya dihitung sekali dalam rentang jam ini, agar spam reload tidak menaikkan jumlah klik.'),
                     ]),
 
                 Section::make('Konfigurasi Token Angkat Produk')
@@ -260,6 +270,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_keywords', $data['site_keywords'] ?? '');
         Setting::setValue('site_region', $data['site_region'] ?? '');
         Setting::setValue('product_schedule_delay_hours', (string) max(1, (int) ($data['product_schedule_delay_hours'] ?? 4)));
+        Setting::setValue('product_view_guard_hours', (string) max(1, (int) ($data['product_view_guard_hours'] ?? 6)));
         Setting::setValue('daily_minimum_push_tokens', (string) max(0, (int) ($data['daily_minimum_push_tokens'] ?? 2)));
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
         Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));

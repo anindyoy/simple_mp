@@ -250,4 +250,103 @@ describe('ProductController@show', function () {
         expect($otherTitles)->toContain('Produk Lain');
         expect($otherTitles)->not->toContain('Produk Non Aktif');
     });
+
+    it('menambah views_count saat pertama kali diakses', function () {
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'views_count' => 0,
+        ]);
+
+        $this->get(route('product.show', $product))->assertOk();
+
+        expect($product->fresh()->views_count)->toBe(1);
+    });
+
+    it('tidak menambah views_count jika direload dari IP yang sama dalam jeda waktu', function () {
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'views_count' => 0,
+        ]);
+
+        $this->get(route('product.show', $product))->assertOk();
+        $this->get(route('product.show', $product))->assertOk();
+        $this->get(route('product.show', $product))->assertOk();
+
+        expect($product->fresh()->views_count)->toBe(1);
+    });
+
+    it('menambah views_count lagi setelah melewati jeda waktu (default 6 jam)', function () {
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'views_count' => 0,
+        ]);
+
+        $this->get(route('product.show', $product))->assertOk();
+
+        $this->travel(7)->hours();
+
+        $this->get(route('product.show', $product))->assertOk();
+
+        expect($product->fresh()->views_count)->toBe(2);
+    });
+
+    it('menghormati durasi jeda kustom dari setting product_view_guard_hours', function () {
+        Setting::factory()->create([
+            'key' => 'product_view_guard_hours',
+            'value' => '1',
+        ]);
+
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'views_count' => 0,
+        ]);
+
+        $this->get(route('product.show', $product))->assertOk();
+
+        $this->travel(30)->minutes();
+        $this->get(route('product.show', $product))->assertOk();
+        expect($product->fresh()->views_count)->toBe(1);
+
+        $this->travel(31)->minutes();
+        $this->get(route('product.show', $product))->assertOk();
+        expect($product->fresh()->views_count)->toBe(2);
+    });
+
+    it('menghitung views_count terpisah untuk IP yang berbeda', function () {
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'views_count' => 0,
+        ]);
+
+        $this->call('GET', route('product.show', $product), server: ['REMOTE_ADDR' => '10.0.0.1'])
+            ->assertOk();
+        $this->call('GET', route('product.show', $product), server: ['REMOTE_ADDR' => '10.0.0.2'])
+            ->assertOk();
+
+        expect($product->fresh()->views_count)->toBe(2);
+    });
+
+    it('tidak menambah views_count untuk produk yang 404', function () {
+        $lapak = LapakProfile::factory()->create();
+
+        $product = Product::factory()->withoutImages()->create([
+            'lapak_id' => $lapak->id,
+            'is_active' => false,
+            'views_count' => 0,
+        ]);
+
+        $this->get(route('product.show', $product))->assertNotFound();
+
+        expect($product->fresh()->views_count)->toBe(0);
+    });
 });

@@ -23,7 +23,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(Product $product)
+    public function show(Request $request, Product $product)
     {
         $product->load([
             'media',
@@ -33,6 +33,13 @@ class ProductController extends Controller
 
         if (! $product->is_active || ! $product->lapak?->is_active) {
             abort(404);
+        }
+
+        $viewGuardKey = "product_view:{$product->id}:{$request->ip()}";
+        $viewGuardHours = Setting::getIntValue('product_view_guard_hours', 6, 1);
+
+        if (Cache::add($viewGuardKey, true, now()->addHours($viewGuardHours))) {
+            $product->increment('views_count');
         }
 
         $hasReported = false;

@@ -16,27 +16,71 @@ class ProductFactory extends Factory
 {
     use AttachesProductImages;
 
+    /** @var array<string, array{min: int, max: int}>|null */
+    protected static ?array $priceRanges = null;
+
     public function definition(): array
     {
         $title = $this->faker->words(3, true);
+
+        $category = Category::query()->inRandomOrder()->first()
+            ?? Category::factory()->create();
 
         return [
             'title' => $title,
             'slug' => Str::slug($title) . '-' . rand(100, 999),
 
-            'category_id' => Category::query()->inRandomOrder()->value('id')
-                ?? Category::factory(),
+            'category_id' => $category->id,
 
             'lapak_id' => LapakProfile::query()->inRandomOrder()->value('id')
                 ?? LapakProfile::factory(),
 
             'description' => $this->faker->paragraph(3),
-            'price' => $this->faker->numberBetween(10_000, 2_000_000),
+            'price' => $this->priceForCategory($category->category_name),
 
             'is_active' => true,
             'pushed_at' => $this->faker->dateTimeBetween('-3 days', 'now'),
             'can_be_delivered' => $this->faker->boolean(50), // 50% kemungkinan bisa diantar
         ];
+    }
+
+    /**
+     * Paksa produk memakai kategori tertentu, sekaligus menyesuaikan
+     * harga agar tetap konsisten dengan kategori tersebut.
+     */
+    public function forCategory(Category $category): static
+    {
+        return $this->state(fn() => [
+            'category_id' => $category->id,
+            'price' => $this->priceForCategory($category->category_name),
+        ]);
+    }
+
+    protected function priceForCategory(?string $categoryName): int
+    {
+        $range = self::loadPriceRanges()[mb_strtolower($categoryName ?? '')]
+            ?? ['min' => 10_000, 'max' => 2_000_000];
+
+        return (int) round($this->faker->numberBetween($range['min'], $range['max']), -3);
+    }
+
+    /** @return array<string, array{min: int, max: int}> */
+    protected static function loadPriceRanges(): array
+    {
+        if (self::$priceRanges !== null) {
+            return self::$priceRanges;
+        }
+
+        $path = storage_path('app/seed-samples/item_produk.json');
+        $data = file_exists($path) ? (json_decode(file_get_contents($path), true) ?? []) : [];
+
+        self::$priceRanges = collect($data)
+            ->mapWithKeys(fn($attributes, $kategori) => [
+                mb_strtolower($kategori) => $attributes['harga'] ?? ['min' => 10_000, 'max' => 2_000_000],
+            ])
+            ->all();
+
+        return self::$priceRanges;
     }
 
     public function configure(): static

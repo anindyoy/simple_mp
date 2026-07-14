@@ -24,6 +24,9 @@ class ProductSeeder extends Seeder
     /** @var array<string, array<string>> */
     private array $productSifat = [];
 
+    /** @var array<string, array{min: int, max: int}> */
+    private array $productPrices = [];
+
     /** @var array<string, array<string>> */
     private array $categoryImages = [];
 
@@ -74,6 +77,7 @@ class ProductSeeder extends Seeder
                 $categoryName = $category->category_name;
 
                 $product->category_id = $category->id;
+                $product->price = $this->generatePrice($categoryName);
 
                 [$title, $slug] = $this->generateTitleAndSlug($categoryName);
                 $product->title = $title;
@@ -115,6 +119,7 @@ class ProductSeeder extends Seeder
                 $categoryName = $category->category_name;
 
                 $product->category_id = $category->id;
+                $product->price = $this->generatePrice($categoryName);
                 $product->lapak_id = $lapak->id;
 
                 [$title, $slug] = $this->generateTitleAndSlug($categoryName);
@@ -138,23 +143,20 @@ class ProductSeeder extends Seeder
 
     private function loadJsonData(): void
     {
-        $seedDir = storage_path('app/seed-samples');
+        $path = storage_path('app/seed-samples/item_produk.json');
 
-        $namesPath = $seedDir . '/item_nama_produk.json';
-        $sifatPath = $seedDir . '/item_sifat_produk.json';
-
-        if (file_exists($namesPath)) {
-            $data = json_decode(file_get_contents($namesPath), true) ?? [];
-            foreach ($data as $kategori => $names) {
-                $this->productNames[mb_strtolower($kategori)] = $names;
-            }
+        if (!file_exists($path)) {
+            return;
         }
 
-        if (file_exists($sifatPath)) {
-            $data = json_decode(file_get_contents($sifatPath), true) ?? [];
-            foreach ($data as $kategori => $sifat) {
-                $this->productSifat[mb_strtolower($kategori)] = $sifat;
-            }
+        $data = json_decode(file_get_contents($path), true) ?? [];
+
+        foreach ($data as $kategori => $attributes) {
+            $key = mb_strtolower($kategori);
+
+            $this->productNames[$key] = $attributes['nama'] ?? [];
+            $this->productSifat[$key] = $attributes['sifat'] ?? [];
+            $this->productPrices[$key] = $attributes['harga'] ?? ['min' => 10_000, 'max' => 2_000_000];
         }
     }
 
@@ -177,6 +179,14 @@ class ProductSeeder extends Seeder
                 $this->categoryImages[mb_strtolower($folder)] = $images;
             }
         }
+    }
+
+    private function generatePrice(string $categoryName): int
+    {
+        $range = $this->productPrices[mb_strtolower($categoryName)]
+            ?? ['min' => 10_000, 'max' => 2_000_000];
+
+        return (int) round(fake()->numberBetween($range['min'], $range['max']), -3);
     }
 
     private function generateTitleAndSlug(string $categoryName): array

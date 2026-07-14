@@ -1,0 +1,157 @@
+{
+    "Makanan": {
+        "nama": [
+            "Mie Ayam",
+            "Nasi Goreng",
+            "Bakso Sapi",
+            "Sate Ayam",
+            "Rendang",
+            "Ayam Geprek",
+            "Gado-Gado",
+            "Ketoprak",
+            "Nasi Padang",
+            "Bubur Ayam",
+            "Gorengan",
+            "Seblak"
+        ],
+        "sifat": ["Enak", "Lezat", "Gurih", "Pedas Mantap", "Mengenyangkan"],
+        "harga": { "min": 5000, "max": 75000 }
+    },
+    "Minuman": {
+        "nama": [
+            "Es Teh Manis",
+            "Kopi Susu",
+            "Jus Alpukat",
+            "Thai Tea",
+            "Air Mineral",
+            "Teh Tarik",
+            "Matcha Latte",
+            "Coklat Panas",
+            "Susu Segar",
+            "Lemon Tea"
+        ],
+        "sifat": ["Segar", "Manis Pas", "Dingin", "Hangat", "Melepas Dahaga"],
+        "harga": { "min": 3000, "max": 35000 }
+    },
+    "Pakaian": {
+        "nama": [
+            "Baju Koko",
+            "Kaos",
+            "Kerudung",
+            "Celana",
+            "Jaket",
+            "Kemeja",
+            "Gamis",
+            "Sweater",
+            "Rompi Pria"
+        ],
+        "sifat": ["Nyaman", "Adem", "Tidak Luntur", "Bahan Tebal", "Modis"],
+        "harga": { "min": 25000, "max": 450000 }
+    },
+    "Elektronik": {
+        "nama": [
+            "Televisi LED",
+            "Mesin Cuci",
+            "Kulkas",
+            "Air Conditioner",
+            "Blender",
+            "Kipas Angin",
+            "Rice Cooker",
+            "Setrika",
+            "Microwave",
+            "Lampu LED"
+        ],
+        "sifat": ["Hemat Listrik", "Cepat Panas", "Suara Jernih", "Awet", "Bergaransi Resmi"],
+        "harga": { "min": 150000, "max": 8000000 }
+    },
+    "Otomotif": {
+        "nama": ["Motor", "Mobil", "Motor Listrik", "Mobil Listrik"],
+        "sifat": ["Jadul", "Terawat", "Masih Bagus", "Dijual Cepat", "Harga Nego"],
+        "harga": { "min": 3000000, "max": 300000000 }
+    },
+    "Jasa": {
+        "nama": [
+            "Jasa Cuci AC",
+            "Jasa Desain Logo",
+            "Jasa Service HP",
+            "Potong Rambut",
+            "Jasa Laundry",
+            "Jasa Cat Rumah",
+            "Jasa Pindahan",
+            "Ojek Online",
+            "Jasa Fotografi",
+            "Jasa Las"
+        ],
+        "sifat": ["Profesional", "Cepat", "Ramah", "Terpercaya", "Rapi"],
+        "harga": { "min": 20000, "max": 1500000 }
+    },
+    "Properti": {
+        "nama": ["Rumah", "Kontrakan", "Tanah Kavling", "Ruko", "Kios"],
+        "sifat": ["Strategis", "Bebas Banjir", "Aman 24 Jam", "Sertifikat Lengkap", "Lingkungan Asri"],
+        "harga": { "min": 50000000, "max": 1000000000 }
+    },
+    "Buah & Sayuran": {
+        "nama": [
+            "Apel",
+            "Brokoli",
+            "Pisang",
+            "Wortel",
+            "Bayam",
+            "Mangga",
+            "Semangka",
+            "Jeruk",
+            "Tomat",
+            "Kangkung"
+        ],
+        "sifat": ["Segar", "Organik", "Manis Alami", "Tanpa Pestisida", "Garing"],
+        "harga": { "min": 5000, "max": 60000 }
+    },
+    "Gadget": {
+        "nama": [
+            "Handphone Android",
+            "Smartwatch",
+            "Earphone Wireless",
+            "Tablet",
+            "Powerbank",
+            "Laptop Gaming",
+            "Kamera Mirrorless",
+            "Speaker Bluetooth",
+            "Router WiFi",
+            "Flash Disk"
+        ],
+        "sifat": ["Canggih", "Respon Cepat", "Baterai Awet", "Kamera Jernih", "Ringan"],
+        "harga": { "min": 100000, "max": 2500000 }
+    },
+    "Suplemen": {
+        "nama": [
+            "Vitamin C",
+            "Minyak Ikan",
+            "Whey Protein",
+            "Madu Murni",
+            "Suplemen Kolagen",
+            "Zinc Tablet",
+            "Probiotik",
+            "Vitamin D3",
+            "Multivitamin",
+            "Herbal Stamina"
+        ],
+        "sifat": ["Khasiat Nyata", "Halal", "Aman Dikonsumsi", "Original", "Bpom Approved"],
+        "harga": { "min": 15000, "max": 500000 }
+    },
+    "Lainnya": {
+        "nama": [
+            "Kardus Packing",
+            "Lakban Bening",
+            "Gantungan Kunci",
+            "Payung Lipat",
+            "Botol Tumbler",
+            "Buku Catatan",
+            "Pulpen Premium",
+            "Tempat Pensil",
+            "Staples",
+            "Gunting"
+        ],
+        "sifat": ["Murah", "Praktis", "Serbaguna", "Unik", "Ekonomis"],
+        "harga": { "min": 5000, "max": 150000 }
+    }
+}

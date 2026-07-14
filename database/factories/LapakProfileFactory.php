@@ -19,6 +19,8 @@ class LapakProfileFactory extends Factory
     public function definition(): array
     {
         $lokasiCimanglid = ['Gg. Purnama', 'Sukamantri', 'Jl. Puspa', 'Tamansari', 'Pasir Eurih', 'Kavling Cimanglid'];
+        $prefixLapak = ['Warung', 'Lapak', 'Toko', 'Kios'];
+        $honorifik = ['Bu', 'Pak', 'Mbak', 'Mas', null];
         $externalLinkTemplates = [
             ['label' => 'Tokopedia', 'link' => 'https://www.tokopedia.com/' . Str::slug($this->faker->userName())],
             ['label' => 'Shopee', 'link' => 'https://shopee.co.id/' . Str::slug($this->faker->userName())],
@@ -41,7 +43,11 @@ class LapakProfileFactory extends Factory
 
         return [
             'user_id' => $user->id,
-            'name' => $name = $this->faker->company() . " Shop",
+            'name' => $name = trim(implode(' ', array_filter([
+                $this->faker->randomElement($prefixLapak),
+                $this->faker->randomElement($honorifik),
+                $this->faker->firstName(),
+            ]))),
             'slug' => Str::slug($name) . '-' . Str::random(5),
             'is_active' => 1,
             'profile_image' => asset('img/default-lapak-image.png'),

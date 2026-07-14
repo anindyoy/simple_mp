@@ -203,9 +203,8 @@ class UpdateCatalogSeeder extends Seeder
         // withoutEvents agar observer creating tidak overwrite pushed_at
         $product = Product::withoutEvents(
             fn() =>
-            Product::factory()->create([
+            Product::factory()->forCategory($category)->create([
                 'title'       => $title,
-                'category_id' => $category->id,
                 'lapak_id'    => $lapak->id,
                 'created_at'  => $createdAt,
                 'updated_at'  => $createdAt,

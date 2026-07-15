@@ -27,7 +27,7 @@
             </span>
         @elseif ($isLifted)
             <span class="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg">
-                BARU DIANGKAT
+                DIANGKAT
             </span>
         @endif
 

@@ -103,4 +103,54 @@ describe('Product Table Actions', function () {
         livewire(ListProducts::class)
             ->assertTableActionHidden('approveReactivation', $product);
     });
+
+    // ── Delete ──────────────────────────────────────────────────────────────
+
+    it('shows delete action for own product', function () {
+        $user    = makeUser();
+        $product = makeProduct($user->lapak);
+
+        $this->actingAs($user);
+
+        livewire(ListProducts::class)
+            ->assertTableActionVisible('delete', $product);
+    });
+
+    it('shows delete action for admin', function () {
+        $admin   = makeUser(isAdmin: true);
+        $user    = makeUser();
+        $product = makeProduct($user->lapak);
+
+        $this->actingAs($admin);
+
+        livewire(ListProducts::class)
+            ->assertTableActionVisible('delete', $product);
+    });
+
+    it('can delete own product via table action', function () {
+        $user    = makeUser();
+        $product = makeProduct($user->lapak);
+
+        $this->actingAs($user);
+
+        livewire(ListProducts::class)
+            ->callTableAction('delete', $product)
+            ->assertSuccessful();
+
+        $this->assertModelMissing($product);
+    });
+
+    it('can delete other user product as admin', function () {
+        $admin   = makeUser(isAdmin: true);
+        $user    = makeUser();
+        $product = makeProduct($user->lapak);
+
+        $this->actingAs($admin);
+
+        livewire(ListProducts::class)
+            ->callTableAction('delete', $product)
+            ->assertSuccessful();
+
+        $this->assertModelMissing($product);
+    });
 });

@@ -475,6 +475,28 @@ class ProductsTable
                                 ->send();
                         }
                     }),
+
+                Action::make('delete')
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->visible(fn($record) => auth()->user()->is_admin || $record->lapak_id === auth()->user()->lapak?->id)
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Produk')
+                    ->modalDescription('Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.')
+                    ->modalSubmitActionLabel('Ya, Hapus')
+                    ->modalCancelActionLabel('Batal')
+                    ->action(function ($record) {
+                        $productTitle = $record->title;
+
+                        $record->delete();
+
+                        Notification::make()
+                            ->title('Produk berhasil dihapus')
+                            ->body("Produk \"{$productTitle}\" telah dihapus.")
+                            ->success()
+                            ->send();
+                    }),
             ])
 
             ->toolbarActions([

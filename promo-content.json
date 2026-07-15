@@ -163,7 +163,7 @@
           "body": "Atur tampilan lapak sesuka hati dan buat produkmu makin menarik dilihat calon pembeli."
         },
         {
-          "title": "Naikkan Visibilitas Produkmu",
+          "title": "Naikkan Eksistensi Produkmu",
           "body": "Gunakan token untuk mengangkat produk agar kembali tampil di halaman utama."
         },
         {
@@ -244,11 +244,7 @@
         },
         {
           "title": "Token Awal Saat Daftar",
-          "body": "Setiap user baru langsung mendapat token awal saat registrasi, jadi bisa langsung upload produk pertama tanpa harus membeli dulu."
-        },
-        {
-          "title": "Token Terisi Otomatis Tiap Hari & Minggu",
-          "body": "Sistem mengisi ulang token secara otomatis ke jumlah minimum setiap hari dan setiap minggu, jadi warga aktif tidak akan kehabisan token untuk berjualan."
+          "body": "Setiap user baru langsung mendapat 5 token setelah registrasi, jadi bisa langsung upload produk pertama tanpa harus membeli dulu."
         },
         {
           "title": "Dipakai Saat Membuat Produk Baru",
@@ -261,10 +257,24 @@
         {
           "title": "Butuh Token Lebih? Bisa Beli",
           "body": "Jika token tidak cukup, user bisa mengajukan pembelian token dengan upload bukti transfer, lalu menunggu konfirmasi dari admin."
-        },
+        }
+      ]
+    },
+    {
+      "theme": "Cara Beli Token",
+      "items": [
         {
           "title": "Pantau Riwayat Pembelian Token",
           "body": "Setiap pengajuan pembelian token bisa dicek statusnya (menunggu, dikonfirmasi, atau dibatalkan) melalui riwayat pembelian di halaman member."
+        }
+      ]
+    },
+    {
+      "theme": "Token Jumat Berkah",
+      "items": [
+        {
+          "title": "Token Diisi Otomatis Setiap Jumat",
+          "body": "Setiap hari Jumat, sistem akan mengisi token semua user menjadi 3 jika tokennya kurang dari 3, jadi warga aktif tidak akan kehabisan token untuk berjualan."
         }
       ]
     },

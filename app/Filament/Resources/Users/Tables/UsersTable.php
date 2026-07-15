@@ -57,7 +57,6 @@ class UsersTable
 
                 TextColumn::make('created_at')
                     ->label('Terdaftar')
-                    ->date('d M Y')
                     ->sortable(),
 
                 TextColumn::make('updated_at')
@@ -66,6 +65,7 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filtersFormColumns(3)
             ->filters([
                 TernaryFilter::make('email_verified_at')
@@ -80,7 +80,6 @@ class UsersTable
                     ->timezone('Asia/Jakarta')
                     ->displayFormat('DD/MM/YYYY')
                     ->format('d/m/Y')
-                    ->defaultLast30Days()
                     ->ranges([
                         'Hari Ini' => [now()->startOfDay(), now()->endOfDay()],
                         'Kemarin' => [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()],
@@ -98,7 +97,6 @@ class UsersTable
                     ->timezone('Asia/Jakarta')
                     ->displayFormat('DD/MM/YYYY')
                     ->format('d/m/Y')
-                    ->defaultLast30Days()
                     ->ranges([
                         'Hari Ini' => [now()->startOfDay(), now()->endOfDay()],
                         'Kemarin' => [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()],

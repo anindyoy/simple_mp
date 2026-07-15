@@ -1,0 +1,343 @@
+{
+  "app": {
+    "name": "lapakwarga.my.id",
+    "description": "Aplikasi marketplace untuk warga atau komunitas tertentu. Mendukung katalog produk publik, profil lapak, pelaporan konten, moderasi admin, serta sistem token untuk fitur angkat produk.",
+    "features": {
+      "publik": [
+        "Melihat daftar produk dengan filter pencarian, kategori, dan kondisi",
+        "Melihat detail produk dan daftar produk lain dari lapak yang sama",
+        "Melihat halaman profil lapak",
+        "Melihat halaman peraturan pengguna",
+        "Fitur anti-spam produk dari pelapak yang sama, dengan batasan minimal 4 jam per produk jika dibuat beberapa sekaligus"
+      ],
+      "member": [
+        "Registrasi dan login publik",
+        "Wajib verifikasi email sebelum bisa mengakses panel member/admin",
+        "Mengelola profil akun (nama, email, password, avatar)",
+        "Mengaktifkan Two-Factor Authentication (2FA) untuk keamanan akun (opsional)",
+        "Mengelola profil lapak dan produk milik lapak sendiri",
+        "Melakukan report produk/lapak",
+        "Fitur token untuk membuat produk baru dan mengangkat produk agar muncul di awal halaman utama",
+        "Membeli token angkat produk (request pembelian + upload bukti transfer)",
+        "Melihat riwayat pembelian token beserta status konfirmasi per transaksi"
+      ]
+    }
+  },
+  "content_themes": [
+    {
+      "theme": "Ajakan Buka Lapak (Seller)",
+      "items": [
+        {
+          "title": "Yuk Buka Lapak, Mulai Jualan Hari Ini!",
+          "body": "Punya produk rumahan, jajanan, atau jasa? Buka lapak gratis di lapakwarga.my.id dan mulai jangkau tetangga sekitar."
+        },
+        {
+          "title": "Jualan Tanpa Ribet, Cukup dari HP",
+          "body": "Daftar lapak, upload produk, langsung tayang — jualan online sekarang semudah posting status."
+        },
+        {
+          "title": "Warga Punya Usaha, Warga Punya Lapak",
+          "body": "Dukung ekonomi warga dengan membuka lapak sendiri di lapakwarga.my.id, platform marketplace khusus komunitas warga."
+        },
+        {
+          "title": "Punya Produk? Saatnya Punya Lapak!",
+          "body": "Jangan biarkan produkmu hanya dikenal orang terdekat. Buat lapak gratis di lapakwarga.my.id dan biarkan lebih banyak warga menemukan usahamu."
+        },
+        {
+          "title": "Usaha Kecil, Peluang Besar",
+          "body": "Setiap usaha besar dimulai dari langkah kecil. Daftarkan lapakmu sekarang dan mulai bangun pelanggan dari lingkungan sekitar."
+        },
+        {
+          "title": "Produk Lokal Layak Dikenal",
+          "body": "Makanan, kerajinan, fashion, tanaman, hingga jasa—semuanya punya tempat di lapakwarga.my.id."
+        },
+        {
+          "title": "Mulai Jualan dalam Hitungan Menit",
+          "body": "Daftar akun, buat lapak, unggah produk, dan mulai menerima calon pembeli tanpa proses yang rumit."
+        },
+        {
+          "title": "Etalase Digital untuk Usaha Warga",
+          "body": "Kini usahamu punya etalase online yang bisa diakses siapa saja kapan saja."
+        },
+        {
+          "title": "Saatnya Naik Kelas Bersama Komunitas",
+          "body": "Bangun kepercayaan pelanggan dengan memiliki profil lapak yang rapi dan mudah ditemukan."
+        },
+        {
+          "title": "Bukan Influencer? Tetap Bisa Jualan Online",
+          "body": "Tidak perlu punya ribuan followers. Cukup punya produk yang bermanfaat dan mulai berjualan."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Cek/Belanja Produk (Buyer)",
+      "items": [
+        {
+          "title": "Cek Produk Warga di Sekitarmu",
+          "body": "Yuk cek produk-produk yang ada di lapakwarga.my.id — dari makanan, kerajinan, sampai kebutuhan harian, semua dari warga sekitar."
+        },
+        {
+          "title": "Belanja Dekat, Untung Bareng",
+          "body": "Kenapa belanja jauh kalau ada produk bagus dari tetangga sendiri? Cek katalognya di lapakwarga.my.id."
+        },
+        {
+          "title": "Temukan yang Kamu Cari, dari yang Kamu Kenal",
+          "body": "Ribuan produk warga siap kamu jelajahi setiap hari di lapakwarga.my.id."
+        },
+        {
+          "title": "Belanja Produk Warga Lebih Praktis",
+          "body": "Cari kebutuhan harian, makanan, jasa, hingga produk unik warga dalam satu tempat."
+        },
+        {
+          "title": "Dukung Tetangga, Dapat Produk Berkualitas",
+          "body": "Setiap transaksi membantu usaha warga sekitar terus berkembang."
+        },
+        {
+          "title": "Cari Produk Tanpa Keluar Komunitas",
+          "body": "Temukan berbagai produk dari pelaku usaha di lingkunganmu."
+        },
+        {
+          "title": "Produk Lokal, Harga Bersahabat",
+          "body": "Banyak pilihan produk dengan harga yang kompetitif dari penjual terpercaya."
+        },
+        {
+          "title": "Belanja Lebih Dekat, Lebih Mudah",
+          "body": "Tidak perlu mencari jauh-jauh. Produk yang kamu butuhkan mungkin ada di sekitar tempat tinggalmu."
+        },
+        {
+          "title": "Temukan Hidden Gem di Sekitarmu",
+          "body": "Siapa tahu jajanan favorit atau jasa terbaik ternyata dijual oleh tetanggamu sendiri."
+        },
+        {
+          "title": "Belanja Sekaligus Mendukung Ekonomi Lokal",
+          "body": "Setiap pembelian adalah bentuk dukungan nyata untuk pelaku usaha di komunitas."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Komunitas / Trust",
+      "items": [
+        {
+          "title": "Marketplace Warga, Milik Bersama",
+          "body": "Bukan sekadar jual-beli, lapakwarga.my.id adalah ruang warga saling mendukung usaha satu sama lain."
+        },
+        {
+          "title": "Kenal Penjualnya, Percaya Produknya",
+          "body": "Belanja jadi lebih tenang karena penjualnya adalah warga di lingkunganmu sendiri."
+        },
+        {
+          "title": "Dari Warga, Untuk Warga",
+          "body": "Marketplace yang dibangun agar warga bisa saling mendukung dalam kegiatan ekonomi."
+        },
+        {
+          "title": "Usaha Bertumbuh Karena Saling Mendukung",
+          "body": "Semakin banyak warga yang berpartisipasi, semakin kuat ekonomi komunitas."
+        },
+        {
+          "title": "Belanja Lebih Dekat, Hubungan Lebih Erat",
+          "body": "Bukan sekadar transaksi, tetapi juga mempererat hubungan antarwarga."
+        },
+        {
+          "title": "Marketplace yang Aman dan Tertata",
+          "body": "Produk dapat dilaporkan jika melanggar aturan dan melalui proses moderasi admin."
+        },
+        {
+          "title": "Lingkungan Maju Dimulai dari UMKM yang Tumbuh",
+          "body": "Mari bersama menciptakan ekosistem usaha lokal yang sehat."
+        },
+        {
+          "title": "Bersama Membangun Ekonomi Komunitas",
+          "body": "Semakin banyak warga bergabung, semakin besar peluang usaha berkembang."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Fitur/Token",
+      "items": [
+        {
+          "title": "Token Gratis Tiap Hari untuk Warga Aktif",
+          "body": "Dapatkan token harian untuk boost produkmu tampil lebih dulu di lapakwarga.my.id."
+        },
+        {
+          "title": "Lapak Kamu, Etalase Kamu",
+          "body": "Atur tampilan lapak sesuka hati dan buat produkmu makin menarik dilihat calon pembeli."
+        },
+        {
+          "title": "Naikkan Visibilitas Produkmu",
+          "body": "Gunakan token untuk mengangkat produk agar kembali tampil di halaman utama."
+        },
+        {
+          "title": "Produk Lama Bisa Tampil Seperti Baru",
+          "body": "Tidak perlu upload ulang. Gunakan token dan produkmu kembali muncul di posisi strategis."
+        },
+        {
+          "title": "Promosi Lebih Fleksibel",
+          "body": "Gunakan token kapan saja saat ingin meningkatkan peluang produk dilihat pembeli."
+        },
+        {
+          "title": "Fokus Promosi Produk Unggulan",
+          "body": "Pilih produk terbaikmu dan buat lebih banyak orang menemukannya."
+        },
+        {
+          "title": "Promosi Tanpa Ribet",
+          "body": "Tidak perlu membuat iklan yang rumit. Cukup gunakan token untuk meningkatkan eksposur produk."
+        }
+      ]
+    },
+    {
+      "theme": "Kemudahan Penggunaan",
+      "items": [
+        {
+          "title": "Semua Bisa Mulai Jualan",
+          "body": "Tidak perlu pengalaman berjualan online. Semua fitur dirancang sederhana dan mudah dipahami."
+        },
+        {
+          "title": "Kelola Lapak dari Mana Saja",
+          "body": "Cukup menggunakan smartphone atau laptop untuk mengelola produk kapan saja."
+        },
+        {
+          "title": "Marketplace yang Mudah Digunakan",
+          "body": "Antarmuka sederhana sehingga fokusmu tetap pada mengembangkan usaha."
+        }
+      ]
+    },
+    {
+      "theme": "Edukasi Seller",
+      "items": [
+        {
+          "title": "Foto Produk yang Menarik = Peluang Lebih Besar",
+          "body": "Gunakan foto yang terang dan jelas agar produk lebih diminati."
+        },
+        {
+          "title": "Lengkapi Deskripsi Produk",
+          "body": "Semakin lengkap informasi produk, semakin mudah calon pembeli mengambil keputusan."
+        },
+        {
+          "title": "Rajin Perbarui Produk",
+          "body": "Produk yang aktif diperbarui cenderung lebih sering dilihat calon pembeli."
+        }
+      ]
+    },
+    {
+      "theme": "Edukasi Buyer",
+      "items": [
+        {
+          "title": "Lihat Profil Lapak Sebelum Membeli",
+          "body": "Kenali penjual melalui profil lapaknya dan lihat produk lain yang tersedia."
+        },
+        {
+          "title": "Gunakan Pencarian agar Lebih Cepat",
+          "body": "Temukan produk berdasarkan kategori, kondisi, atau kata kunci."
+        },
+        {
+          "title": "Laporkan Konten yang Tidak Sesuai",
+          "body": "Bantu menjaga kenyamanan marketplace dengan menggunakan fitur pelaporan."
+        }
+      ]
+    },
+    {
+      "theme": "Motivasi UMKM",
+      "items": [
+        {
+          "title": "Jangan Tunggu Sempurna",
+          "body": "Mulailah berjualan hari ini. Lapakmu bisa terus berkembang seiring waktu."
+        },
+        {
+          "title": "Satu Produk Bisa Membuka Banyak Peluang",
+          "body": "Tidak ada yang tahu siapa pelanggan pertamamu jika belum mulai."
+        },
+        {
+          "title": "Setiap Lapak Memiliki Cerita",
+          "body": "Bagikan karya dan usahamu kepada komunitas yang siap mendukung."
+        }
+      ]
+    },
+    {
+      "theme": "Keunggulan lapakwarga.my.id",
+      "items": [
+        {
+          "title": "Marketplace Khusus Komunitas",
+          "body": "Fokus mempertemukan penjual dan pembeli dalam lingkungan warga sehingga interaksi menjadi lebih dekat."
+        },
+        {
+          "title": "Tidak Sekadar Upload Produk",
+          "body": "Bangun identitas usahamu melalui profil lapak yang dapat dilihat calon pembeli."
+        },
+        {
+          "title": "Produk Lebih Tertata",
+          "body": "Pencarian, kategori, dan filter memudahkan pembeli menemukan produk yang mereka butuhkan."
+        },
+        {
+          "title": "Marketplace yang Lebih Nyaman",
+          "body": "Sistem moderasi dan pelaporan membantu menjaga kualitas konten yang tampil."
+        }
+      ]
+    },
+    {
+      "theme": "Call-to-Action Penutup",
+      "items": [
+        {
+          "title": "Yuk Gabung Sekarang!",
+          "body": "Kunjungi lapakwarga.my.id, daftar gratis, dan jadi bagian dari geliat ekonomi warga."
+        },
+        {
+          "title": "Tunggu Apa Lagi?",
+          "body": "Buka akun, buka lapak, dan mulai jualan hari ini juga di lapakwarga.my.id."
+        },
+        {
+          "title": "Usahamu Layak Dikenal Lebih Luas",
+          "body": "Daftar gratis di lapakwarga.my.id, buat lapak, dan mulai perkenalkan produkmu kepada komunitas."
+        },
+        {
+          "title": "Saatnya Giliran Lapakmu Bersinar",
+          "body": "Bergabung bersama pelaku usaha lainnya dan manfaatkan marketplace yang dirancang khusus untuk warga."
+        },
+        {
+          "title": "Satu Langkah Menuju Pelanggan Baru",
+          "body": "Kunjungi lapakwarga.my.id, buat akun, dan mulai mengembangkan usahamu hari ini."
+        },
+        {
+          "title": "Jadilah Bagian dari Ekonomi Warga",
+          "body": "Mari bersama membangun komunitas yang saling mendukung melalui jual beli produk lokal."
+        }
+      ]
+    }
+  ],
+  "weekly_content_series": [
+    {
+      "day": "Senin",
+      "hashtag": "#MulaiJualanSenin",
+      "theme": "Tips membuka lapak dan promosi UMKM"
+    },
+    {
+      "day": "Selasa",
+      "hashtag": "#ProdukPilihan",
+      "theme": "Highlight produk menarik dari pelapak"
+    },
+    {
+      "day": "Rabu",
+      "hashtag": "#KenalanDenganPelapak",
+      "theme": "Cerita singkat profil salah satu penjual"
+    },
+    {
+      "day": "Kamis",
+      "hashtag": "#TipsJualan",
+      "theme": "Tips foto produk, deskripsi, harga, pelayanan"
+    },
+    {
+      "day": "Jumat",
+      "hashtag": "#FiturLapakWarga",
+      "theme": "Edukasi fitur token, boost produk, profil lapak"
+    },
+    {
+      "day": "Sabtu",
+      "hashtag": "#BelanjaLokal",
+      "theme": "Ajakan membeli produk warga sekitar"
+    },
+    {
+      "day": "Minggu",
+      "hashtag": "#CeritaUMKM",
+      "theme": "Kisah inspiratif pelaku usaha atau testimoni pengguna"
+    }
+  ]
+}

@@ -11,7 +11,6 @@ use Filament\Support\Assets\Js;
 use App\Observers\ProductObserver;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\App;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Policies\WhatsappAgentPolicy;
@@ -25,7 +24,6 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Filament\Support\Facades\FilamentAsset;
-use App\Listeners\SendTelegramOnEmailVerified;
 use Illuminate\Console\Events\CommandFinished;
 use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
@@ -52,8 +50,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen(Verified::class, SendTelegramOnEmailVerified::class);
-
         Event::listen(CommandFinished::class, function (CommandFinished $event) {
             if ($event->command === 'optimize:clear') {
                 Artisan::call('responsecache:clear', [], $event->output);

@@ -236,6 +236,39 @@
       ]
     },
     {
+      "theme": "Edukasi Fungsi Token",
+      "items": [
+        {
+          "title": "Apa Itu Token?",
+          "body": "Token adalah 'saldo' yang dipakai untuk membuat produk baru dan mengangkat (boost) produk lama agar tampil di awal halaman utama."
+        },
+        {
+          "title": "Token Awal Saat Daftar",
+          "body": "Setiap user baru langsung mendapat token awal saat registrasi, jadi bisa langsung upload produk pertama tanpa harus membeli dulu."
+        },
+        {
+          "title": "Token Terisi Otomatis Tiap Hari & Minggu",
+          "body": "Sistem mengisi ulang token secara otomatis ke jumlah minimum setiap hari dan setiap minggu, jadi warga aktif tidak akan kehabisan token untuk berjualan."
+        },
+        {
+          "title": "Dipakai Saat Membuat Produk Baru",
+          "body": "Setiap kali menambahkan produk baru, token akan berkurang sesuai ketentuan yang berlaku."
+        },
+        {
+          "title": "Dipakai untuk Mengangkat Produk Lama",
+          "body": "Produk lama tidak perlu dihapus dan diupload ulang. Cukup gunakan token untuk mengangkatnya kembali ke posisi atas halaman utama."
+        },
+        {
+          "title": "Butuh Token Lebih? Bisa Beli",
+          "body": "Jika token tidak cukup, user bisa mengajukan pembelian token dengan upload bukti transfer, lalu menunggu konfirmasi dari admin."
+        },
+        {
+          "title": "Pantau Riwayat Pembelian Token",
+          "body": "Setiap pengajuan pembelian token bisa dicek statusnya (menunggu, dikonfirmasi, atau dibatalkan) melalui riwayat pembelian di halaman member."
+        }
+      ]
+    },
+    {
       "theme": "Motivasi UMKM",
       "items": [
         {
@@ -270,6 +303,31 @@
         {
           "title": "Marketplace yang Lebih Nyaman",
           "body": "Sistem moderasi dan pelaporan membantu menjaga kualitas konten yang tampil."
+        }
+      ]
+    },
+    {
+      "theme": "Cara Transaksi di lapakwarga.my.id",
+      "items": [
+        {
+          "title": "1. Cari & Pilih Produk",
+          "body": "Jelajahi katalog di lapakwarga.my.id, gunakan filter kategori, kondisi, atau kata kunci untuk menemukan produk yang kamu butuhkan."
+        },
+        {
+          "title": "2. Cek Detail Produk & Profil Lapak",
+          "body": "Lihat foto, deskripsi, harga, dan kondisi barang, lalu cek profil lapak penjual (nama, alamat, kontak) untuk memastikan kecocokan."
+        },
+        {
+          "title": "3. Hubungi Penjual Langsung",
+          "body": "Gunakan nomor WhatsApp yang tercantum di profil lapak untuk menanyakan ketersediaan, nego harga, serta menyepakati metode pembayaran dan pengiriman/pengambilan barang."
+        },
+        {
+          "title": "4. Transaksi Dilakukan di Luar Aplikasi",
+          "body": "Pembayaran (transfer, COD, dll) dan serah terima barang dilakukan langsung antara pembeli dan penjual. lapakwarga.my.id berperan sebagai katalog dan etalase, bukan sistem pembayaran."
+        },
+        {
+          "title": "5. Laporkan Jika Ada Masalah",
+          "body": "Temukan penjual atau produk yang mencurigakan? Gunakan fitur laporkan (report) agar admin dapat menindaklanjuti."
         }
       ]
     },

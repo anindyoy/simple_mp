@@ -60,11 +60,10 @@
                             @endif
 
                             <div>Harga: Rp {{ number_format((float) $product->price, 0, ',', '.') }}</div>
-                            <div>Bisa Dikirim: {{ $product->can_be_delivered ? 'Ya' : 'Tidak' }}</div>
-                            <div>Status: {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}</div>
-                            <div>Dilihat: {{ number_format($product->views_count) }} kali</div>
+                            <div>Bisa Diantar: {{ $product->can_be_delivered ? 'Ya' : 'Tidak' }}</div>
+                            {{-- <div>Dilihat: {{ number_format($product->views_count) }} kali</div> --}}
                             <div>Lapak: {{ $product->lapak?->name ?? '-' }}</div>
-                            <div>Dibuat: {{ $product->created_at->translatedFormat('d F Y H:i') }}</div>
+                            <div>Dibuat: {{ $product->created_at->translatedFormat('d F Y') }}</div>
                         </div>
 
                         <div class="pt-1 text-sm">

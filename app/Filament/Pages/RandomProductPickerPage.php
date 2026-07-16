@@ -72,6 +72,8 @@ class RandomProductPickerPage extends Page
         $product = $this->product;
 
         $lines = [
+            'Produk Pilihan Hari Ini',
+            '',
             'Nama Produk: ' . $product->title,
             'Kategori: ' . ($product->category?->category_name ?? '-'),
         ];
@@ -81,11 +83,10 @@ class RandomProductPickerPage extends Page
         }
 
         $lines[] = 'Harga: Rp ' . number_format((float) $product->price, 0, ',', '.');
-        $lines[] = 'Bisa Dikirim: ' . ($product->can_be_delivered ? 'Ya' : 'Tidak');
-        $lines[] = 'Status: ' . ($product->is_active ? 'Aktif' : 'Nonaktif');
-        $lines[] = 'Dilihat: ' . number_format($product->views_count) . ' kali';
+        $lines[] = 'Bisa Diantar: ' . ($product->can_be_delivered ? 'Ya' : 'Tidak');
+        // $lines[] = 'Dilihat: ' . number_format($product->views_count) . ' kali';
         $lines[] = 'Lapak: ' . ($product->lapak?->name ?? '-');
-        $lines[] = 'Dibuat: ' . $product->created_at->translatedFormat('d F Y H:i');
+        $lines[] = 'Dibuat: ' . $product->created_at->translatedFormat('d F Y');
         $lines[] = 'Link Produk: ' . route('product.show', $product);
 
         return implode("\n", $lines);

@@ -88,6 +88,11 @@
                 </div>
 
                 <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    <span class="inline-flex items-center gap-1">
+                        <x-heroicon-o-eye class="w-3.5 h-3.5 text-gray-400" />
+                        <span class="font-semibold text-gray-600">Dilihat:</span>
+                        {{ number_format($product->views_count) }}x
+                    </span>
                     <span>
                         <span class="font-semibold text-gray-600">Dibuat:</span>
                         {{ $product->created_at->diffForHumans() }}

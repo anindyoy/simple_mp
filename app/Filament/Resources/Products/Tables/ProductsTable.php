@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
@@ -15,6 +16,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
+use App\Services\ProductScheduleService;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
@@ -22,9 +24,7 @@ use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Carbon\Carbon;
 use App\Services\ProductModerationService;
-use App\Services\ProductScheduleService;
 use Filament\Tables\Filters\TernaryFilter;
 
 class ProductsTable
@@ -107,11 +107,18 @@ class ProductsTable
                     TextColumn::make('pushed_at')
                         ->label('Diangkat')
                         ->sortable()
+                        ->icon('heroicon-o-eye')
                         ->formatStateUsing(function ($state, $record) {
+                            $views = number_format($record->views_count, 0, ',', '.');
+
+                            $pushedText = '';
                             if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
-                                return '-';
+                                $pushedText = '-';
+                            } else {
+                                $pushedText = "Diangkat " . $record->pushed_at?->diffForHumans();
                             }
-                            return $record->pushed_at?->diffForHumans();
+
+                            return "{$views}x dilihat · {$pushedText}";
                         })
                         ->description(fn($record) => 'Dibuat: ' . $record->created_at->format('d M Y')),
 

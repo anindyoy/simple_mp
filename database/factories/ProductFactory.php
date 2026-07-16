@@ -29,7 +29,6 @@ class ProductFactory extends Factory
         return [
             'title' => $title,
             'slug' => Str::slug($title) . '-' . rand(100, 999),
-
             'category_id' => $category->id,
 
             'lapak_id' => LapakProfile::query()->inRandomOrder()->value('id')
@@ -37,10 +36,10 @@ class ProductFactory extends Factory
 
             'description' => $this->faker->paragraph(3),
             'price' => $this->priceForCategory($category->category_name),
-
             'is_active' => true,
             'pushed_at' => $this->faker->dateTimeBetween('-3 days', 'now'),
             'can_be_delivered' => $this->faker->boolean(50), // 50% kemungkinan bisa diantar
+            'views_count' => rand(0, 100),
         ];
     }
 

@@ -72,21 +72,33 @@
                     {{ $product->lapak->name }}
                 </a>
             </div>
-        @endif
 
-        <div class="mt-auto pt-3 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-[10px] text-gray-400">
-            <div>
+            {{-- Waktu --}}
+            <div class="flex items-center gap-1 mt-0.5 text-[10px] text-gray-400">
+                <x-heroicon-s-clock class="w-3 h-3" />
                 @if ($product->pushed_at?->greaterThan($product->created_at))
-                    <span class="text-emerald-600 font-medium">Diangkat</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">Diangkat</span>
                     {{ $product->pushed_at->diffForHumans() }}
                 @else
                     <span class="text-gray-500">Dibuat</span>
                     {{ $product->created_at->diffForHumans() }}
                 @endif
             </div>
+        @endif
 
-            <div class="font-semibold text-gray-600">
-                {{ $product->lapak->address_short }}
+        <div class="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between text-[11px]">
+                {{-- Kiri: Views badge --}}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-medium leading-none">
+                    <x-heroicon-o-eye class="w-3 h-3" />
+                    <span class="leading-none">{{ number_format($product->views_count) }}</span>
+                </span>
+
+                {{-- Kanan: Lokasi --}}
+                <div class="flex items-center gap-1 text-gray-400 font-medium">
+                    <x-heroicon-o-map-pin class="w-3 h-3 text-gray-400" />
+                    {{ $product->lapak->address_short }}
+                </div>
             </div>
         </div>
     </div>

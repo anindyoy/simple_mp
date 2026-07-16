@@ -87,7 +87,7 @@
         @endif
 
         <div class="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700">
-            <div class="flex items-center justify-between text-[11px]">
+            <div class="flex items-center justify-between text-[10px]">
                 {{-- Kiri: Views badge --}}
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-medium leading-none">
                     <x-heroicon-o-eye class="w-3 h-3" />

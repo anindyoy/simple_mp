@@ -10,6 +10,13 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-6">
+        <a href="{{ route('products.index') }}"
+           class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-4">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Kembali ke Beranda
+        </a>
 
         <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 shadow-sm mb-8">
             <div class="flex items-center gap-4 mb-6">
@@ -43,6 +50,14 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="copyLapakLink()"
+                        class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                    </svg>
+                    Bagikan
+                </button>
+
                 {{-- WhatsApp --}}
                 @if ($lapak->whatsapp_url)
                     <a href="{{ $lapak->whatsapp_url }}"
@@ -101,6 +116,29 @@
                 'title' => $lapak->name,
             ])
         </div>
+
+        <div id="shareLapakToast" class="fixed bottom-4 right-4 bg-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+            Tautan lapak berhasil disalin!
+        </div>
+
+        @push('scripts')
+        <script>
+            function copyLapakLink() {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    const toast = document.getElementById('shareLapakToast');
+                    toast.classList.remove('opacity-0');
+                    toast.classList.add('opacity-100');
+                    setTimeout(() => {
+                        toast.classList.remove('opacity-100');
+                        toast.classList.add('opacity-0');
+                    }, 2500);
+                }).catch(() => {
+                    alert('Gagal menyalin tautan. Silakan salin URL secara manual.');
+                });
+            }
+        </script>
+        @endpush
 
         <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
             Produk dari Lapak ini

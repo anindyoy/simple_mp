@@ -15,7 +15,7 @@ class SellerStatsOverviewWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 2;
 
-    protected int|array|null $columns = 2;
+    protected int|array|null $columns = 3;
 
     public static function canView(): bool
     {
@@ -43,9 +43,17 @@ class SellerStatsOverviewWidget extends StatsOverviewWidget
             ->sort()
             ->first();
 
+        $totalViews = $lapak->products()->sum('views_count');
+
         return [
-            Stat::make('Jumlah Produk Tayang Sekarang', $liveNow)
+            Stat::make('Total Tayangan Produk', number_format($totalViews, 0, ',', '.'))
+                ->description('Akumulasi dari semua produk')
                 ->icon('heroicon-o-eye')
+                ->color('info')
+                ->url(ProductResource::getUrl('index')),
+
+            Stat::make('Jumlah Produk Tayang Sekarang', $liveNow)
+                ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->url(ProductResource::getUrl('index')),
 

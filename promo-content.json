@@ -222,6 +222,10 @@
       "theme": "Edukasi Buyer",
       "items": [
         {
+          "title": "Manfaatkan fitur filter",
+          "body": "Gunakan filter produk untuk mencari produk yang anda inginkan."
+        },
+        {
           "title": "Lihat Profil Lapak Sebelum Membeli",
           "body": "Kenali penjual melalui profil lapaknya dan lihat produk lain yang tersedia."
         },

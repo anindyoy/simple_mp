@@ -32,7 +32,7 @@
                 @endif
                 @if ($deliverable)
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
-                        Bisa Dikirim
+                        Bisa Diantar
                     </span>
                 @endif
             </span>
@@ -148,7 +148,7 @@
                             type="checkbox"
                             wire:model="deliverable"
                             class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">Bisa Dikirim</span>
+                        <span class="text-sm text-gray-700">Bisa Diantar</span>
                     </label>
                 </div>
             </div>

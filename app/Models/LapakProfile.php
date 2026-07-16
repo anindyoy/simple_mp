@@ -131,6 +131,21 @@ class LapakProfile extends Model
         return 'https://wa.me/' . $number . '?text=' . urlencode($message);
     }
 
+    public function getWhatsappNumberUrlAttribute(): ?string
+    {
+        if (!$this->whatsapp_number) {
+            return null;
+        }
+
+        $number = preg_replace('/[^0-9]/', '', $this->whatsapp_number);
+
+        if (str_starts_with($number, '08')) {
+            $number = '628' . substr($number, 2);
+        }
+
+        return 'https://wa.me/' . $number;
+    }
+
     // =========================
     // TELEGRAM
     // =========================

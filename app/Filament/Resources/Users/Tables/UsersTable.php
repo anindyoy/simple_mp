@@ -30,7 +30,8 @@ class UsersTable
                 TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn($record) => $record->lapak?->name ? 'Lapak: ' . $record->lapak->name : null),
 
                 TextColumn::make('email')
                     ->label('Email')

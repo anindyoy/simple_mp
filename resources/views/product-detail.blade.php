@@ -25,48 +25,48 @@
                         $imgUrl = $image->getUrl();
                     @endphp
 
-                    <div class="w-full h-56 md:h-96 bg-white border rounded-base shadow-sm flex items-center justify-center">
+                    <div class="w-full bg-gray-100 border rounded-base shadow-sm">
                         <img
                             src="{{ $imgUrl }}"
-                            class="max-w-full max-h-full object-contain"
+                            class="w-full h-auto"
                             alt="Gambar Produk {{ $product->title }}">
                     </div>
                 @elseif ($product->getMedia('products')->count() > 1)
                     {{-- Carousel (jika > 1 foto) --}}
                     <div id="productImagesCarousel" class="relative w-full" data-carousel="slide">
-                        <div class="relative h-56 md:h-96 overflow-hidden rounded-base bg-white shadow-sm border">
+                        <div class="relative aspect-square rounded-base bg-gray-100 shadow-sm border overflow-hidden">
                             @foreach ($product->getMedia('products') as $index => $image)
                                 <div
                                     data-carousel-item="{{ $index === 0 ? 'active' : '' }}"
-                                    class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out">
+                                    class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out w-full h-full absolute inset-0">
 
                                     <img
                                         src="{{ $image->getUrl() }}"
-                                        class="block w-full h-full object-contain mx-auto"
+                                        class="block w-full h-full object-contain p-2"
                                         alt="Gambar Produk {{ $product->title }}">
                                 </div>
                             @endforeach
                         </div>
 
                         {{-- Indicators --}}
-                        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+                        <div class="absolute z-30 flex -translate-x-1/2 bottom-3 left-1/2 space-x-3 rtl:space-x-reverse">
                             @foreach ($product->getMedia('products') as $i => $img)
                                 <button
                                     type="button"
-                                    class="w-3 h-3 rounded-base bg-white/50"
+                                    class="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors"
                                     data-carousel-slide-to="{{ $i }}"
                                     aria-label="Slide {{ $i + 1 }}"></button>
                             @endforeach
                         </div>
 
                         {{-- Controls --}}
-                        <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4" data-carousel-prev>
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                        <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group" data-carousel-prev>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 transition-colors">
                                 ‹
                             </span>
                         </button>
-                        <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4" data-carousel-next>
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-base bg-white/30">
+                        <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group" data-carousel-next>
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 transition-colors">
                                 ›
                             </span>
                         </button>

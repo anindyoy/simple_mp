@@ -112,7 +112,17 @@
                     @endif
                 </div>
 
-                <div class="mt-6">
+                <div class="mt-5">
+                    <button onclick="copyProductLink()"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Bagikan
+                    </button>
+                </div>
+
+                <div class="mt-5">
                     <h3 class="font-bold text-gray-500 uppercase text-xs">Deskripsi</h3>
                     <p class="text-gray-600 mt-2">{{ $product->description }}</p>
                 </div>
@@ -143,14 +153,6 @@
                     <div class="mt-6">
                         <p class="text-sm font-semibold text-gray-600 mb-2">Pesan Melalui:</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <button onclick="copyProductLink()"
-                                    class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                                </svg>
-                                Bagikan
-                            </button>
-
                             {{-- WhatsApp --}}
                             @if ($product->lapak->whatsapp_url)
                                 <a href="{{ $product->lapak->whatsapp_url }}"

@@ -95,5 +95,92 @@
                 Tidak ada produk aktif yang bisa dipilih saat ini.
             </div>
         @endif
+
+        {{-- History --}}
+        @if (count($history) > 0)
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700">
+                <div class="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        Riwayat Produk Acak ({{ count($history) }} terakhir)
+                    </h3>
+                </div>
+
+                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach ($history as $entry)
+                        @php
+                            $p = $entry->product;
+                        @endphp
+                        <div
+                            class="px-4 py-3 transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                            x-data="{
+                                copied_{{ $entry->id }}: false,
+                                copyText_{{ $entry->id }}(text) {
+                                    const fallbackCopy = () => {
+                                        const el = document.createElement('textarea');
+                                        el.value = text;
+                                        el.setAttribute('readonly', '');
+                                        el.style.position = 'fixed';
+                                        el.style.opacity = '0';
+                                        document.body.appendChild(el);
+                                        el.select();
+                                        document.execCommand('copy');
+                                        document.body.removeChild(el);
+                                    };
+                                    if (navigator.clipboard && window.isSecureContext) {
+                                        navigator.clipboard.writeText(text).catch(() => fallbackCopy());
+                                    } else {
+                                        fallbackCopy();
+                                    }
+                                    this.copied_{{ $entry->id }} = true;
+                                    setTimeout(() => this.copied_{{ $entry->id }} = false, 1500);
+                                }
+                            }"
+                        >
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <img
+                                            src="{{ $p?->thumbnail_url ?? '' }}"
+                                            alt="{{ $p?->title ?? 'Produk dihapus' }}"
+                                            class="h-10 w-10 flex-shrink-0 rounded object-cover"
+                                        />
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                @if ($p)
+                                                    <a href="{{ route('product.show', $p) }}" target="_blank" class="hover:underline">
+                                                        {{ $p->title }}
+                                                    </a>
+                                                @else
+                                                    <span class="italic text-gray-400">Produk telah dihapus</span>
+                                                @endif
+                                            </div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                @if ($p)
+                                                    Rp {{ number_format((float) $p->price, 0, ',', '.') }} &middot;
+                                                    {{ $p->lapak?->name ?? '-' }} &middot;
+                                                @endif
+                                                {{ $entry->created_at->translatedFormat('d M Y, H:i') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if ($p)
+                                    <x-filament::button
+                                        type="button"
+                                        size="xs"
+                                        color="gray"
+                                        x-on:click="copyText_{{ $entry->id }}({{ \Illuminate\Support\Js::from($this->buildHistoryCopyText($p)) }})"
+                                    >
+                                        <span x-show="!copied_{{ $entry->id }}">Copy</span>
+                                        <span x-show="copied_{{ $entry->id }}">Tersalin</span>
+                                    </x-filament::button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 </x-filament::page>

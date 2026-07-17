@@ -209,17 +209,29 @@
                                     </div>
                                 </div>
 
-                                @if ($p)
-                                    <x-filament::button
+                                <div class="flex flex-shrink-0 items-center gap-2">
+                                    @if ($p)
+                                        <x-filament::button
+                                            type="button"
+                                            size="xs"
+                                            color="gray"
+                                            x-on:click="copyText_{{ $entry->id }}({{ \Illuminate\Support\Js::from($this->buildHistoryCopyText($p)) }})"
+                                        >
+                                            <span x-show="!copied_{{ $entry->id }}">Copy</span>
+                                            <span x-show="copied_{{ $entry->id }}">Tersalin</span>
+                                        </x-filament::button>
+                                    @endif
+
+                                    <x-filament::icon-button
                                         type="button"
-                                        size="xs"
-                                        color="gray"
-                                        x-on:click="copyText_{{ $entry->id }}({{ \Illuminate\Support\Js::from($this->buildHistoryCopyText($p)) }})"
-                                    >
-                                        <span x-show="!copied_{{ $entry->id }}">Copy</span>
-                                        <span x-show="copied_{{ $entry->id }}">Tersalin</span>
-                                    </x-filament::button>
-                                @endif
+                                        icon="heroicon-o-trash"
+                                        color="danger"
+                                        size="sm"
+                                        label="Hapus riwayat"
+                                        wire:click="deleteHistory({{ $entry->id }})"
+                                        wire:confirm="Hapus riwayat ini?"
+                                    />
+                                </div>
                             </div>
                         </div>
                     @endforeach

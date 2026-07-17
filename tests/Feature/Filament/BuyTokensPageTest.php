@@ -4,6 +4,7 @@ use App\Filament\Pages\BuyTokensPage;
 use App\Filament\Resources\TokenPurchases\TokenPurchaseResource;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 use function Pest\Livewire\livewire;
 
@@ -212,6 +213,78 @@ describe('submit', function () {
         $purchase = $this->user->tokenPurchases()->latest()->first();
 
         expect($purchase->total_price)->toBe(12000); // 3 × 4000
+    });
+});
+
+// ── notifyTelegram ────────────────────────────────────────────────────────────
+
+describe('notifyTelegram', function () {
+    it('sends a telegram message with the purchase details when credentials are configured', function () {
+        config(['services.telegram.bot_token' => 'test-token', 'services.telegram.chat_id' => '12345']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true], 200)]);
+
+        Setting::setValue('token_price', '3000');
+        Setting::setValue('token_bank_accounts', json_encode([
+            ['bank_name' => 'BCA', 'account_number' => '123456', 'account_holder' => 'John Doe'],
+        ]));
+
+        $this->actingAs($this->user);
+
+        $page = makeBuyPage(
+            ['quantity' => 5, 'bank_account' => '123456', 'proof_of_payment' => 'proof.jpg'],
+            tokenPrice: 3000,
+        );
+        $page->submit();
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'api.telegram.org/bottest-token/sendMessage')
+                && $request['chat_id'] === '12345'
+                && str_contains($request['text'], $this->user->name)
+                && str_contains($request['text'], $this->user->email)
+                && str_contains($request['text'], $this->user->lapak->name)
+                && str_contains($request['text'], '5')
+                && str_contains($request['text'], 'Rp 15.000')
+                && str_contains($request['text'], 'BCA')
+                && str_contains($request['text'], '123456')
+                && str_contains($request['text'], 'John Doe');
+        });
+    });
+
+    it('does not send a telegram message when credentials are not configured', function () {
+        config(['services.telegram.bot_token' => null, 'services.telegram.chat_id' => null]);
+        Http::fake();
+
+        Setting::setValue('token_bank_accounts', json_encode([
+            ['bank_name' => 'BCA', 'account_number' => '123456', 'account_holder' => 'John Doe'],
+        ]));
+
+        $this->actingAs($this->user);
+
+        $page = makeBuyPage(
+            ['quantity' => 1, 'bank_account' => '123456', 'proof_of_payment' => 'proof.jpg'],
+        );
+        $page->submit();
+
+        Http::assertNothingSent();
+    });
+
+    it('does not fail submit when the telegram request throws', function () {
+        config(['services.telegram.bot_token' => 'test-token', 'services.telegram.chat_id' => '12345']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => false], 500)]);
+
+        Setting::setValue('token_bank_accounts', json_encode([
+            ['bank_name' => 'BCA', 'account_number' => '123456', 'account_holder' => 'John Doe'],
+        ]));
+
+        $this->actingAs($this->user);
+
+        $page = makeBuyPage(
+            ['quantity' => 1, 'bank_account' => '123456', 'proof_of_payment' => 'proof.jpg'],
+        );
+        $page->submit();
+
+        $purchase = $this->user->tokenPurchases()->latest()->first();
+        expect($purchase)->not->toBeNull();
     });
 });
 

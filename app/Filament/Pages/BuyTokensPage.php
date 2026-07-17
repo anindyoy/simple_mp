@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use UnitEnum;
 use BackedEnum;
 use App\Models\Setting;
+use App\Models\TokenPurchase;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
@@ -13,6 +14,8 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Filament\Forms\Concerns\InteractsWithForms;
 use App\Filament\Resources\TokenPurchases\TokenPurchaseResource;
 
@@ -121,12 +124,58 @@ class BuyTokensPage extends Page implements HasForms
             'payment_method' => 'bank_transfer',
         ]);
 
+        $this->notifyTelegram($purchase, $selectedBank);
+
         Notification::make()
             ->title('Permintaan pembelian token berhasil dibuat')
             ->success()
             ->send();
 
         $this->redirect(TokenPurchaseResource::getUrl('view', ['record' => $purchase]));
+    }
+
+    protected function notifyTelegram(TokenPurchase $purchase, array $selectedBank): void
+    {
+        $token = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+
+        if (blank($token) || blank($chatId)) {
+            return;
+        }
+
+        $user = auth()->user();
+
+        $message = implode("\n", [
+            '💰 <b>Permintaan Pembelian Token</b>',
+            '',
+            "Nama: <b>{$user->name}</b>",
+            "Email: <code>{$user->email}</code>",
+            'Nama Toko: <b>' . ($user->lapak?->name ?? '-') . '</b>',
+            "Jumlah Token: <b>{$purchase->quantity}</b>",
+            'Total Bayar: <b>Rp ' . number_format($purchase->total_price, 0, ',', '.') . '</b>',
+            "Rekening Tujuan: <b>{$selectedBank['bank_name']}</b> - {$selectedBank['account_number']} a.n. {$selectedBank['account_holder']}",
+            'Status: <b>Menunggu Konfirmasi</b>',
+            'Waktu: ' . now()->format('d M Y, H:i') . ' WIB',
+            '',
+            'Domain: ' . config('app.url'),
+        ]);
+
+        try {
+            Http::connectTimeout(5)
+                ->timeout(10)
+                ->retry(2, 500)
+                ->post("https://api.telegram.org/bot{$token}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'parse_mode' => 'HTML',
+                    'text' => $message,
+                ])
+                ->throw();
+        } catch (\Throwable $e) {
+            Log::warning('Gagal mengirim notifikasi Telegram untuk pembelian token', [
+                'token_purchase_id' => $purchase->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     protected function getBankAccountOptions(): array

@@ -162,6 +162,22 @@ class RandomProductPickerPage extends Page
         }
     }
 
+    public function deleteHistory(int $historyId): void
+    {
+        RandomProductHistory::query()->whereKey($historyId)->delete();
+
+        $this->history = RandomProductHistory::query()
+            ->with('product.category', 'product.lapak')
+            ->latest()
+            ->take(20)
+            ->get();
+
+        Notification::make()
+            ->title('Riwayat dihapus')
+            ->success()
+            ->send();
+    }
+
     public function buildHistoryCopyText(Product $product): string
     {
         $lines = [

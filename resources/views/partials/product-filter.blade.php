@@ -113,7 +113,7 @@
                         class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Semua Kategori</option>
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                            <option value="{{ $category->id }}">{{ $category->category_name }} ({{ $categoryProductCounts->get($category->id, 0) }})</option>
                         @endforeach
                     </select>
                 </div>

@@ -58,9 +58,17 @@ class ProductCatalog extends Component
             fn() => Category::orderBy('category_name')->get()
         );
 
+        $categoryProductCounts = Product::whereIn('id', $eligibleProductIds)
+            ->whereHas('lapak', fn($q) => $q->where('is_active', true))
+            ->where('is_active', true)
+            ->selectRaw('category_id, count(*) as aggregate')
+            ->groupBy('category_id')
+            ->pluck('aggregate', 'category_id');
+
         return view('livewire.product-catalog', [
-            'products'   => $products,
-            'categories' => $categories,
+            'products'              => $products,
+            'categories'            => $categories,
+            'categoryProductCounts' => $categoryProductCounts,
         ]);
     }
 

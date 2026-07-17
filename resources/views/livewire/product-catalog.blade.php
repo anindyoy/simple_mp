@@ -2,6 +2,7 @@
 
     @include('partials.product-filter', [
         'categories' => $categories,
+        'categoryProductCounts' => $categoryProductCounts,
         'search' => $search,
         'categoryId' => $categoryId,
         'condition' => $condition,

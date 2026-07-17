@@ -258,7 +258,7 @@ describe('logTurnstileClientError', function () {
                 'ok' => true,
             ]);
 
-        Log::shouldHaveReceived('error')
+        Log::shouldHaveReceived('warning')
             ->once();
     });
 

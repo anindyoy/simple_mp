@@ -161,7 +161,7 @@ class PublicAuthController extends Controller
             'sitekey_preview' => ['nullable', 'string', 'max:50'],
         ]);
 
-        Log::error('Turnstile client error callback', [
+        Log::warning('Turnstile client error callback', [
             'host' => $request->getHost(),
             'app_url_host' => parse_url(config('app.url'), PHP_URL_HOST),
             'remote_ip' => $request->ip(),

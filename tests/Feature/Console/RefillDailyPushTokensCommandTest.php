@@ -20,7 +20,7 @@ it('mengisi ulang token user yang di bawah minimum harian', function () {
     ]);
 
     $this->artisan('tokens:refill-daily')
-        ->expectsOutput('Refill token angkat produk harian selesai (minimum: 5). User diperbarui: 3.')
+        ->expectsOutput('Refill token harian selesai (minimum: 5). User diperbarui: 3.')
         ->assertExitCode(0);
 
     expect(User::where('push_tokens', 5)->count())->toBe(3);
@@ -41,7 +41,7 @@ it('tidak memperbarui user yang sudah memiliki token cukup', function () {
     ]);
 
     $this->artisan('tokens:refill-daily')
-        ->expectsOutput('Refill token angkat produk harian selesai (minimum: 3). User diperbarui: 0.')
+        ->expectsOutput('Refill token harian selesai (minimum: 3). User diperbarui: 0.')
         ->assertExitCode(0);
 
     expect(User::where('push_tokens', 5)->count())->toBe(2);
@@ -62,7 +62,7 @@ it('melewati user admin saat refill token', function () {
     ]);
 
     $this->artisan('tokens:refill-daily')
-        ->expectsOutput('Refill token angkat produk harian selesai (minimum: 4). User diperbarui: 1.')
+        ->expectsOutput('Refill token harian selesai (minimum: 4). User diperbarui: 1.')
         ->assertExitCode(0);
 
     expect(User::where('is_admin', true)->first()->push_tokens)->toBe(1);
@@ -76,7 +76,7 @@ it('menggunakan nilai default 2 saat setting belum dikonfigurasi', function () {
     ]);
 
     $this->artisan('tokens:refill-daily')
-        ->expectsOutput('Refill token angkat produk harian selesai (minimum: 2). User diperbarui: 1.')
+        ->expectsOutput('Refill token harian selesai (minimum: 2). User diperbarui: 1.')
         ->assertExitCode(0);
 
     expect(User::first()->push_tokens)->toBe(2);

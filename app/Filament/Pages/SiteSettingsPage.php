@@ -132,34 +132,34 @@ class SiteSettingsPage extends Page implements HasForms
                             ->helperText('Klik produk dari IP yang sama hanya dihitung sekali dalam rentang jam ini, agar spam reload tidak menaikkan jumlah klik.'),
                     ]),
 
-                Section::make('Konfigurasi Token Angkat Produk')
+                Section::make('Konfigurasi Token')
                     ->collapsible()
                     ->collapsed()
                     ->columns(2)
                     ->schema([
                         TextInput::make('daily_minimum_push_tokens')
-                            ->label('Minimum Token Angkat Produk Harian')
+                            ->label('Minimum Token Harian')
                             ->required()
                             ->numeric()
                             ->minValue(0)
                             ->default(2)
-                            ->helperText('Nilai minimum token angkat produk user setiap refill harian.'),
+                            ->helperText('Nilai minimum token user setiap refill harian.'),
 
                         TextInput::make('weekly_minimum_push_tokens')
-                            ->label('Minimum Token Angkat Produk Mingguan')
+                            ->label('Minimum Token Mingguan')
                             ->required()
                             ->numeric()
                             ->minValue(0)
                             ->default(3)
-                            ->helperText('Nilai minimum token angkat produk user setiap refill mingguan.'),
+                            ->helperText('Nilai minimum token user setiap refill mingguan.'),
 
                         TextInput::make('initial_push_tokens')
-                            ->label('Token Angkat Produk Awal User Baru')
+                            ->label('Token Awal User Baru')
                             ->required()
                             ->numeric()
                             ->minValue(0)
                             ->default(10)
-                            ->helperText('Nilai token angkat produk awal saat user mendaftar.'),
+                            ->helperText('Nilai token awal saat user mendaftar.'),
                     ]),
 
                 Section::make('Konfigurasi Pembelian Token')

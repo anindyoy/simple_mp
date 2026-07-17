@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RecordProductViewJob;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Cache;
 use App\Services\ProductScheduleService;
 
 class ProductController extends Controller
@@ -35,12 +35,7 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $viewGuardKey = "product_view:{$product->id}:{$request->ip()}";
-        $viewGuardHours = Setting::getIntValue('product_view_guard_hours', 6, 1);
-
-        if (Cache::add($viewGuardKey, true, now()->addHours($viewGuardHours))) {
-            $product->increment('views_count');
-        }
+        RecordProductViewJob::dispatch($product->id, $request->ip());
 
         $hasReported = false;
 

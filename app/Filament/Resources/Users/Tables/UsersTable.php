@@ -51,7 +51,7 @@ class UsersTable
                     ->sortable(),
 
                 TextColumn::make('push_tokens')
-                    ->label('Token Angkat Produk')
+                    ->label('Token')
                     ->badge()
                     ->color(fn(int $state) => $state > 0 ? 'success' : 'danger')
                     ->sortable(),
@@ -176,8 +176,8 @@ class UsersTable
                             ]);
 
                             Notification::make()
-                                ->title('Saldo token angkat produk diperbarui')
-                                ->body('Saldo token angkat produk sekarang: ' . (int) $record->fresh()->push_tokens)
+                                ->title('Saldo token diperbarui')
+                                ->body('Saldo token sekarang: ' . (int) $record->fresh()->push_tokens)
                                 ->success()
                                 ->send();
                         }),

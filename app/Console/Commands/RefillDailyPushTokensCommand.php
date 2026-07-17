@@ -21,7 +21,7 @@ class RefillDailyPushTokensCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Set token angkat produk user ke nilai minimum harian setiap hari';
+    protected $description = 'Set token user ke nilai minimum harian setiap hari';
 
     /**
      * Execute the console command.
@@ -37,7 +37,7 @@ class RefillDailyPushTokensCommand extends Command
                 'push_tokens' => $minimumDailyTokens,
             ]);
 
-        $this->info("Refill token angkat produk harian selesai (minimum: {$minimumDailyTokens}). User diperbarui: {$affectedUsers}.");
+        $this->info("Refill token harian selesai (minimum: {$minimumDailyTokens}). User diperbarui: {$affectedUsers}.");
         Log::info('tokens:refill-daily selesai', ['minimum' => $minimumDailyTokens, 'affected_users' => $affectedUsers]);
 
         return self::SUCCESS;

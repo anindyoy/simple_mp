@@ -109,6 +109,22 @@ Perintah ini menjalankan sekaligus:
 - MAIL_*: untuk verifikasi email.
 - TURNSTILE_SITE_KEY dan TURNSTILE_SECRET_KEY: untuk proteksi captcha (non-local).
 
+## Deployment Notes
+
+### Migrasi View Guard (Cache → Database)
+
+Pada versi terbaru, mekanisme view guard produk diubah dari cache-driven (`Cache::add()`) menjadi database-driven via queued job (`RecordProductViewJob`).
+
+**Dampak saat deploy:**
+1. **Data `views_count` yang sudah ada tetap aman** — Nilai di kolom `views_count` tabel `products` tidak direset, hanya akan di-increment untuk view baru.
+2. **One-time double counting** — IP yang sebelumnya sudah pernah melihat produk (dicatat di cache) mungkin akan dihitung sekali lagi saat pertama kali mengakses setelah deploy, karena data cache sebelumnya sudah tidak tersedia. Ini hanya terjadi 1x per IP per produk dan tidak akan terulang setelahnya.
+3. **Tabel baru**: migration `create_product_views_table` akan menambahkan tabel `product_views` sebagai source of truth view guard.
+
+**Prasyarat:**
+- Jalankan `php artisan migrate` untuk membuat tabel `product_views`.
+- Pastikan queue worker berjalan (sudah termasuk dalam `composer run dev`).
+- Untuk production, pastikan scheduler berjalan agar cleanup expired views berjalan otomatis setiap jam (lihat `routes/console.php`).
+
 ## Aturan Warna
 
 Project ini menggunakan palet warna dari Color Hunt:

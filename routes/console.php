@@ -20,6 +20,10 @@ Schedule::command('telescope:prune', ['--hours' => 360])
     ->daily()
     ->at('03:00');
 
+Schedule::call(function () {
+    \App\Models\ProductView::where('expires_at', '<=', now())->delete();
+})->hourly()->description('Cleanup expired product views');
+
 if (config('app.demo_mode')) {
     Schedule::command('db:seed', ['--class' => 'UpdateCatalogSeeder'])
         ->twiceDaily(6, 18)

@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\FailedJob;
+use UnitEnum;
 use BackedEnum;
+use App\Models\FailedJob;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use App\Filament\Resources\FailedJobResource\Pages\ListFailedJobs;
 
 class FailedJobResource extends Resource
@@ -92,7 +93,7 @@ class FailedJobResource extends Resource
                     ->label('Hapus'),
             ])
             ->bulkActions([
-                \Filament\Tables\Actions\DeleteBulkAction::make()
+                DeleteBulkAction::make()
                     ->label('Hapus Terpilih'),
             ]);
     }

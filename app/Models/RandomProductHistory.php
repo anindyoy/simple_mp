@@ -18,6 +18,11 @@ class RandomProductHistory extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function lapak(): BelongsTo
+    {
+        return $this->belongsTo(LapakProfile::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

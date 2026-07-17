@@ -16,15 +16,18 @@ beforeEach(function () {
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Generate history entries for given products.
+ * Generate history entries for given products, oldest first (last argument = most recent).
  */
 function createHistory(mixed ...$products): void
 {
-    foreach ($products as $product) {
+    $count = count($products);
+
+    foreach ($products as $index => $product) {
         RandomProductHistory::create([
             'product_id' => $product->id,
+            'lapak_id'   => $product->lapak_id,
             'user_id'    => null,
-            'created_at' => now()->subMinutes(rand(1, 60)),
+            'created_at' => now()->subMinutes($count - $index),
         ]);
     }
 }
@@ -99,6 +102,7 @@ describe('generate', function () {
 
         expect(RandomProductHistory::count())->toBe(1);
         expect(RandomProductHistory::first()->product_id)->toBe($product->id);
+        expect(RandomProductHistory::first()->lapak_id)->toBe($seller->lapak->id);
         expect(RandomProductHistory::first()->user_id)->toBe($admin->id);
     });
 
@@ -113,16 +117,15 @@ describe('generate', function () {
 
     it('does not pick a product from the last 10 history entries', function () {
         $admin = makeUser(isAdmin: true);
-        $seller = makeUser();
-        $lapak = $seller->lapak;
 
-        // The schedule delays 4h between products per lapak, so we create
-        // products spaced 4h apart so all become eligible.
+        // Each product belongs to its own lapak so the new "same store in
+        // the last 7 picks" rule does not interfere with this product-level check.
         $now = now();
         $products = [];
         for ($i = 0; $i < 12; $i++) {
-            $products[] = makeProduct($lapak, [
-                'created_at' => (clone $now)->subHours(4 * (12 - $i)),
+            $seller = makeUser();
+            $products[] = makeProduct($seller->lapak, [
+                'created_at' => (clone $now)->subHours(4),
             ]);
         }
 
@@ -141,6 +144,38 @@ describe('generate', function () {
 
         // Must NOT be one of the 10 in history
         expect(collect($recent)->pluck('id'))->not->toContain($pickedId);
+    });
+
+    it('does not pick a product from a lapak that appeared in the last 7 history entries', function () {
+        $admin = makeUser(isAdmin: true);
+
+        // 8 different lapaks, one product each, all eligible immediately.
+        $sellers = [];
+        $products = [];
+        for ($i = 0; $i < 8; $i++) {
+            $sellers[] = $seller = makeUser();
+            $products[] = makeProduct($seller->lapak, [
+                'created_at' => now()->subHours(4),
+            ]);
+        }
+
+        // Put the first 7 products' lapaks into the most recent history.
+        $recent = array_slice($products, 0, 7);
+        createHistory(...$recent);
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class)->call('generate');
+
+        expect($component->get('hasGenerated'))->toBeTrue();
+        expect($component->get('product'))->not->toBeNull();
+
+        $pickedLapakId = $component->get('product')->lapak_id;
+
+        // Must NOT belong to one of the 7 lapaks in the recent history.
+        expect(collect($recent)->pluck('lapak_id'))->not->toContain($pickedLapakId);
+        // The only remaining eligible product is the 8th one.
+        expect($component->get('product')->id)->toBe($products[7]->id);
     });
 
     it('falls back to any eligible product when all are in recent history', function () {

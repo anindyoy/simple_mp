@@ -64,6 +64,14 @@ class RandomProductPickerPage extends Page
             ->unique()
             ->toArray();
 
+        // Exclude products from lapak that appeared in the last 7 history entries
+        $recentLapakIds = RandomProductHistory::query()
+            ->latest()
+            ->take(7)
+            ->pluck('lapak_id')
+            ->unique()
+            ->toArray();
+
         $query = Product::query()
             ->whereIn('id', $eligibleIds)
             ->where('is_active', true)
@@ -71,6 +79,10 @@ class RandomProductPickerPage extends Page
 
         if (! empty($recentProductIds)) {
             $query->whereNotIn('id', $recentProductIds);
+        }
+
+        if (! empty($recentLapakIds)) {
+            $query->whereNotIn('lapak_id', $recentLapakIds);
         }
 
         $this->product = $query->inRandomOrder()->first();
@@ -90,6 +102,7 @@ class RandomProductPickerPage extends Page
         if ($this->product) {
             RandomProductHistory::create([
                 'product_id' => $this->product->id,
+                'lapak_id' => $this->product->lapak_id,
                 'user_id' => auth()->id(),
             ]);
 

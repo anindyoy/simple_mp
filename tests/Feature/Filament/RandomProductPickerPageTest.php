@@ -3,6 +3,7 @@
 use App\Models\LapakProfile;
 use App\Models\Product;
 use App\Models\RandomProductHistory;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use App\Filament\Pages\RandomProductPickerPage;
 
@@ -11,6 +12,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     Cache::flush();
     RandomProductHistory::truncate();
+    Setting::query()->delete();
 });
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -72,6 +74,62 @@ describe('mount', function () {
         $this->actingAs($admin);
 
         livewire(RandomProductPickerPage::class)->assertSuccessful();
+    });
+
+    it('defaults maxProductHistory and maxLapakHistory to the class defaults when no setting is stored', function () {
+        $admin = makeUser(isAdmin: true);
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        expect($component->get('maxProductHistory'))->toBe(10);
+        expect($component->get('maxLapakHistory'))->toBe(7);
+    });
+
+    it('loads maxProductHistory and maxLapakHistory from the setting table when stored', function () {
+        Setting::setValue('random_product_picker_max_product_history', '5');
+        Setting::setValue('random_product_picker_max_lapak_history', '3');
+
+        $admin = makeUser(isAdmin: true);
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        expect($component->get('maxProductHistory'))->toBe(5);
+        expect($component->get('maxLapakHistory'))->toBe(3);
+    });
+
+    it('computes active product and lapak counts', function () {
+        $admin = makeUser(isAdmin: true); // has its own active lapak, no products
+        $seller1 = makeUser();
+        $seller2 = makeUser();
+        $seller2->lapak->update(['is_active' => false]);
+
+        makeProduct($seller1->lapak);
+        makeProduct($seller1->lapak, ['created_at' => now()->subHours(4)]);
+        makeProduct($seller1->lapak, ['is_active' => false, 'created_at' => now()->subHours(8)]);
+        makeProduct($seller2->lapak->fresh());
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        // 2 active products from seller1 + 1 active product from seller2 (lapak inactive doesn't affect product flag)
+        expect($component->get('activeProductCount'))->toBe(3);
+        // admin's own lapak + seller1's lapak are active; seller2's lapak is inactive
+        expect($component->get('activeLapakCount'))->toBe(2);
+    });
+
+    it('recommends 50% of active product/lapak counts, rounded', function () {
+        $admin = makeUser(isAdmin: true);
+        $this->actingAs($admin);
+
+        $page = new RandomProductPickerPage();
+        $page->activeProductCount = 11;
+        $page->activeLapakCount = 5;
+
+        expect($page->recommendedMaxProductHistory())->toBe(6);
+        expect($page->recommendedMaxLapakHistory())->toBe(3);
     });
 });
 
@@ -176,6 +234,52 @@ describe('generate', function () {
         expect(collect($recent)->pluck('lapak_id'))->not->toContain($pickedLapakId);
         // The only remaining eligible product is the 8th one.
         expect($component->get('product')->id)->toBe($products[7]->id);
+    });
+
+    it('respects custom maxProductHistory and maxLapakHistory values', function () {
+        $admin = makeUser(isAdmin: true);
+
+        // 3 products in the same lapak, spaced so all are eligible.
+        $seller = makeUser();
+        $now = now();
+        $products = [];
+        for ($i = 0; $i < 3; $i++) {
+            $products[] = makeProduct($seller->lapak, [
+                'created_at' => (clone $now)->subHours(4 * (3 - $i)),
+            ]);
+        }
+
+        // History (oldest -> newest): products[0], products[1]
+        createHistory($products[0], $products[1]);
+
+        $this->actingAs($admin);
+
+        // With maxProductHistory = 1 only the most recent entry (products[1]) is
+        // excluded by product id, and maxLapakHistory = 0 disables the store rule
+        // entirely, so products[0] becomes eligible again.
+        $component = livewire(RandomProductPickerPage::class)
+            ->set('maxProductHistory', 1)
+            ->set('maxLapakHistory', 0)
+            ->call('generate');
+
+        expect($component->get('product'))->not->toBeNull();
+        expect($component->get('product')->id)->not->toBe($products[1]->id);
+    });
+
+    it('persists maxProductHistory and maxLapakHistory to the setting table on generate', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+        makeProduct($seller->lapak);
+
+        $this->actingAs($admin);
+
+        livewire(RandomProductPickerPage::class)
+            ->set('maxProductHistory', 4)
+            ->set('maxLapakHistory', 2)
+            ->call('generate');
+
+        expect(Setting::getValue('random_product_picker_max_product_history'))->toBe('4');
+        expect(Setting::getValue('random_product_picker_max_lapak_history'))->toBe('2');
     });
 
     it('falls back to any eligible product when all are in recent history', function () {

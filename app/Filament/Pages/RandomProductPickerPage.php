@@ -5,11 +5,13 @@ namespace App\Filament\Pages;
 use UnitEnum;
 use BackedEnum;
 use App\Models\Product;
-use App\Models\RandomProductHistory;
+use App\Models\Setting;
 use Filament\Pages\Page;
-use Filament\Notifications\Notification;
-use App\Services\ProductScheduleService;
+use App\Models\LapakProfile;
 use Illuminate\Support\Collection;
+use App\Models\RandomProductHistory;
+use App\Services\ProductScheduleService;
+use Filament\Notifications\Notification;
 
 class RandomProductPickerPage extends Page
 {
@@ -25,11 +27,37 @@ class RandomProductPickerPage extends Page
 
     protected string $view = 'filament.pages.random-product-picker-page';
 
+    private const DEFAULT_MAX_PRODUCT_HISTORY = 10;
+
+    private const DEFAULT_MAX_LAPAK_HISTORY = 7;
+
+    private const SETTING_MAX_PRODUCT_HISTORY = 'random_product_picker_max_product_history';
+
+    private const SETTING_MAX_LAPAK_HISTORY = 'random_product_picker_max_lapak_history';
+
     public ?Product $product = null;
 
     public bool $hasGenerated = false;
 
     public Collection $history;
+
+    public int $maxProductHistory = self::DEFAULT_MAX_PRODUCT_HISTORY;
+
+    public int $maxLapakHistory = self::DEFAULT_MAX_LAPAK_HISTORY;
+
+    public int $activeProductCount = 0;
+
+    public int $activeLapakCount = 0;
+
+    public function recommendedMaxProductHistory(): int
+    {
+        return (int) round($this->activeProductCount * 0.5);
+    }
+
+    public function recommendedMaxLapakHistory(): int
+    {
+        return (int) round($this->activeLapakCount * 0.5);
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -45,6 +73,12 @@ class RandomProductPickerPage extends Page
     {
         abort_unless((bool) auth()->user()?->is_admin, 403);
 
+        $this->maxProductHistory = Setting::getIntValue(self::SETTING_MAX_PRODUCT_HISTORY, self::DEFAULT_MAX_PRODUCT_HISTORY);
+        $this->maxLapakHistory = Setting::getIntValue(self::SETTING_MAX_LAPAK_HISTORY, self::DEFAULT_MAX_LAPAK_HISTORY);
+
+        $this->activeProductCount = Product::query()->where('is_active', true)->count();
+        $this->activeLapakCount = LapakProfile::query()->where('is_active', true)->count();
+
         $this->history = RandomProductHistory::query()
             ->with('product.category', 'product.lapak')
             ->latest()
@@ -56,18 +90,24 @@ class RandomProductPickerPage extends Page
     {
         $eligibleIds = ProductScheduleService::getEligibleProductIds();
 
-        // Exclude products that appeared in the last 10 history entries
+        $maxProductHistory = max(0, $this->maxProductHistory);
+        $maxLapakHistory = max(0, $this->maxLapakHistory);
+
+        Setting::setValue(self::SETTING_MAX_PRODUCT_HISTORY, (string) $maxProductHistory);
+        Setting::setValue(self::SETTING_MAX_LAPAK_HISTORY, (string) $maxLapakHistory);
+
+        // Exclude products that appeared in the last N history entries
         $recentProductIds = RandomProductHistory::query()
             ->latest()
-            ->take(10)
+            ->take($maxProductHistory)
             ->pluck('product_id')
             ->unique()
             ->toArray();
 
-        // Exclude products from lapak that appeared in the last 7 history entries
+        // Exclude products from lapak that appeared in the last N history entries
         $recentLapakIds = RandomProductHistory::query()
             ->latest()
-            ->take(7)
+            ->take($maxLapakHistory)
             ->pluck('lapak_id')
             ->unique()
             ->toArray();

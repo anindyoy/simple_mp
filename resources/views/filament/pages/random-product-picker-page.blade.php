@@ -1,13 +1,57 @@
 <x-filament::page>
     <div class="space-y-6">
-        <div class="flex items-center justify-between gap-3">
+        <div class="space-y-3">
             <p class="text-sm text-gray-500 dark:text-gray-400">
                 Klik tombol di bawah untuk memilih satu produk aktif secara acak dari seluruh lapak yang sedang tampil.
             </p>
 
-            <x-filament::button wire:click="generate" icon="heroicon-o-sparkles">
-                Generate Produk Acak
-            </x-filament::button>
+            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                <span>Produk aktif: <span class="font-medium text-gray-700 dark:text-gray-200">{{ number_format($activeProductCount) }}</span></span>
+                <span>Lapak aktif: <span class="font-medium text-gray-700 dark:text-gray-200">{{ number_format($activeLapakCount) }}</span></span>
+            </div>
+
+            <div class="flex flex-wrap items-start gap-3">
+                <div>
+                    <label for="maxProductHistory" class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Maks. riwayat produk
+                    </label>
+                    <x-filament::input.wrapper class="w-32">
+                        <x-filament::input
+                            type="number"
+                            id="maxProductHistory"
+                            wire:model="maxProductHistory"
+                            min="0"
+                        />
+                    </x-filament::input.wrapper>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                        Rekomendasi: {{ $this->recommendedMaxProductHistory() }}
+                    </p>
+                </div>
+
+                <div>
+                    <label for="maxLapakHistory" class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Maks. riwayat toko
+                    </label>
+                    <x-filament::input.wrapper class="w-32">
+                        <x-filament::input
+                            type="number"
+                            id="maxLapakHistory"
+                            wire:model="maxLapakHistory"
+                            min="0"
+                        />
+                    </x-filament::input.wrapper>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                        Rekomendasi: {{ $this->recommendedMaxLapakHistory() }}
+                    </p>
+                </div>
+
+                <div>
+                    <span class="invisible mb-1 block text-xs font-medium">&nbsp;</span>
+                    <x-filament::button wire:click="generate" icon="heroicon-o-sparkles">
+                        Generate Produk Acak
+                    </x-filament::button>
+                </div>
+            </div>
         </div>
 
         @if ($hasGenerated && $product)

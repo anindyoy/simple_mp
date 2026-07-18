@@ -51,7 +51,7 @@ class LapakProfileFactory extends Factory
             'slug' => Str::slug($name) . '-' . Str::random(5),
             'is_active' => 1,
             'profile_image' => asset('img/default-lapak-image.png'),
-            'whatsapp_number' => '628' . $this->faker->numerify('##########'),
+            'whatsapp_number' => '628' . $this->faker->numerify('#######'),
             'telegram_username' => $this->faker->userName(),
             'external_links' => $externalLinks,
             'address_raw' => "Desa " . $this->faker->randomElement($lokasiCimanglid) . ", Ciapus, Bogor",

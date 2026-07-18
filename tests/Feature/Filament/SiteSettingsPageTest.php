@@ -371,6 +371,14 @@ describe('form', function () {
                 'token_bank_accounts'          => [
                     ['bank_name' => 'BCA', 'account_number' => '123', 'account_holder' => 'A'],
                 ],
+                'whatsapp_agents'              => [
+                    [
+                        'name' => 'Admin 1',
+                        'gender' => 'pria',
+                        'phone' => '62812345678',
+                        'active' => true,
+                    ],
+                ],
             ])
             ->call('save')
             ->assertHasNoFormErrors();

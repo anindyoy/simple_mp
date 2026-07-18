@@ -7,14 +7,18 @@ use BackedEnum;
 use App\Models\Setting;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Toggle;
+use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Components\Repeater;
+use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
 
 class SiteSettingsPage extends Page implements HasForms
 {
@@ -66,6 +70,7 @@ class SiteSettingsPage extends Page implements HasForms
             'token_bank_accounts' => $this->getBankAccounts(),
             'rules_content' => Setting::getValue('user_rules_content', ''),
             'external_link_labels' => implode("\n", $this->getExternalLinkLabels()),
+            'whatsapp_agents' => $this->getWhatsappAgents(),
         ]);
     }
 
@@ -74,6 +79,7 @@ class SiteSettingsPage extends Page implements HasForms
         return $schema
             ->schema([
                 Section::make('Informasi Site')
+                    ->description('Kelola identitas dasar situs seperti judul dan nama wilayah.')
                     ->collapsible()
                     ->collapsed()
                     ->schema([
@@ -91,6 +97,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
 
                 Section::make('SEO Site')
+                    ->description('Optimasi mesin pencari dengan mengatur deskripsi dan kata kunci situs.')
                     ->collapsible()
                     ->collapsed()
                     ->schema([
@@ -110,6 +117,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
 
                 Section::make('Konfigurasi Antrian Produk')
+                    ->description('Atur jeda waktu antar produk dan batas hitung klik untuk mencegah manipulasi.')
                     ->collapsible()
                     ->collapsed()
                     ->schema([
@@ -133,6 +141,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
 
                 Section::make('Konfigurasi Token')
+                    ->description('Tentukan nilai minimum token harian, mingguan, dan token awal untuk pengguna baru.')
                     ->collapsible()
                     ->collapsed()
                     ->columns(2)
@@ -163,6 +172,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
 
                 Section::make('Konfigurasi Pembelian Token')
+                    ->description('Atur harga token, nomor WhatsApp konfirmasi, dan rekening bank tujuan pembayaran.')
                     ->collapsible()
                     ->collapsed()
                     ->columns(2)
@@ -223,6 +233,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
 
                 Section::make('Konten Peraturan Pengguna')
+                    ->description('Kelola halaman peraturan pengguna yang ditampilkan saat pendaftaran.')
                     ->collapsible()
                     ->collapsed()
                     ->schema([
@@ -244,6 +255,48 @@ class SiteSettingsPage extends Page implements HasForms
                                 'link',
                             ])
                             ->columnSpanFull(),
+                    ]),
+
+                Section::make('Nomor WhatsApp Admin')
+                    ->collapsible()
+                    ->collapsed()
+                    ->description('Atur daftar nomor WhatsApp yang akan ditampilkan di menu "Hubungi Admin" pada sidebar.')
+                    ->schema([
+                        Repeater::make('whatsapp_agents')
+                            ->label('')
+                            ->itemLabel(fn(array $state): ?string => filled($state['name'] ?? null) ? (string) $state['name'] : 'Agen Baru')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nama / Label')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->placeholder('WhatsApp Admin'),
+                                Select::make('gender')
+                                    ->label('Gender')
+                                    ->options([
+                                        'pria' => 'Pria',
+                                        'wanita' => 'Wanita',
+                                    ])
+                                    ->native(false)
+                                    ->placeholder('Pilih gender'),
+                                TextInput::make('phone')
+                                    ->label('Nomor WhatsApp')
+                                    ->required()
+                                    ->tel()
+                                    ->maxLength(20)
+                                    ->placeholder('62812345678')
+                                    ->helperText('Nomor tanpa tanda +, contoh: 62812345678'),
+                                Toggle::make('active')
+                                    ->label('Aktif')
+                                    ->default(true),
+                            ])
+                            ->columns(4)
+                            ->collapsible()
+                            ->columnSpanFull()
+                            ->minItems(1)
+                            ->addActionLabel('Tambah Nomor WhatsApp')
+                            ->orderable()
+                            ->reorderable(),
                     ]),
 
                 Section::make('Label Link External Lapak')
@@ -291,6 +344,9 @@ class SiteSettingsPage extends Page implements HasForms
             json_encode($bankAccounts, JSON_UNESCAPED_UNICODE)
         );
 
+        // Sync WhatsApp agents
+        $this->syncWhatsappAgents($data['whatsapp_agents'] ?? []);
+
         $labels = collect(preg_split('/\r\n|\r|\n/', (string) ($data['external_link_labels'] ?? '')))
             ->map(fn(string $label): string => trim($label))
             ->filter()
@@ -307,6 +363,54 @@ class SiteSettingsPage extends Page implements HasForms
             ->title('Pengaturan aplikasi disimpan')
             ->success()
             ->send();
+    }
+
+    protected function getWhatsappAgents(): array
+    {
+        return WhatsappAgent::query()
+            ->orderBy('id')
+            ->get()
+            ->map(fn(WhatsappAgent $agent): array => [
+                'name' => $agent->name,
+                'gender' => $agent->gender,
+                'phone' => $agent->phone,
+                'active' => $agent->active,
+            ])
+            ->values()
+            ->all();
+    }
+
+    protected function syncWhatsappAgents(array $agents): void
+    {
+        $submittedPhones = collect($agents)->pluck('phone')->filter()->values()->all();
+
+        // Delete agents that are no longer in the list
+        WhatsappAgent::query()
+            ->whereNotIn('phone', $submittedPhones)
+            ->delete();
+
+        // Upsert submitted agents
+        foreach ($agents as $agent) {
+            if (blank($agent['phone'] ?? null)) {
+                continue;
+            }
+
+            $record = WhatsappAgent::query()->updateOrCreate(
+                ['phone' => $agent['phone']],
+                [
+                    'name' => $agent['name'] ?? 'WhatsApp Admin',
+                    'active' => filter_var($agent['active'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'text' => 'Halo, saya ingin bertanya tentang ' . config('app.name') . '.',
+                ]
+            );
+
+            $record->forceFill([
+                'gender' => $agent['gender'] ?? null,
+            ])->save();
+        }
+
+        // Clear the cache used by the modal
+        Cache::forget('whatsapp_active_agents');
     }
 
     protected function getExternalLinkLabels(): array

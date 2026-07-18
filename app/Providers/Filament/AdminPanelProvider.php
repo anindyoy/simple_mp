@@ -75,16 +75,14 @@ class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->databaseNotifications()
             ->databaseNotificationsPolling('15s')
-            ->navigationItems([
-                NavigationItem::make('Hubungi Admin')
-                    ->url(fn (): string => 'https://wa.me/' . (WhatsappAgent::where('active', true)->first()?->phone ?? env('HP_ADMIN')), shouldOpenInNewTab: true)
-                    ->icon('heroicon-s-chat-bubble-left')
-                    ->group('Lainnya')
-                    ->sort(99),
-            ])
+            ->navigationItems([])
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn() => view('filament.topbar.scripts')
+            )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_NAV_END,
+                fn() => view('livewire.hubungi-admin-modal')
             )
             ->colors([
                 'primary' => Color::hex('#3F9AAE'),

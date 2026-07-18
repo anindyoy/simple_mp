@@ -6,7 +6,7 @@ This repository is a Laravel 12 + Filament 5 marketplace app with public storefr
 
 - Install and bootstrap: `composer run setup`
 - Full local dev stack (server, queue listener, pail logs, vite): `composer run dev`
-- Run tests: `composer test`
+- Run tests: `php artisan test --parallel` (gunakan flag `--parallel` untuk menjalankan testing secara paralel agar lebih cepat)
 - Build frontend assets: `npm run build`
 
 ## Architecture Map
@@ -34,7 +34,7 @@ This repository is a Laravel 12 + Filament 5 marketplace app with public storefr
 
 ## Validation Checklist Before Finishing
 
-- Run `composer test` for backend-impacting changes.
+- Run `php artisan test --parallel` (atau `composer test`) untuk backend-impacting changes; gunakan flag `--parallel` agar testing berjalan lebih cepat.
 - Run `npm run build` when touching frontend assets, Tailwind, or Vite configuration.
 - Prefer minimal, targeted edits; preserve existing Indonesian-facing labels and user text unless asked otherwise.
 

@@ -19,6 +19,7 @@ class WhatsappAgentSeeder extends Seeder
             [
                 'active' => true,
                 'name' => 'WhatsApp Admin',
+                'gender' => null,
                 'text' => 'Halo, saya ingin bertanya tentang ' . config('app.name') . '.',
                 'image' => null,
             ]

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use App\Observers\LapakProfileObserver;
+use App\Observers\WhatsappAgentObserver;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
 
         Product::observe(ProductObserver::class);
         LapakProfile::observe(LapakProfileObserver::class);
+        WhatsappAgent::observe(WhatsappAgentObserver::class);
         Gate::policy(WhatsappAgent::class, WhatsappAgentPolicy::class);
         App::setLocale('id');
 

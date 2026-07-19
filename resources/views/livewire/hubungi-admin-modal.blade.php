@@ -56,18 +56,19 @@
                         class="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700 dark:hover:border-primary-500 dark:hover:bg-primary-900/20"
                     >
                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-                            <x-filament::icon
-                                icon="heroicon-s-chat-bubble-left-right"
-                                class="h-5 w-5"
-                            />
+                            @if ($agent->gender === 'pria')
+                                <img src="{{ asset('img/pria.png') }}" alt="Pria" class="h-8 w-8 rounded-full object-cover" />
+                            @elseif ($agent->gender === 'wanita')
+                                <img src="{{ asset('img/wanita.png') }}" alt="Wanita" class="h-8 w-8 rounded-full object-cover" />
+                            @else
+                                <x-filament::icon
+                                    icon="heroicon-s-chat-bubble-left-right"
+                                    class="h-5 w-5"
+                                />
+                            @endif
                         </div>
                         <div class="flex flex-col">
                             <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                @if ($agent->gender === 'pria')
-                                    <x-filament::icon icon="heroicon-s-user" class="inline h-4 w-4 text-blue-500" />
-                                @elseif ($agent->gender === 'wanita')
-                                    <x-filament::icon icon="heroicon-s-user" class="inline h-4 w-4 text-pink-500" />
-                                @endif
                                 {{ $agent->name }}
                             </span>
                             <span class="text-xs text-gray-500 dark:text-gray-400">{{ $agent->phone }}</span>

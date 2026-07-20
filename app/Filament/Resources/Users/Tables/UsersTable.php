@@ -29,7 +29,11 @@ class UsersTable
 
                 TextColumn::make('name')
                     ->label('Nama')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('lapak', fn(Builder $q) => $q->where('name', 'like', "%{$search}%"));
+                    })
                     ->sortable()
                     ->description(fn($record) => $record->lapak?->name ? 'Lapak: ' . $record->lapak->name : null),
 

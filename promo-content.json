@@ -209,8 +209,22 @@
           "body": "Gunakan foto yang terang dan jelas agar produk lebih diminati."
         },
         {
-          "title": "Lengkapi Deskripsi Produk",
-          "body": "Semakin lengkap informasi produk, semakin mudah calon pembeli mengambil keputusan."
+          "title": "Tips Lengkapi Deskripsi Produk Anda",
+          "body": "Semakin lengkap informasi produk, semakin mudah calon pembeli mengambil keputusan. Deskripsi yang detail membuat calon pembeli lebih percaya dan mengurangi tanya jawab yang tidak perlu.",
+          "sub_items": [
+            {
+              "title": "Cantumkan Jam Operasional Toko",
+              "body": "Tuliskan jam operasional toko, misalnya: buka Senin–Sabtu pukul 08.00–17.00 WIB. Dengan begitu pembeli tahu kapan bisa menghubungi kamu atau kapan bisa mengambil pesanan langsung."
+            },
+            {
+              "title": "Jelaskan Syarat & Ketentuan Pengantaran",
+              "body": "Cantumkan informasi pengiriman seperti jarak tempuh yang dilayani, minimal pembelian untuk gratis ongkir, estimasi waktu pengiriman (H+1 atau H+2), dan opsi pengambilan langsung (COD atau ambil di tempat) agar tidak ada kesalahpahaman dengan pembeli."
+            },
+            {
+              "title": "Sertakan Metode Pembayaran yang Tersedia",
+              "body": "Tulis metode pembayaran yang kamu terima, misalnya transfer bank, e-wallet (GoPay, OVO, Dana), atau tunai saat COD. Informasi ini membantu transaksi berjalan lebih lancar."
+            }
+          ]
         },
         {
           "title": "Rajin Perbarui Produk",

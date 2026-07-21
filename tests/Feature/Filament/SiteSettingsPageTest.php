@@ -206,6 +206,7 @@ describe('mount', function () {
             ->assertSet('data.site_description', 'Marketplace online untuk warga. Jual beli produk dan jasa lokal dengan mudah.')
             ->assertSet('data.site_keywords', 'marketplace, jual beli online, produk lokal, warga, toko online')
             ->assertSet('data.product_schedule_delay_hours', 4)
+            ->assertSet('data.show_visitor_count', true)
             ->assertSet('data.daily_minimum_push_tokens', 2)
             ->assertSet('data.weekly_minimum_push_tokens', 3)
             ->assertSet('data.initial_push_tokens', 10)
@@ -232,6 +233,15 @@ describe('mount', function () {
             ->assertSet('data.product_schedule_delay_hours', 6)
             ->assertSet('data.initial_push_tokens', 15)
             ->assertSet('data.token_purchase_whatsapp', '+628123456789');
+    });
+
+    it('fills form with show_visitor_count false when stored as disabled', function () {
+        Setting::setValue('show_visitor_count', '0');
+
+        $this->actingAs($this->admin);
+
+        livewire(SiteSettingsPage::class)
+            ->assertSet('data.show_visitor_count', false);
     });
 
     it('loads token_bank_accounts from stored JSON', function () {
@@ -385,5 +395,54 @@ describe('form', function () {
 
         expect(Setting::getValue('site_title'))->toBe('Judul Valid');
         expect(Setting::getValue('site_region'))->toBe('Wilayah Valid');
+    });
+
+    it('menyimpan show_visitor_count sebagai "0" saat dimatikan', function () {
+        $this->actingAs($this->admin);
+
+        livewire(SiteSettingsPage::class)
+            ->fillForm([
+                'site_title'              => 'Judul Valid',
+                'site_region'             => 'Wilayah Valid',
+                'site_description'        => 'Deskripsi valid untuk site ini.',
+                'site_keywords'           => 'keyword, valid',
+                'token_purchase_whatsapp' => '+628123456789',
+                'rules_content'           => '<p>Peraturan</p>',
+                'show_visitor_count'      => false,
+                'token_bank_accounts'     => [
+                    ['bank_name' => 'BCA', 'account_number' => '123', 'account_holder' => 'A'],
+                ],
+                'whatsapp_agents'         => [
+                    ['name' => 'Admin 1', 'gender' => 'pria', 'phone' => '62812345678', 'active' => true],
+                ],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect(Setting::getValue('show_visitor_count'))->toBe('0');
+    });
+
+    it('menyimpan show_visitor_count sebagai "1" secara default', function () {
+        $this->actingAs($this->admin);
+
+        livewire(SiteSettingsPage::class)
+            ->fillForm([
+                'site_title'              => 'Judul Valid',
+                'site_region'             => 'Wilayah Valid',
+                'site_description'        => 'Deskripsi valid untuk site ini.',
+                'site_keywords'           => 'keyword, valid',
+                'token_purchase_whatsapp' => '+628123456789',
+                'rules_content'           => '<p>Peraturan</p>',
+                'token_bank_accounts'     => [
+                    ['bank_name' => 'BCA', 'account_number' => '123', 'account_holder' => 'A'],
+                ],
+                'whatsapp_agents'         => [
+                    ['name' => 'Admin 1', 'gender' => 'pria', 'phone' => '62812345678', 'active' => true],
+                ],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect(Setting::getValue('show_visitor_count'))->toBe('1');
     });
 });

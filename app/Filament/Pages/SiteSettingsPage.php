@@ -7,11 +7,11 @@ use BackedEnum;
 use App\Models\Setting;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -61,6 +61,7 @@ class SiteSettingsPage extends Page implements HasForms
             'site_region' => Setting::getValue('site_region', 'Cimanglid'),
             'product_schedule_delay_hours' => Setting::getIntValue('product_schedule_delay_hours', 4),
             'product_view_guard_hours' => Setting::getIntValue('product_view_guard_hours', 6),
+            'show_visitor_count' => filter_var(Setting::getValue('show_visitor_count', '1'), FILTER_VALIDATE_BOOLEAN),
             'daily_minimum_push_tokens' => Setting::getIntValue('daily_minimum_push_tokens', 2),
             'weekly_minimum_push_tokens' => Setting::getIntValue('weekly_minimum_push_tokens', 3),
             'initial_push_tokens' => Setting::getIntValue('initial_push_tokens', 10),
@@ -138,6 +139,17 @@ class SiteSettingsPage extends Page implements HasForms
                             ->default(6)
                             ->suffix('jam')
                             ->helperText('Klik produk dari IP yang sama hanya dihitung sekali dalam rentang jam ini, agar spam reload tidak menaikkan jumlah klik.'),
+                    ]),
+
+                Section::make('Tampilan Halaman Utama')
+                    ->description('Atur elemen yang ditampilkan di halaman utama.')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        Toggle::make('show_visitor_count')
+                            ->label('Tampilkan Jumlah Pengunjung')
+                            ->default(true)
+                            ->helperText('Tampilkan teks jumlah pengunjung 24 jam terakhir di halaman utama, di atas grid produk.'),
                     ]),
 
                 Section::make('Konfigurasi Token')
@@ -324,6 +336,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_region', $data['site_region'] ?? '');
         Setting::setValue('product_schedule_delay_hours', (string) max(1, (int) ($data['product_schedule_delay_hours'] ?? 4)));
         Setting::setValue('product_view_guard_hours', (string) max(1, (int) ($data['product_view_guard_hours'] ?? 6)));
+        Setting::setValue('show_visitor_count', filter_var($data['show_visitor_count'] ?? true, FILTER_VALIDATE_BOOLEAN) ? '1' : '0');
         Setting::setValue('daily_minimum_push_tokens', (string) max(0, (int) ($data['daily_minimum_push_tokens'] ?? 2)));
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));
         Setting::setValue('initial_push_tokens', (string) max(0, (int) ($data['initial_push_tokens'] ?? 10)));

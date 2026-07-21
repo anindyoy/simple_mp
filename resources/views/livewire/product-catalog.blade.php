@@ -9,6 +9,13 @@
         'deliverable' => $deliverable,
     ])
 
+    @if($showVisitorCount)
+        <div class="flex items-center gap-1.5 text-sm text-gray-500 mt-1 mb-4">
+            <span>👥</span>
+            <span>{{ number_format($visitorCount24h) }} pengunjung dalam 24 jam terakhir</span>
+        </div>
+    @endif
+
     {{-- Loading overlay --}}
     <div
         wire:loading

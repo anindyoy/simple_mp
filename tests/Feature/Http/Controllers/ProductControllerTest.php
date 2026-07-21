@@ -126,6 +126,28 @@ describe('ProductController@index', function () {
         expect($titles)->not->toContain('Produk Non Aktif');
     });
 
+    it('menyertakan jumlah pengunjung unik 24 jam terakhir', function () {
+        Cache::put('stats.visitors_24h', 42, now()->addHour());
+
+        Livewire::test(ProductCatalog::class)
+            ->assertSee('42 pengunjung dalam 24 jam terakhir')
+            ->assertViewHas('visitorCount24h', 42);
+    });
+
+    it('menyembunyikan jumlah pengunjung saat setting show_visitor_count dimatikan', function () {
+        Setting::factory()->create([
+            'key' => 'show_visitor_count',
+            'value' => '0',
+        ]);
+
+        Cache::put('stats.visitors_24h', 42, now()->addHour());
+
+        Livewire::test(ProductCatalog::class)
+            ->assertDontSee('pengunjung dalam 24 jam terakhir')
+            ->assertViewHas('showVisitorCount', false)
+            ->assertViewHas('visitorCount24h', null);
+    });
+
     it('menggunakan cache untuk categories', function () {
         Cache::forget('categories_list');
 

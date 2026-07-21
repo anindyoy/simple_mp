@@ -10,6 +10,7 @@ use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Cache;
 use App\Services\ProductScheduleService;
+use App\Services\VisitorStatsService;
 
 class ProductCatalog extends Component
 {
@@ -65,10 +66,14 @@ class ProductCatalog extends Component
             ->groupBy('category_id')
             ->pluck('aggregate', 'category_id');
 
+        $showVisitorCount = filter_var(Setting::getValue('show_visitor_count', '1'), FILTER_VALIDATE_BOOLEAN);
+
         return view('livewire.product-catalog', [
             'products'              => $products,
             'categories'            => $categories,
             'categoryProductCounts' => $categoryProductCounts,
+            'showVisitorCount'      => $showVisitorCount,
+            'visitorCount24h'       => $showVisitorCount ? VisitorStatsService::getCached() : null,
         ]);
     }
 

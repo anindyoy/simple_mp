@@ -2,16 +2,16 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\Reports\ReportResource;
-use App\Filament\Resources\TokenPurchases\TokenPurchaseResource;
-use App\Models\LapakProfile;
-use App\Models\ProductModeration;
 use App\Models\Report;
+use App\Models\LapakProfile;
 use App\Models\TokenPurchase;
-use App\Services\ProductScheduleService;
+use App\Models\ProductModeration;
 use App\Services\VisitorStatsService;
+use App\Services\ProductScheduleService;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Filament\Resources\Reports\ReportResource;
+use App\Filament\Resources\TokenPurchases\TokenPurchaseResource;
 
 class AdminStatsOverviewWidget extends StatsOverviewWidget
 {
@@ -47,7 +47,7 @@ class AdminStatsOverviewWidget extends StatsOverviewWidget
                 ->icon('heroicon-o-shield-exclamation')
                 ->color('warning'),
 
-            Stat::make('Pengunjung Unik 24 Jam', VisitorStatsService::getCached())
+            Stat::make('Pengunjung Unik 24 Jam Terakhir', VisitorStatsService::getCached())
                 ->description('Berdasarkan IP unik di ProductView, dihitung ulang tiap 6 jam')
                 ->icon('heroicon-o-users')
                 ->color('primary'),

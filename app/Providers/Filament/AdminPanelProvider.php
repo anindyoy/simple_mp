@@ -5,7 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Panel;
 use App\Models\User;
 use Filament\PanelProvider;
-use Filament\Pages\Dashboard;
+use App\Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;

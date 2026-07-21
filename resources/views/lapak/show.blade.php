@@ -49,50 +49,49 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <button onclick="copyLapakLink()"
-                        class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex justify-center items-center gap-2 px-4 py-2.5 text-sm text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                     </svg>
                     Bagikan
                 </button>
-                <div class="grid grid-cols-2 gap-4">
-                    {{-- WhatsApp --}}
-                    @if ($lapak->whatsapp_url)
-                        <a href="{{ $lapak->whatsapp_url }}"
-                            target="_blank"
-                            class="flex justify-center items-center gap-2 px-6 py-3
-                          text-white bg-green-500 hover:bg-green-600
-                          font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                            <x-fab-whatsapp class="w-5 h-5" />
-                            WhatsApp
-                        </a>
-                    @endif
 
-                    {{-- Telegram --}}
-                    @if ($lapak->telegram_url)
-                        <a href="{{ $lapak->telegram_url }}"
-                            target="_blank"
-                            class="flex justify-center items-center gap-2 px-6 py-3
-                          text-white bg-sky-500 hover:bg-sky-600
-                          font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                            <x-fab-telegram class="w-5 h-5" />
-                            Telegram
-                        </a>
-                    @endif
-                </div>
+                {{-- WhatsApp --}}
+                @if ($lapak->whatsapp_url)
+                    <a href="{{ $lapak->whatsapp_url }}"
+                        target="_blank"
+                        class="flex justify-center items-center gap-2 px-4 py-2.5 text-sm
+                      text-white bg-green-500 hover:bg-green-600
+                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                        <x-fab-whatsapp class="w-4 h-4" />
+                        WhatsApp
+                    </a>
+                @endif
+
+                {{-- Telegram --}}
+                @if ($lapak->telegram_url)
+                    <a href="{{ $lapak->telegram_url }}"
+                        target="_blank"
+                        class="flex justify-center items-center gap-2 px-4 py-2.5 text-sm
+                      text-white bg-sky-500 hover:bg-sky-600
+                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                        <x-fab-telegram class="w-4 h-4" />
+                        Telegram
+                    </a>
+                @endif
             </div>
 
             @if (! empty($externalLinks))
                 <div class="mt-6">
                     <p class="text-sm font-semibold text-gray-600 mb-2">Link Toko Lainnya:</p>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                         @foreach ($externalLinks as $externalLink)
                             <a href="{{ $externalLink['link'] }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="flex justify-center items-center gap-2 px-6 py-3
+                                class="flex justify-center items-center gap-2 px-4 py-2.5 text-sm
                               text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200
                               font-bold rounded-xl shadow-lg transition-all active:scale-95">
                                 {{ $externalLink['label'] }}

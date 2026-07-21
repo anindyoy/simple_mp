@@ -207,18 +207,30 @@ class LapakProfile extends Page implements HasForms
                     Repeater::make('external_links')
                         ->label('Link External Toko')
                         ->schema([
-                            Select::make('label')
-                                ->label('Jenis Link')
-                                ->options($this->getExternalLinkLabelOptions())
-                                ->placeholder('Pilih atau kosongkan')
-                                ->searchable(),
-                            TextInput::make('link')
-                                ->label('Link')
-                                ->required()
-                                ->url()
-                                ->maxLength(2048),
+                            Grid::make(2)->schema([
+                                Select::make('label')
+                                    ->label('Jenis Link')
+                                    ->options($this->getExternalLinkLabelOptions())
+                                    ->placeholder('Pilih atau kosongkan')
+                                    ->searchable()
+                                    ->reactive()
+                                    ->afterStateUpdated(function (callable $set, $state) {
+                                        if ($state) {
+                                            $set('custom_label', $state);
+                                        }
+                                    }),
+                                TextInput::make('link')
+                                    ->label('Link')
+                                    ->required()
+                                    ->url()
+                                    ->maxLength(2048),
+                            ]),
+                            TextInput::make('custom_label')
+                                ->label('Label (opsional)')
+                                ->placeholder('Kosongkan untuk menggunakan label dari jenis link terpilih')
+                                ->maxLength(100),
                         ])
-                        ->columns(2)
+                        ->columns(1)
                         ->default([])
                         ->reorderable(false)
                         ->addActionLabel('Tambah Link'),

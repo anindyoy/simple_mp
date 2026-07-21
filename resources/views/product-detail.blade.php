@@ -210,11 +210,16 @@
                                         @php
                                             $externalLinkCounter++;
                                         @endphp
+                                        @php
+                                            $linkLabel = $externalLink['custom_label']
+                                                ?? $externalLink['label']
+                                                ?? ('Toko Online ' . $externalLinkCounter);
+                                        @endphp
                                         <a href="{{ $externalLink['link'] }}"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             class="flex justify-center items-center gap-2 px-6 py-3 text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                                            {{ !empty($externalLink['label']) ? $externalLink['label'] : 'Toko Online ' . $externalLinkCounter }}
+                                            {{ $linkLabel }}
                                         </a>
                                     @endif
                                 @endforeach

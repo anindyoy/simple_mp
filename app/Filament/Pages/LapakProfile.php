@@ -210,7 +210,7 @@ class LapakProfile extends Page implements HasForms
                             Select::make('label')
                                 ->label('Jenis Link')
                                 ->options($this->getExternalLinkLabelOptions())
-                                ->required()
+                                ->placeholder('Pilih atau kosongkan')
                                 ->searchable(),
                             TextInput::make('link')
                                 ->label('Link')

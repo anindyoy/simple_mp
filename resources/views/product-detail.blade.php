@@ -202,13 +202,19 @@
                         <div class="mt-6">
                             <p class="text-sm font-semibold text-gray-600 mb-2">Toko Online:</p>
                             <div class="grid grid-cols-2 gap-4">
+                                @php
+                                    $externalLinkCounter = 0;
+                                @endphp
                                 @foreach ($product->lapak->external_links as $externalLink)
-                                    @if (!empty($externalLink['label']) && !empty($externalLink['link']))
+                                    @if (!empty($externalLink['link']))
+                                        @php
+                                            $externalLinkCounter++;
+                                        @endphp
                                         <a href="{{ $externalLink['link'] }}"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             class="flex justify-center items-center gap-2 px-6 py-3 text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                                            {{ $externalLink['label'] }}
+                                            {{ !empty($externalLink['label']) ? $externalLink['label'] : 'Toko Online ' . $externalLinkCounter }}
                                         </a>
                                     @endif
                                 @endforeach

@@ -9,6 +9,7 @@ use App\Models\ProductModeration;
 use App\Models\Report;
 use App\Models\TokenPurchase;
 use App\Services\ProductScheduleService;
+use App\Services\VisitorStatsService;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -45,6 +46,11 @@ class AdminStatsOverviewWidget extends StatsOverviewWidget
             Stat::make('Moderasi Produk Pending', ProductModeration::where('status', 'pending')->count())
                 ->icon('heroicon-o-shield-exclamation')
                 ->color('warning'),
+
+            Stat::make('Pengunjung Unik 24 Jam', VisitorStatsService::getCached())
+                ->description('Berdasarkan IP unik di ProductView, dihitung ulang tiap 6 jam')
+                ->icon('heroicon-o-users')
+                ->color('primary'),
         ];
     }
 }

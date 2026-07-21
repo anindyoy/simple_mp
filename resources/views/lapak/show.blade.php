@@ -57,44 +57,50 @@
                     </svg>
                     Bagikan
                 </button>
-
-                {{-- WhatsApp --}}
-                @if ($lapak->whatsapp_url)
-                    <a href="{{ $lapak->whatsapp_url }}"
-                        target="_blank"
-                        class="flex justify-center items-center gap-2 px-6 py-3
-                      text-white bg-green-500 hover:bg-green-600
-                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                        <x-fab-whatsapp class="w-5 h-5" />
-                        WhatsApp
-                    </a>
-                @endif
-
-                {{-- Telegram --}}
-                @if ($lapak->telegram_url)
-                    <a href="{{ $lapak->telegram_url }}"
-                        target="_blank"
-                        class="flex justify-center items-center gap-2 px-6 py-3
-                      text-white bg-sky-500 hover:bg-sky-600
-                      font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                        <x-fab-telegram class="w-5 h-5" />
-                        Telegram
-                    </a>
-                @endif
-
-                @if (! empty($externalLinks))
-                    @foreach ($externalLinks as $externalLink)
-                        <a href="{{ $externalLink['link'] }}"
+                <div class="grid grid-cols-2 gap-4">
+                    {{-- WhatsApp --}}
+                    @if ($lapak->whatsapp_url)
+                        <a href="{{ $lapak->whatsapp_url }}"
                             target="_blank"
-                            rel="noopener noreferrer"
                             class="flex justify-center items-center gap-2 px-6 py-3
-                          text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200
+                          text-white bg-green-500 hover:bg-green-600
                           font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                            {{ $externalLink['label'] }}
+                            <x-fab-whatsapp class="w-5 h-5" />
+                            WhatsApp
                         </a>
-                    @endforeach
-                @endif
+                    @endif
+
+                    {{-- Telegram --}}
+                    @if ($lapak->telegram_url)
+                        <a href="{{ $lapak->telegram_url }}"
+                            target="_blank"
+                            class="flex justify-center items-center gap-2 px-6 py-3
+                          text-white bg-sky-500 hover:bg-sky-600
+                          font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                            <x-fab-telegram class="w-5 h-5" />
+                            Telegram
+                        </a>
+                    @endif
+                </div>
             </div>
+
+            @if (! empty($externalLinks))
+                <div class="mt-6">
+                    <p class="text-sm font-semibold text-gray-600 mb-2">Link Toko Lainnya:</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        @foreach ($externalLinks as $externalLink)
+                            <a href="{{ $externalLink['link'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex justify-center items-center gap-2 px-6 py-3
+                              text-indigo-700 bg-white hover:bg-indigo-50 border border-indigo-200
+                              font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                                {{ $externalLink['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <div class="mt-4">
                 @if ($hasReported)

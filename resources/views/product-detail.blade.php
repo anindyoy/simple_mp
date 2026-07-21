@@ -11,9 +11,9 @@
 @section('content')
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <a href="{{ route('products.index') }}"
-           class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-4">
+            class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
             Kembali ke Beranda
         </a>
@@ -114,9 +114,10 @@
 
                 <div class="mt-5 flex items-center justify-between">
                     <button onclick="copyProductLink()"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-95">
+                        class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                         </svg>
                         Bagikan
                     </button>
@@ -124,7 +125,8 @@
                     @if ($hasReported)
                         <span class="inline-flex items-center gap-1.5 text-sm text-gray-400 cursor-not-allowed">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                             Anda sudah melaporkan ini
                         </span>
@@ -133,7 +135,8 @@
                             onclick="document.getElementById('reportProductModal').classList.remove('hidden')"
                             class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl shadow-sm transition-all active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                             Laporkan Produk
                         </button>
@@ -154,53 +157,64 @@
                 {{-- Card Profil Penjual & Kontak --}}
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 shadow-sm mt-8">
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-inner">
-                            {{ strtoupper(substr($product->lapak->name, 0, 1)) }}
-                        </div>
+                        <img
+                            src="{{ $product->lapak->profile_image_url }}"
+                            class="w-14 h-14 rounded-xl object-cover shadow"
+                            alt="{{ $product->lapak->name }}" />
+
                         <div>
-                            <h4 class="font-bold text-gray-900 text-lg">
+                            <h4 class="font-bold text-gray-900 text-lg flex items-center gap-1">
+                                <x-heroicon-o-building-storefront class="w-4 h-4 text-indigo-500" />
                                 <a href="{{ route('lapak.show', $product->lapak) }}"
                                     class="font-semibold text-blue-500 hover:underline">
                                     {{ $product->lapak->name }}
                                 </a>
                             </h4>
+
                             <p class="text-sm text-gray-500 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                </svg>
+                                <x-heroicon-o-map-pin class="w-4 h-4 text-red-500" />
                                 {{ $product->lapak->address_raw }}
                             </p>
+
+                            <p class="text-xs text-gray-400">
+                                Bergabung sejak {{ $product->lapak->joined_at_label }}
+                            </p>
+
+                            @if ($product->lapak->can_be_delivered)
+                                <p class="text-xs font-semibold text-blue-600 flex items-center gap-1 mt-1">
+                                    <x-heroicon-o-truck class="w-3 h-3" />
+                                    Melayani Pengiriman
+                                </p>
+                            @endif
                         </div>
                     </div>
 
-                    <div class="mt-6">
-                        <p class="text-sm font-semibold text-gray-600 mb-2">Pesan Melalui:</p>
-                        <div class="grid grid-cols-2 gap-4">
-                            {{-- WhatsApp --}}
-                            @if ($product->lapak->whatsapp_url)
-                                <a href="{{ $product->lapak->whatsapp_url }}"
-                                    target="_blank"
-                                    class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-green-500 hover:bg-green-600 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                                    <x-fab-whatsapp class="w-5 h-5" />
-                                    WhatsApp
-                                </a>
-                            @endif
+                    <p class="text-sm font-semibold text-gray-600 mb-2">Pesan Melalui:</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        {{-- WhatsApp --}}
+                        @if ($product->lapak->whatsapp_url)
+                            <a href="{{ $product->lapak->whatsapp_url }}"
+                                target="_blank"
+                                class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-green-500 hover:bg-green-600 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                                <x-fab-whatsapp class="w-5 h-5" />
+                                WhatsApp
+                            </a>
+                        @endif
 
-                            {{-- Telegram --}}
-                            @if ($product->lapak->telegram_url)
-                                <a href="{{ $product->lapak->telegram_url }}"
-                                    target="_blank"
-                                    class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-sky-500 hover:bg-sky-600 font-bold rounded-xl shadow-lg transition-all active:scale-95">
-                                    <x-fab-telegram class="w-5 h-5" />
-                                    Telegram
-                                </a>
-                            @endif
-                        </div>
+                        {{-- Telegram --}}
+                        @if ($product->lapak->telegram_url)
+                            <a href="{{ $product->lapak->telegram_url }}"
+                                target="_blank"
+                                class="flex justify-center items-center gap-2 px-6 py-3 text-white bg-sky-500 hover:bg-sky-600 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+                                <x-fab-telegram class="w-5 h-5" />
+                                Telegram
+                            </a>
+                        @endif
                     </div>
 
                     @if (filled($product->lapak->external_links) && is_array($product->lapak->external_links))
                         <div class="mt-6">
-                            <p class="text-sm font-semibold text-gray-600 mb-2">Toko Online:</p>
+                            <p class="text-sm font-semibold text-gray-600 mb-2">Link Toko Lainnya:</p>
                             <div class="grid grid-cols-2 gap-4">
                                 @php
                                     $externalLinkCounter = 0;
@@ -211,9 +225,7 @@
                                             $externalLinkCounter++;
                                         @endphp
                                         @php
-                                            $linkLabel = $externalLink['custom_label']
-                                                ?? $externalLink['label']
-                                                ?? ('Toko Online ' . $externalLinkCounter);
+                                            $linkLabel = $externalLink['custom_label'] ?? ($externalLink['label'] ?? 'Toko Online ' . $externalLinkCounter);
                                         @endphp
                                         <a href="{{ $externalLink['link'] }}"
                                             target="_blank"
@@ -234,22 +246,22 @@
                 </div>
 
                 @push('scripts')
-                <script>
-                    function copyProductLink() {
-                        const url = window.location.href;
-                        navigator.clipboard.writeText(url).then(() => {
-                            const toast = document.getElementById('shareToast');
-                            toast.classList.remove('opacity-0');
-                            toast.classList.add('opacity-100');
-                            setTimeout(() => {
-                                toast.classList.remove('opacity-100');
-                                toast.classList.add('opacity-0');
-                            }, 2500);
-                        }).catch(() => {
-                            alert('Gagal menyalin tautan. Silakan salin URL secara manual.');
-                        });
-                    }
-                </script>
+                    <script>
+                        function copyProductLink() {
+                            const url = window.location.href;
+                            navigator.clipboard.writeText(url).then(() => {
+                                const toast = document.getElementById('shareToast');
+                                toast.classList.remove('opacity-0');
+                                toast.classList.add('opacity-100');
+                                setTimeout(() => {
+                                    toast.classList.remove('opacity-100');
+                                    toast.classList.add('opacity-0');
+                                }, 2500);
+                            }).catch(() => {
+                                alert('Gagal menyalin tautan. Silakan salin URL secara manual.');
+                            });
+                        }
+                    </script>
                 @endpush
             </div>
         </div>

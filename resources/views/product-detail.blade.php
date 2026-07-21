@@ -112,7 +112,7 @@
                     @endif
                 </div>
 
-                <div class="mt-5">
+                <div class="mt-5 flex items-center justify-between">
                     <button onclick="copyProductLink()"
                             class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,6 +120,24 @@
                         </svg>
                         Bagikan
                     </button>
+
+                    @if ($hasReported)
+                        <span class="inline-flex items-center gap-1.5 text-sm text-gray-400 cursor-not-allowed">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                            Anda sudah melaporkan ini
+                        </span>
+                    @else
+                        <button
+                            onclick="document.getElementById('reportProductModal').classList.remove('hidden')"
+                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl shadow-sm transition-all active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                            Laporkan Produk
+                        </button>
+                    @endif
                 </div>
 
                 <div class="mt-5">
@@ -127,7 +145,12 @@
                     <p class="text-gray-600 mt-2">{{ $product->description }}</p>
                 </div>
 
-                {{-- Tombol WA --}}
+                @include('partials.report-modal', [
+                    'type' => 'product',
+                    'id' => $product->id,
+                    'title' => $product->title,
+                ])
+
                 {{-- Card Profil Penjual & Kontak --}}
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 shadow-sm mt-8">
                     <div class="flex items-center gap-4 mb-6">
@@ -152,7 +175,7 @@
 
                     <div class="mt-6">
                         <p class="text-sm font-semibold text-gray-600 mb-2">Pesan Melalui:</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             {{-- WhatsApp --}}
                             @if ($product->lapak->whatsapp_url)
                                 <a href="{{ $product->lapak->whatsapp_url }}"
@@ -172,9 +195,14 @@
                                     Telegram
                                 </a>
                             @endif
+                        </div>
+                    </div>
 
-                            @if (filled($product->lapak->external_links) && is_array($product->lapak->external_links))
-                                @foreach ($product->getMedia('products') as $index => $image)
+                    @if (filled($product->lapak->external_links) && is_array($product->lapak->external_links))
+                        <div class="mt-6">
+                            <p class="text-sm font-semibold text-gray-600 mb-2">Toko Online:</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                @foreach ($product->lapak->external_links as $externalLink)
                                     @if (!empty($externalLink['label']) && !empty($externalLink['link']))
                                         <a href="{{ $externalLink['link'] }}"
                                             target="_blank"
@@ -184,29 +212,10 @@
                                         </a>
                                     @endif
                                 @endforeach
-                            @endif
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
-                    <div class="mt-6">
-                        @if ($hasReported)
-                            <span class="text-sm text-gray-400 cursor-not-allowed">
-                                Anda sudah melaporkan ini
-                            </span>
-                        @else
-                            <button
-                                onclick="document.getElementById('reportProductModal').classList.remove('hidden')"
-                                class="text-sm text-red-500 hover:underline">
-                                Laporkan Produk
-                            </button>
-                        @endif
-                    </div>
-
-                    @include('partials.report-modal', [
-                        'type' => 'product',
-                        'id' => $product->id,
-                        'title' => $product->title,
-                    ])
                 </div>
 
                 <div id="shareToast" class="fixed bottom-4 right-4 bg-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50">

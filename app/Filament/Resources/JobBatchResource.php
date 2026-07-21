@@ -77,15 +77,15 @@ class JobBatchResource extends Resource
                     ->color(fn (int $state): string => $state > 0 ? 'danger' : 'success'),
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
-                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state)->format('d M Y H:i:s'))
+                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s'))
                     ->sortable(),
                 TextColumn::make('finished_at')
                     ->label('Selesai Pada')
-                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state)->format('d M Y H:i:s') : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s') : '-')
                     ->sortable(),
                 TextColumn::make('cancelled_at')
                     ->label('Dibatalkan Pada')
-                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state)->format('d M Y H:i:s') : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s') : '-')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')

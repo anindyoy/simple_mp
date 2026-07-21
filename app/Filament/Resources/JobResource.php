@@ -71,16 +71,16 @@ class JobResource extends Resource
                     ->sortable(),
                 TextColumn::make('reserved_at')
                     ->label('Sedang Diproses')
-                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state)->format('d M Y H:i:s') : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s') : '-')
                     ->badge()
                     ->color(fn (?int $state): string => $state ? 'warning' : 'gray'),
                 TextColumn::make('available_at')
                     ->label('Tersedia Pada')
-                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state)->format('d M Y H:i:s'))
+                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s'))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
-                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state)->format('d M Y H:i:s'))
+                    ->formatStateUsing(fn (int $state): string => Carbon::createFromTimestamp($state, config('app.timezone'))->format('d M Y H:i:s'))
                     ->sortable(),
             ])
             ->defaultSort('id', 'desc')

@@ -27,7 +27,7 @@ class ProductViewSeeder extends Seeder
             return;
         }
 
-        $total = $this->count ?? 200;
+        $total = $this->count ?? rand(100, 200);
 
         ProductView::factory()
             ->count($total)

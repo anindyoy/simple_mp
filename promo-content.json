@@ -148,6 +148,14 @@
         {
           "title": "Bersama Membangun Ekonomi Komunitas",
           "body": "Semakin banyak warga bergabung, semakin besar peluang usaha berkembang."
+        },
+        {
+          "title": "Ada Masalah? Hubungi Admin Lewat WhatsApp",
+          "body": "Temukan produk atau lapak yang mencurigakan? Punya kendala teknis? Di panel member/admin, kamu bisa langsung menghubungi admin melalui fitur 'Hubungi Admin' di sidebar. Klik, pilih nomor admin yang tersedia, dan chat via WhatsApp — admin siap membantu."
+        },
+        {
+          "title": "Konsultasi Langsung dengan Admin via WhatsApp",
+          "body": "Butuh bantuan atau ingin menanyakan sesuatu seputar lapakwarga.my.id? Gunakan fitur 'Hubungi Admin' yang tersedia di sidebar panel membermu. Pilih kontak admin yang aktif, dan kamu akan langsung terhubung ke WhatsApp admin tanpa perlu mencari nomor manual."
         }
       ]
     },
@@ -234,7 +242,8 @@
         },
         {
           "title": "Tambahkan Link Toko External di Profil Lapak",
-          "body": "Jika kamu punya toko di Shopee, Tokopedia, Instagram, atau website sendiri, tambahkan link-nya di halaman profil lapak. Calon pembeli bisa melihat portofolio dan reputasi tokomu lebih lengkap, sehingga semakin percaya untuk bertransaksi."
+          "body": "Jika kamu punya toko di Shopee, Tokopedia, Instagram, atau website sendiri, tambahkan link-nya di halaman profil lapak. Calon pembeli bisa melihat portofolio dan reputasi tokomu lebih lengkap, sehingga semakin percaya untuk bertransaksi.",
+          "post_link": "https://t.me/lapakwarga/14"
         }
       ]
     },
@@ -253,6 +262,10 @@
         {
           "title": "Laporkan Konten yang Tidak Sesuai",
           "body": "Bantu menjaga kenyamanan marketplace dengan menggunakan fitur pelaporan."
+        },
+        {
+          "title": "Hubungi Admin Jika Ada Masalah",
+          "body": "Temukan konten mencurigakan atau punya pertanyaan seputar marketplace? Di panel member, kamu bisa langsung chat admin lewat fitur 'Hubungi Admin' di sidebar. Pilih nomor admin yang tersedia dan terhubung via WhatsApp untuk mendapatkan bantuan."
         }
       ]
     },
@@ -335,6 +348,10 @@
         {
           "title": "Marketplace yang Lebih Nyaman",
           "body": "Sistem moderasi dan pelaporan membantu menjaga kualitas konten yang tampil."
+        },
+        {
+          "title": "Ada Masalah? Admin Siap Bantu via WhatsApp",
+          "body": "Jika menemukan kendala atau konten yang tidak sesuai, kamu bisa langsung menghubungi admin melalui fitur 'Hubungi Admin' di sidebar panel member. Tersedia beberapa nomor admin yang aktif dan siap merespons via WhatsApp."
         }
       ]
     },
@@ -359,7 +376,7 @@
         },
         {
           "title": "5. Laporkan Jika Ada Masalah",
-          "body": "Temukan penjual atau produk yang mencurigakan? Gunakan fitur laporkan (report) agar admin dapat menindaklanjuti."
+          "body": "Temukan penjual atau produk yang mencurigakan? Gunakan fitur laporkan (report) agar admin dapat menindaklanjuti. Atau jika butuh bantuan lebih lanjut, hubungi admin langsung lewat fitur 'Hubungi Admin' di sidebar panel."
         }
       ],
       "post_link": "https://t.me/lapakwarga/8"
@@ -390,6 +407,23 @@
         {
           "title": "Jadilah Bagian dari Ekonomi Warga",
           "body": "Mari bersama membangun komunitas yang saling mendukung melalui jual beli produk lokal."
+        }
+      ]
+    },
+    {
+      "theme": "Hubungi Admin",
+      "items": [
+        {
+          "title": "Hubungi Admin dari Halaman Utama atau Panel Member",
+          "body": "Fitur hubungi admin tersedia di dua tempat. Di halaman utama, klik 'Hubungi Kami' di navbar (atas halaman) — jika ada lebih dari satu admin, akan muncul modal berisi daftar admin yang bisa dipilih. Di dalam panel member/admin, klik 'Hubungi Admin' di sidebar sebelah kiri. Keduanya akan menampilkan daftar admin aktif lengkap dengan nama, avatar (pria/wanita), dan nomor telepon — cukup klik salah satu untuk langsung chat via WhatsApp."
+        },
+        {
+          "title": "Pilih Admin yang Ingin Dihubungi",
+          "body": "Saat membuka fitur 'Hubungi Kami' di halaman utama atau 'Hubungi Admin' di sidebar panel, kamu akan melihat daftar nomor admin yang aktif beserta namanya. Cukup klik salah satu, dan chat WhatsApp akan terbuka secara otomatis — tidak perlu repot menyalin nomor manual."
+        },
+        {
+          "title": "Butuh Bantuan? Hubungi Admin via WA",
+          "body": "Ada pertanyaan seputar penggunaan atau masalah teknis lainnya? Kamu bisa menghubungi admin dari halaman utama melalui tombol 'Hubungi Kami' di navbar, atau dari dalam panel member lewat menu 'Hubungi Admin' di sidebar. Pilih kontak admin yang tersedia, dan sampaikan masalahmu langsung via WhatsApp. Admin siap membantu."
         }
       ]
     }

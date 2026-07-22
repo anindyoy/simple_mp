@@ -13,7 +13,7 @@
         <div class="flex items-center gap-6">
             {{-- Brand --}}
             <a href="/" class="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
-                <img src="{{ asset('img/logo-transparent.png') }}" alt="{{ $siteTitle ?? App\Models\Setting::getValue('site_title', 'Lapak Warga') }}" class="h-12 w-auto max-w-full object-contain" />
+                <img src="{{ asset('img/logo-transparent.png') }}" alt="{{ $siteTitle ?? App\Models\Setting::getValue('site_title', 'Lapak Warga') }}" class="h-8 md:h-12 w-auto max-w-full object-contain" />
             </a>
 
             {{-- Desktop nav links --}}
@@ -38,18 +38,18 @@
 
         {{-- Actions --}}
         @php $demoMode = config('app.demo_mode'); @endphp
-        <div class="flex items-center gap-2 {{ $demoMode ? 'opacity-50 pointer-events-none select-none' : '' }}">
+        <div class="flex items-center gap-1.5 md:gap-2 {{ $demoMode ? 'opacity-50 pointer-events-none select-none' : '' }}">
             @auth
                 {{-- Member Area --}}
                 <a href="/admin"
-                    class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900 transition">
+                    class="inline-flex items-center justify-center rounded-lg px-2 py-1 md:px-4 md:py-2 text-[11px] leading-tight md:text-sm font-medium border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900 transition whitespace-nowrap">
                     Area Member
                 </a>
 
                 {{-- Logout --}}
-                <form action="{{ route('logout.public') }}" method="POST">
+                <form action="{{ route('logout.public') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')">
                     @csrf
-                    <button type="submit" {{ $demoMode ? 'disabled' : '' }} class="px-4 py-2 text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-500 hover:text-white transition duration-200 ease-in-out">
+                    <button type="submit" {{ $demoMode ? 'disabled' : '' }} class="px-2 py-1 md:px-4 md:py-2 text-[11px] leading-tight md:text-sm font-medium border border-red-500 text-red-600 rounded-lg hover:bg-red-500 hover:text-white transition duration-200 ease-in-out whitespace-nowrap">
                         Keluar
                     </button>
                 </form>
@@ -57,21 +57,21 @@
                 {{-- Login --}}
                 <button data-modal-target="loginModal" data-modal-toggle="loginModal"
                     {{ $demoMode ? 'disabled' : '' }}
-                    class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    class="inline-flex items-center justify-center rounded-lg px-2 py-1 md:px-4 md:py-2 text-[11px] leading-tight md:text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 transition whitespace-nowrap">
                     Masuk
                 </button>
 
                 {{-- Register --}}
                 <button data-modal-target="registerModal" data-modal-toggle="registerModal"
                     {{ $demoMode ? 'disabled' : '' }}
-                    class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition">
+                    class="inline-flex items-center justify-center rounded-lg px-2 py-1 md:px-4 md:py-2 text-[11px] leading-tight md:text-sm font-medium border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition whitespace-nowrap">
                     Daftar
                 </button>
             @endauth
 
             {{-- Mobile menu toggle --}}
-            <button id="mobileMenuToggle" class="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition" aria-label="Menu">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button id="mobileMenuToggle" class="md:hidden inline-flex items-center justify-center rounded-lg p-1.5 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition" aria-label="Menu">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>

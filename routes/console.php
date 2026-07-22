@@ -25,7 +25,7 @@ Schedule::call(function () {
 })->hourly()->description('Cleanup expired product views');
 
 Schedule::command('visitors:calculate-24h')
-    ->everyHour()
+    ->hourly()
     ->withoutOverlapping();
 
 if (config('app.demo_mode')) {

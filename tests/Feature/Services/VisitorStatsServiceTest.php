@@ -5,6 +5,7 @@ use App\Models\LapakProfile;
 use App\Models\Product;
 use App\Models\ProductView;
 use App\Models\User;
+use App\Models\VisitorStats;
 use App\Services\VisitorStatsService;
 use Illuminate\Support\Facades\Cache;
 
@@ -63,4 +64,40 @@ it('menghitung otomatis saat cache kosong', function () {
     makeVisitorProductView(['ip_address' => '10.0.0.1']);
 
     expect(VisitorStatsService::getCached())->toBe(1);
+});
+
+it('mencatat jumlah pengunjung unik hari ini ke tabel visitor_stats', function () {
+    makeVisitorProductView(['ip_address' => '10.0.0.1', 'created_at' => now()->subHour()]);
+    makeVisitorProductView(['ip_address' => '10.0.0.1', 'created_at' => now()->subMinutes(30)]);
+    makeVisitorProductView(['ip_address' => '10.0.0.2', 'created_at' => now()->subMinutes(15)]);
+
+    VisitorStatsService::recordDaily();
+
+    $record = VisitorStats::where('date', today()->toDateString())->first();
+
+    expect($record)->not->toBeNull()
+        ->and($record->visitor_count)->toBe(2);
+});
+
+it('memperbarui data jika sudah ada catatan untuk hari ini', function () {
+    VisitorStats::create(['date' => today()->toDateString(), 'visitor_count' => 0]);
+
+    makeVisitorProductView(['ip_address' => '10.0.0.1']);
+
+    VisitorStatsService::recordDaily();
+
+    $record = VisitorStats::where('date', today()->toDateString())->first();
+
+    expect($record->visitor_count)->toBe(1);
+});
+
+it('hanya menghitung kunjungan hari ini untuk recordDaily', function () {
+    makeVisitorProductView(['ip_address' => '10.0.0.1', 'created_at' => now()->subDay()->subHour()]);
+    makeVisitorProductView(['ip_address' => '10.0.0.2', 'created_at' => now()->subHour()]);
+
+    VisitorStatsService::recordDaily();
+
+    $record = VisitorStats::where('date', today()->toDateString())->first();
+
+    expect($record->visitor_count)->toBe(1);
 });

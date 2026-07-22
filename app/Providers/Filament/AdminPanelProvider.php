@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Schema;
 use Filament\Http\Middleware\Authenticate;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use App\Filament\Widgets\PushCountdownWidget;
+use App\Filament\Widgets\VisitorStatsChartWidget;
 use JibayMcs\FilamentTour\FilamentTourPlugin;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -100,6 +101,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                VisitorStatsChartWidget::class,
                 PushCountdownWidget::class,
                 AccountWidget::class,
             ])

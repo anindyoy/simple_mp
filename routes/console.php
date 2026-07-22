@@ -28,8 +28,17 @@ Schedule::command('visitors:calculate-24h')
     ->hourly()
     ->withoutOverlapping();
 
+Schedule::command('visitors:record-daily')
+    ->daily()
+    ->at('23:59')
+    ->withoutOverlapping();
+
 if (config('app.demo_mode')) {
     Schedule::command('db:seed', ['--class' => 'UpdateCatalogSeeder'])
         ->twiceDaily(6, 18)
+        ->withoutOverlapping();
+
+    Schedule::command('db:seed', ['--class' => 'ProductViewSeeder'])
+        ->daily()
         ->withoutOverlapping();
 }

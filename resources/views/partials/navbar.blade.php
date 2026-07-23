@@ -37,7 +37,7 @@
         </div>
 
         {{-- Actions --}}
-        @php $demoMode = config('app.demo_mode'); @endphp
+        @php $demoMode = config('app.demo_mode') && (!auth()->check() || !auth()->user()->is_admin); @endphp
         <div class="flex items-center gap-1.5 md:gap-2 {{ $demoMode ? 'opacity-50 pointer-events-none select-none' : '' }}">
             @auth
                 {{-- Member Area --}}

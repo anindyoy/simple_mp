@@ -4,28 +4,20 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Database\Seeder;
 use App\Traits\AttachesProductImages;
+use App\Traits\UsesProductJsonData;
 use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ProductSeeder extends Seeder
 {
     use AttachesProductImages;
+    use UsesProductJsonData;
 
     protected ?int $count;
     protected ?string $mode;
-
-    /** @var array<string, array<string>> */
-    private array $productNames = [];
-
-    /** @var array<string, array<string>> */
-    private array $productSifat = [];
-
-    /** @var array<string, array{min: int, max: int}> */
-    private array $productPrices = [];
 
     /** @var array<string, array<string>> */
     private array $categoryImages = [];
@@ -79,7 +71,7 @@ class ProductSeeder extends Seeder
                 $product->category_id = $category->id;
                 $product->price = $this->generatePrice($categoryName);
 
-                [$title, $slug] = $this->generateTitleAndSlug($categoryName);
+                [$title, $slug] = $this->makeProductTitle($categoryName);
                 $product->title = $title;
                 $product->slug = $slug;
 
@@ -122,7 +114,7 @@ class ProductSeeder extends Seeder
                 $product->price = $this->generatePrice($categoryName);
                 $product->lapak_id = $lapak->id;
 
-                [$title, $slug] = $this->generateTitleAndSlug($categoryName);
+                [$title, $slug] = $this->makeProductTitle($categoryName);
                 $product->title = $title;
                 $product->slug = $slug;
 
@@ -139,25 +131,6 @@ class ProductSeeder extends Seeder
                 $this->attachRandomImages($product);
             });
         });
-    }
-
-    private function loadJsonData(): void
-    {
-        $path = storage_path('app/seed-samples/item_produk.json');
-
-        if (!file_exists($path)) {
-            return;
-        }
-
-        $data = json_decode(file_get_contents($path), true) ?? [];
-
-        foreach ($data as $kategori => $attributes) {
-            $key = mb_strtolower($kategori);
-
-            $this->productNames[$key] = $attributes['nama'] ?? [];
-            $this->productSifat[$key] = $attributes['sifat'] ?? [];
-            $this->productPrices[$key] = $attributes['harga'] ?? ['min' => 10_000, 'max' => 2_000_000];
-        }
     }
 
     private function loadCategoryImages(): void
@@ -181,36 +154,6 @@ class ProductSeeder extends Seeder
         }
     }
 
-    private function generatePrice(string $categoryName): int
-    {
-        $range = $this->productPrices[mb_strtolower($categoryName)]
-            ?? ['min' => 10_000, 'max' => 2_000_000];
-
-        return (int) round(fake()->numberBetween($range['min'], $range['max']), -3);
-    }
-
-    private function generateTitleAndSlug(string $categoryName): array
-    {
-        $key = mb_strtolower($categoryName);
-
-        $names = $this->productNames[$key] ?? [];
-        $sifat = $this->productSifat[$key] ?? [];
-
-        if (!empty($names) && !empty($sifat)) {
-            $nama = $names[array_rand($names)];
-            $sif = $sifat[array_rand($sifat)];
-            $title = "{$nama} {$sif}";
-        } elseif (!empty($names)) {
-            $title = $names[array_rand($names)];
-        } else {
-            $title = fake()->words(3, true);
-        }
-
-        $slug = Str::slug($title) . '-' . rand(100, 999);
-
-        return [$title, $slug];
-    }
-
     private function getImagesForCategory(string $categoryName): array
     {
         $key = mb_strtolower($categoryName);
@@ -222,6 +165,7 @@ class ProductSeeder extends Seeder
     private function getFallbackFiles(): array
     {
         $seedDir = storage_path('app/seed-samples');
+
         return collect(scandir($seedDir))
             ->reject(fn($f) => in_array($f, ['.', '..']) || is_dir($seedDir . DIRECTORY_SEPARATOR . $f))
             ->filter(fn($f) => !str_ends_with($f, '.json'))

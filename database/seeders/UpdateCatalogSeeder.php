@@ -4,17 +4,19 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Str;
 use App\Models\LapakProfile;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use App\Traits\UsesProductJsonData;
 use App\Services\ProductScheduleService;
 use Spatie\ResponseCache\Facades\ResponseCache;
 
 class UpdateCatalogSeeder extends Seeder
 {
+    use UsesProductJsonData;
+
     /**
      * Jumlah total iterasi create/update yang dijalankan, didistribusikan
      * merata ke tiap hari dalam range tanggal (lihat $fromDate).
@@ -33,6 +35,8 @@ class UpdateCatalogSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->loadJsonData();
+
         $lapaks      = LapakProfile::all();
         $categories  = Category::all();
         $products    = Product::all();
@@ -41,6 +45,8 @@ class UpdateCatalogSeeder extends Seeder
         $createdLapakCount = 0;
         $createdCount     = 0;
         $updatedCount     = 0;
+        $createdProducts  = [];
+        $updatedProducts  = [];
 
         $days        = $this->resolveDays();
         $runsPerDay  = $this->distributeRuns($this->totalRuns, count($days));
@@ -80,13 +86,25 @@ class UpdateCatalogSeeder extends Seeder
                         $products->push($product);
                         $createdCount++;
                         $changed = true;
+                        $createdProducts[] = [
+                            'id'         => $product->id,
+                            'title'      => $product->title,
+                            'lapak_name' => $product->lapak?->name ?? '(unknown)',
+                        ];
                     }
                     continue;
                 }
 
-                $updated = $this->updateRandomProductPushTime($products, $day);
-                $updatedCount += $updated ? 1 : 0;
-                $changed = $updated || $changed;
+                $updatedProduct = $this->updateRandomProductPushTime($products, $day);
+                if ($updatedProduct) {
+                    $updatedCount++;
+                    $changed = true;
+                    $updatedProducts[] = [
+                        'id'         => $updatedProduct->id,
+                        'title'      => $updatedProduct->title,
+                        'lapak_name' => $updatedProduct->lapak?->name ?? '(unknown)',
+                    ];
+                }
             }
         }
 
@@ -113,6 +131,29 @@ class UpdateCatalogSeeder extends Seeder
             $summary['date_from'],
             $summary['date_to'],
         ));
+
+        // Tampilkan detail produk yang dibuat
+        if ($createdProducts) {
+            $this->info('');
+            $this->info('--- Produk yang DIBUAT ---');
+            $this->info(sprintf('%-6s %-40s %s', 'ID', 'Nama Produk', 'Lapak'));
+            $this->info(str_repeat('-', 80));
+            foreach ($createdProducts as $p) {
+                $this->info(sprintf('%-6d %-40s %s', $p['id'], $p['title'], $p['lapak_name']));
+            }
+        }
+
+        // Tampilkan detail produk yang diupdate
+        if ($updatedProducts) {
+            $this->info('');
+            $this->info('--- Produk yang DIUPDATE ---');
+            $this->info(sprintf('%-6s %-40s %s', 'ID', 'Nama Produk', 'Lapak'));
+            $this->info(str_repeat('-', 80));
+            foreach ($updatedProducts as $p) {
+                $this->info(sprintf('%-6d %-40s %s', $p['id'], $p['title'], $p['lapak_name']));
+            }
+        }
+
         Log::info('UpdateCatalogSeeder selesai', $summary);
     }
 
@@ -197,7 +238,7 @@ class UpdateCatalogSeeder extends Seeder
             return null;
         }
 
-        $title     = $this->makeProductTitle($category->category_name);
+        [$title, $slug] = $this->makeProductTitle($category->category_name);
         $createdAt = $this->randomTimestampOn($day);
 
         // withoutEvents agar observer creating tidak overwrite pushed_at
@@ -205,6 +246,7 @@ class UpdateCatalogSeeder extends Seeder
             fn() =>
             Product::factory()->forCategory($category)->create([
                 'title'       => $title,
+                'slug'        => $slug,
                 'lapak_id'    => $lapak->id,
                 'created_at'  => $createdAt,
                 'updated_at'  => $createdAt,
@@ -217,23 +259,19 @@ class UpdateCatalogSeeder extends Seeder
         return $product;
     }
 
-    private function updateRandomProductPushTime(Collection $products, Carbon $day): bool
+    private function updateRandomProductPushTime(Collection $products, Carbon $day): ?Product
     {
         if ($products->isEmpty()) {
-            return false;
+            return null;
         }
 
         $pushedAt = $this->randomTimestampOn($day)->subHours(random_int(1, 5));
 
-        $products->random()->updateQuietly([
+        $product = $products->random();
+        $product->updateQuietly([
             'pushed_at' => $pushedAt,
         ]);
 
-        return true;
-    }
-
-    private function makeProductTitle(string $categoryName): string
-    {
-        return $categoryName . ' ' . Str::headline(fake()->words(2, true));
+        return $product;
     }
 }

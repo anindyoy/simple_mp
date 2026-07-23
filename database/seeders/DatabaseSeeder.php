@@ -10,6 +10,8 @@ use App\Models\LapakProfile;
 use App\Models\TokenPurchase;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ProductSeeder;
+use Database\Seeders\ProductViewSeeder;
+use Database\Seeders\RandomProductHistorySeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Database\Seeders\WhatsappAgentSeeder;
@@ -64,6 +66,12 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Membuat produk...');
         $this->call([ProductSeeder::class]);
+
+        $this->command->info('Membuat product views...');
+        $this->call([ProductViewSeeder::class]);
+
+        $this->command->info('Membuat riwayat pick produk acak...');
+        $this->call([RandomProductHistorySeeder::class]);
 
         $this->command->info('Membuat laporan...');
         Report::factory()->count(20)->create();

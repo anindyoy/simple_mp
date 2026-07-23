@@ -49,6 +49,30 @@ class RandomProductPickerPage extends Page
 
     public int $activeLapakCount = 0;
 
+    public string $search = '';
+
+    public int $page = 1;
+
+    public int $totalHistory = 0;
+
+    public function updatedSearch(): void
+    {
+        $this->page = 1;
+        $this->refreshHistory();
+    }
+
+    public function nextPage(): void
+    {
+        $this->page++;
+        $this->refreshHistory();
+    }
+
+    public function prevPage(): void
+    {
+        $this->page = max(1, $this->page - 1);
+        $this->refreshHistory();
+    }
+
     public function recommendedMaxProductHistory(): int
     {
         return (int) round($this->activeProductCount * 0.5);
@@ -79,9 +103,25 @@ class RandomProductPickerPage extends Page
         $this->activeProductCount = Product::query()->where('is_active', true)->count();
         $this->activeLapakCount = LapakProfile::query()->where('is_active', true)->count();
 
-        $this->history = RandomProductHistory::query()
-            ->with('product.category', 'product.lapak')
-            ->latest()
+        $this->refreshHistory();
+    }
+
+    public function refreshHistory(): void
+    {
+        $query = RandomProductHistory::query()
+            ->with('product.category', 'product.lapak');
+
+        if ($this->search !== '') {
+            $query->whereHas('product', function ($q) {
+                $q->where('title', 'like', "%{$this->search}%");
+            })->orWhereHas('product.lapak', function ($q) {
+                $q->where('name', 'like', "%{$this->search}%");
+            });
+        }
+
+        $this->totalHistory = $query->count();
+        $this->history = $query->latest()
+            ->skip(($this->page - 1) * 20)
             ->take(20)
             ->get();
     }
@@ -147,11 +187,7 @@ class RandomProductPickerPage extends Page
             ]);
 
             // Refresh history
-            $this->history = RandomProductHistory::query()
-                ->with('product.category', 'product.lapak')
-                ->latest()
-                ->take(20)
-                ->get();
+            $this->refreshHistory();
         }
 
         if (! $this->product) {
@@ -162,15 +198,24 @@ class RandomProductPickerPage extends Page
         }
     }
 
+    public function pushProduct(int $productId): void
+    {
+        $product = Product::query()->whereKey($productId)->firstOrFail();
+        $product->update(['pushed_at' => now(), 'pushed_by' => 'system']);
+
+        $this->refreshHistory();
+
+        Notification::make()
+            ->title('Produk berhasil diangkat')
+            ->success()
+            ->send();
+    }
+
     public function deleteHistory(int $historyId): void
     {
         RandomProductHistory::query()->whereKey($historyId)->delete();
 
-        $this->history = RandomProductHistory::query()
-            ->with('product.category', 'product.lapak')
-            ->latest()
-            ->take(20)
-            ->get();
+        $this->refreshHistory();
 
         Notification::make()
             ->title('Riwayat dihapus')

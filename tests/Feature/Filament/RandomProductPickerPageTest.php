@@ -426,3 +426,168 @@ describe('getCopyText', function () {
             ->not->toContain('RAHASIA_DESKRIPSI_TIDAK_BOLEH_MUNCUL');
     });
 });
+
+// ── pushProduct ──────────────────────────────────────────────────────────────────
+
+describe('pushProduct', function () {
+    it('updates pushed_at and sets pushed_by to system', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+        $product = makeProduct($seller->lapak, ['pushed_at' => null, 'pushed_by' => null]);
+
+        $this->actingAs($admin);
+
+        livewire(RandomProductPickerPage::class)->call('pushProduct', $product->id);
+
+        $product->refresh();
+
+        expect($product->pushed_at)->not->toBeNull();
+        expect($product->pushed_at->diffInSeconds(now()))->toBeLessThan(5);
+        expect($product->pushed_by)->toBe('system');
+    });
+
+    it('shows a success notification', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+        $product = makeProduct($seller->lapak);
+
+        $this->actingAs($admin);
+
+        livewire(RandomProductPickerPage::class)
+            ->call('pushProduct', $product->id)
+            ->assertNotified();
+    });
+});
+
+// ── search / filter history ──────────────────────────────────────────────────────
+
+describe('search', function () {
+    it('filters history by product title', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+        $p1 = makeProduct($seller->lapak, ['title' => 'Gadget Canggih']);
+        $p2 = makeProduct($seller->lapak, ['title' => 'Makanan Enak']);
+
+        createHistory($p1, $p2);
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class)
+            ->set('search', 'Gadget');
+
+        /** @var \Illuminate\Support\Collection $history */
+        $history = $component->get('history');
+
+        expect($history)->toHaveCount(1);
+        expect($history->first()->product_id)->toBe($p1->id);
+    });
+
+    it('filters history by lapak name', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller1 = makeUser();
+        $seller1->lapak->update(['name' => 'Toko Jaya']);
+        $seller2 = makeUser();
+        $seller2->lapak->update(['name' => 'Warung Makmur']);
+
+        $p1 = makeProduct($seller1->lapak->fresh(), ['title' => 'Produk A']);
+        $p2 = makeProduct($seller2->lapak->fresh(), ['title' => 'Produk B']);
+
+        createHistory($p1, $p2);
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class)
+            ->set('search', 'Makmur');
+
+        /** @var \Illuminate\Support\Collection $history */
+        $history = $component->get('history');
+
+        expect($history)->toHaveCount(1);
+        expect($history->first()->product_id)->toBe($p2->id);
+    });
+
+    it('resets to page 1 when search changes', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+
+        // Create 30 history entries
+        $products = [];
+        for ($i = 0; $i < 30; $i++) {
+            $products[] = makeProduct($seller->lapak, ['title' => 'Produk ' . $i]);
+        }
+        createHistory(...$products);
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        // Go to page 2
+        $component->call('nextPage');
+        expect($component->get('page'))->toBe(2);
+
+        // Change search — should reset to page 1
+        $component->set('search', 'Produk 0');
+
+        expect($component->get('page'))->toBe(1);
+    });
+});
+
+// ── pagination (prevPage / nextPage) ─────────────────────────────────────────────
+
+describe('pagination', function () {
+    it('starts at page 1', function () {
+        $admin = makeUser(isAdmin: true);
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        expect($component->get('page'))->toBe(1);
+    });
+
+    it('goes to page 2 with nextPage', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+
+        // Need more than 20 entries to have page 2
+        for ($i = 0; $i < 25; $i++) {
+            $p = makeProduct($seller->lapak);
+            createHistory($p);
+        }
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        $component->call('nextPage');
+        expect($component->get('page'))->toBe(2);
+
+        $history = $component->get('history');
+        expect($history)->toHaveCount(5); // remaining items
+    });
+
+    it('does not go below page 1 with prevPage', function () {
+        $admin = makeUser(isAdmin: true);
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        $component->call('prevPage');
+        expect($component->get('page'))->toBe(1);
+    });
+
+    it('tracks totalHistory correctly', function () {
+        $admin = makeUser(isAdmin: true);
+        $seller = makeUser();
+
+        for ($i = 0; $i < 5; $i++) {
+            $p = makeProduct($seller->lapak);
+            createHistory($p);
+        }
+
+        $this->actingAs($admin);
+
+        $component = livewire(RandomProductPickerPage::class);
+
+        expect($component->get('totalHistory'))->toBe(5);
+    });
+});

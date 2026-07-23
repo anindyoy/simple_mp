@@ -77,7 +77,7 @@
             <div class="flex items-center gap-1 mt-0.5 text-[10px] text-gray-400">
                 <x-heroicon-s-clock class="w-3 h-3" />
                 @if ($product->pushed_at?->greaterThan($product->created_at))
-                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">Diangkat</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">Diangkat{{ $product->pushed_by === 'system' ? ' oleh sistem' : '' }}</span>
                     {{ $product->pushed_at->diffForHumans() }}
                 @else
                     <span class="text-gray-500">Dibuat</span>

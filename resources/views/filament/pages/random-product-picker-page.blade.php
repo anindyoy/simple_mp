@@ -141,14 +141,24 @@
         @endif
 
         {{-- History --}}
-        @if (count($history) > 0)
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700">
-                <div class="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                        Riwayat Produk Acak ({{ count($history) }} terakhir)
-                    </h3>
-                </div>
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700">
+            <div class="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+                    Riwayat Produk Acak
+                </h3>
 
+                <div class="mt-3">
+                    <x-filament::input.wrapper>
+                        <x-filament::input
+                            type="search"
+                            placeholder="Cari berdasarkan nama produk atau lapak..."
+                            wire:model.live="search"
+                        />
+                    </x-filament::input.wrapper>
+                </div>
+            </div>
+
+            @if (count($history) > 0)
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach ($history as $entry)
                         @php
@@ -158,7 +168,7 @@
                             class="px-4 py-3 transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
                             x-data="{
                                 copied_{{ $entry->id }}: false,
-                                copyText_{{ $entry->id }}(text) {
+                                copyAndPush_{{ $entry->id }}(text, productId) {
                                     const fallbackCopy = () => {
                                         const el = document.createElement('textarea');
                                         el.value = text;
@@ -177,6 +187,10 @@
                                     }
                                     this.copied_{{ $entry->id }} = true;
                                     setTimeout(() => this.copied_{{ $entry->id }} = false, 1500);
+
+                                    if (confirm('Update waktu push produk ini?')) {
+                                        $wire.pushProduct(productId);
+                                    }
                                 }
                             }"
                         >
@@ -204,6 +218,11 @@
                                                     {{ $p->lapak?->name ?? '-' }} &middot;
                                                 @endif
                                                 {{ $entry->created_at->translatedFormat('d M Y, H:i') }}
+                                                @if ($p && $p->pushed_at && $p->pushed_at->greaterThan($p->created_at))
+                                                    &middot; <span class="font-medium">Diangkat:</span> {{ $p->pushed_at->translatedFormat('d M Y, H:i') }}
+                                                @else
+                                                    &middot; <span class="italic">Belum pernah diangkat</span>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -215,7 +234,7 @@
                                             type="button"
                                             size="xs"
                                             color="gray"
-                                            x-on:click="copyText_{{ $entry->id }}({{ \Illuminate\Support\Js::from($this->buildHistoryCopyText($p)) }})"
+                                            x-on:click="copyAndPush_{{ $entry->id }}({{ \Illuminate\Support\Js::from($this->buildHistoryCopyText($p)) }}, {{ $p->id }})"
                                         >
                                             <span x-show="!copied_{{ $entry->id }}">Copy</span>
                                             <span x-show="copied_{{ $entry->id }}">Tersalin</span>
@@ -236,7 +255,43 @@
                         </div>
                     @endforeach
                 </div>
-            </div>
-        @endif
+
+                <div class="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">
+                            Menampilkan {{ $history->count() }} dari {{ number_format($totalHistory) }} total
+                        </span>
+                        <div class="flex gap-2">
+                            <x-filament::button
+                                type="button"
+                                size="xs"
+                                color="gray"
+                                wire:click="prevPage"
+                                :disabled="$page <= 1"
+                            >
+                                Sebelumnya
+                            </x-filament::button>
+                            <x-filament::button
+                                type="button"
+                                size="xs"
+                                color="gray"
+                                wire:click="nextPage"
+                                :disabled="$history->count() < 20"
+                            >
+                                Berikutnya
+                            </x-filament::button>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                    @if ($search !== '')
+                        Tidak ada riwayat yang cocok dengan pencarian "{{ $search }}".
+                    @else
+                        Belum ada riwayat produk acak.
+                    @endif
+                </div>
+            @endif
+        </div>
     </div>
 </x-filament::page>

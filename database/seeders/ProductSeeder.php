@@ -82,7 +82,8 @@ class ProductSeeder extends Seeder
                     ? $existingLapaks->random()->id
                     : LapakProfile::factory()->create()->id;
 
-                $product->created_at = now()->subHours(rand(1, 48));
+                $product->timestamps = false;
+                $product->created_at = fake()->dateTimeBetween('-10 days', 'now');
                 $product->save();
 
                 $product->unsetRelation('category');
@@ -122,7 +123,8 @@ class ProductSeeder extends Seeder
                     ? fake()->randomElement(['baru', 'seken'])
                     : null;
 
-                $time = now()->subHours(rand(1, 48));
+                $product->timestamps = false;
+                $time = fake()->dateTimeBetween('-10 days', 'now');
                 $product->created_at = $time;
                 $product->pushed_at = $time;
 

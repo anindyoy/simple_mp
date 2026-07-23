@@ -44,6 +44,8 @@ class Setting extends Model
             ['key' => $key],
             ['value' => $value]
         );
+
+        Cache::forget("setting.{$key}");
     }
 
     public static function getIntValue(string $key, int $default = 0, int $min = 0): int

@@ -20,6 +20,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Concerns\InteractsWithForms;
 use JeffersonGoncalves\WhatsappWidget\Models\WhatsappAgent;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class SiteSettingsPage extends Page implements HasForms
 {
@@ -377,6 +378,9 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('min_tokens_for_normal_price', (string) max(1, (int) ($data['min_tokens_for_normal_price'] ?? 5)));
         Setting::setValue('token_purchase_whatsapp', $data['token_purchase_whatsapp'] ?? '');
         Setting::setValue('user_rules_content', $data['rules_content'] ?? '');
+
+        // Hapus response cache agar halaman utama langsung mereflekikan perubahan setting
+        ResponseCache::clear();
 
         // Save bank accounts
         $bankAccounts = collect($data['token_bank_accounts'] ?? [])

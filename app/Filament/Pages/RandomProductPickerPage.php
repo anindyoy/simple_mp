@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use App\Models\RandomProductHistory;
 use App\Services\ProductScheduleService;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 
 class RandomProductPickerPage extends Page
 {
@@ -133,88 +134,113 @@ class RandomProductPickerPage extends Page
         $maxProductHistory = max(0, $this->maxProductHistory);
         $maxLapakHistory = max(0, $this->maxLapakHistory);
 
-        Setting::setValue(self::SETTING_MAX_PRODUCT_HISTORY, (string) $maxProductHistory);
-        Setting::setValue(self::SETTING_MAX_LAPAK_HISTORY, (string) $maxLapakHistory);
+        $this->persistHistorySettings($maxProductHistory, $maxLapakHistory);
 
-        // Exclude products that appeared in the last N history entries
-        $recentProductIds = RandomProductHistory::query()
-            ->latest()
-            ->take($maxProductHistory)
-            ->pluck('product_id')
-            ->unique()
-            ->toArray();
+        $baseQuery = $this->buildEligibleProductQuery(
+            $eligibleIds,
+            $this->recentHistoryIds('product_id', $maxProductHistory),
+            $this->recentHistoryIds('lapak_id', $maxLapakHistory),
+        );
 
-        // Exclude products from lapak that appeared in the last N history entries
-        $recentLapakIds = RandomProductHistory::query()
-            ->latest()
-            ->take($maxLapakHistory)
-            ->pluck('lapak_id')
-            ->unique()
-            ->toArray();
-
-        $baseQuery = Product::query()
-            ->whereIn('id', $eligibleIds)
-            ->where('is_active', true)
-            ->with(['category', 'lapak']);
-
-        if (! empty($recentProductIds)) {
-            $baseQuery->whereNotIn('id', $recentProductIds);
-        }
-
-        if (! empty($recentLapakIds)) {
-            $baseQuery->whereNotIn('lapak_id', $recentLapakIds);
-        }
-
-        // Get total count of eligible products
-        $totalEligible = (clone $baseQuery)->count();
-
-        $this->product = null;
-        $percentage = 30;
-
-        // Try with increasing percentage: 30%, 40%, 50%, ... up to 100%
-        while ($percentage <= 100 && ! $this->product) {
-            $limit = (int) ceil($totalEligible * ($percentage / 100));
-
-            if ($limit > 0) {
-                $this->product = (clone $baseQuery)
-                    ->orderby('pushed_at')
-                    ->limit($limit)
-                    ->inRandomOrder()
-                    ->first();
-            }
-
-            $percentage += 10;
-        }
-
-        // If still no product found, allow any eligible product as fallback
-        if (! $this->product) {
-            $this->product = Product::query()
-                ->whereIn('id', $eligibleIds)
-                ->where('is_active', true)
-                ->with(['category', 'lapak'])
-                ->inRandomOrder()
-                ->first();
-        }
+        $this->product = $this->pickProductByIncreasingPercentage($baseQuery)
+            ?? $this->pickFallbackProduct($eligibleIds);
 
         $this->hasGenerated = true;
 
         if ($this->product) {
-            RandomProductHistory::create([
-                'product_id' => $this->product->id,
-                'lapak_id' => $this->product->lapak_id,
-                'user_id' => auth()->id(),
-            ]);
-
-            // Refresh history
+            $this->recordHistory($this->product);
             $this->refreshHistory();
-        }
-
-        if (! $this->product) {
+        } else {
             Notification::make()
                 ->title('Tidak ada produk aktif yang bisa dipilih saat ini')
                 ->warning()
                 ->send();
         }
+    }
+
+    private function persistHistorySettings(int $maxProductHistory, int $maxLapakHistory): void
+    {
+        Setting::setValue(self::SETTING_MAX_PRODUCT_HISTORY, (string) $maxProductHistory);
+        Setting::setValue(self::SETTING_MAX_LAPAK_HISTORY, (string) $maxLapakHistory);
+    }
+
+    /**
+     * IDs to exclude, taken from the most recent N history entries.
+     */
+    private function recentHistoryIds(string $column, int $limit): array
+    {
+        return RandomProductHistory::query()
+            ->latest()
+            ->take($limit)
+            ->pluck($column)
+            ->unique()
+            ->toArray();
+    }
+
+    private function buildEligibleProductQuery(Collection|array $eligibleIds, array $excludedProductIds, array $excludedLapakIds): Builder
+    {
+        $query = Product::query()
+            ->whereIn('id', $eligibleIds)
+            ->where('is_active', true)
+            ->with(['category', 'lapak']);
+
+        if (! empty($excludedProductIds)) {
+            $query->whereNotIn('id', $excludedProductIds);
+        }
+
+        if (! empty($excludedLapakIds)) {
+            $query->whereNotIn('lapak_id', $excludedLapakIds);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Widen the eligible pool in 10% steps (30%..100%) of least-recently-pushed
+     * products until a random pick succeeds.
+     */
+    private function pickProductByIncreasingPercentage(Builder $baseQuery): ?Product
+    {
+        $totalEligible = (clone $baseQuery)->count();
+
+        for ($percentage = 30; $percentage <= 100; $percentage += 10) {
+            $limit = (int) ceil($totalEligible * ($percentage / 100));
+
+            if ($limit === 0) {
+                continue;
+            }
+
+            $product = (clone $baseQuery)
+                ->orderBy('pushed_at')
+                ->limit($limit)
+                ->inRandomOrder()
+                ->first();
+
+            if ($product) {
+                return $product;
+            }
+        }
+
+        return null;
+    }
+
+    private function pickFallbackProduct(Collection|array $eligibleIds): ?Product
+    {
+        return Product::query()
+            ->whereIn('id', $eligibleIds)
+            ->where('is_active', true)
+            ->with(['category', 'lapak'])
+            ->inRandomOrder()
+            ->first();
+    }
+
+    private function recordHistory(Product $product): void
+    {
+        RandomProductHistory::create([
+            'product_id' => $product->id,
+            'lapak_id' => $product->lapak_id,
+            'user_id' => auth()->id(),
+        ]);
     }
 
     public function pushProduct(int $productId): void

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class EnsureLapakProfileExists
 {
@@ -31,6 +32,7 @@ class EnsureLapakProfileExists
 
         // Route yang dikecualikan dari pengecekan
         $excludedRoutes = [
+            'filament.admin.pages.dashboard',
             'filament.admin.pages.lapak-profile',
             'logout',
         ];
@@ -41,8 +43,13 @@ class EnsureLapakProfileExists
 
         // Cek apakah user sudah memiliki lapak profile
         if (!$user->lapak) {
-            return redirect()->route('filament.admin.pages.lapak-profile')
-                ->with('message', 'Anda harus membuat profil lapak terlebih dahulu sebelum melanjutkan.');
+            Notification::make('no-lapak-profile')
+                ->title('Lapak belum dibuat')
+                ->body('Anda harus membuat profil lapak terlebih dahulu sebelum melanjutkan.')
+                ->warning()
+                ->send();
+
+            return redirect()->route('filament.admin.pages.lapak-profile');
         }
 
         return $next($request);

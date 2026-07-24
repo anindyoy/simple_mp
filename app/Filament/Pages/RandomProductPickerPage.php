@@ -177,7 +177,7 @@ class RandomProductPickerPage extends Page
 
             if ($limit > 0) {
                 $this->product = (clone $baseQuery)
-                    ->orderByDesc('id')
+                    ->orderby('pushed_at')
                     ->limit($limit)
                     ->inRandomOrder()
                     ->first();

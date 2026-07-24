@@ -152,22 +152,41 @@ class RandomProductPickerPage extends Page
             ->unique()
             ->toArray();
 
-        $query = Product::query()
+        $baseQuery = Product::query()
             ->whereIn('id', $eligibleIds)
             ->where('is_active', true)
             ->with(['category', 'lapak']);
 
         if (! empty($recentProductIds)) {
-            $query->whereNotIn('id', $recentProductIds);
+            $baseQuery->whereNotIn('id', $recentProductIds);
         }
 
         if (! empty($recentLapakIds)) {
-            $query->whereNotIn('lapak_id', $recentLapakIds);
+            $baseQuery->whereNotIn('lapak_id', $recentLapakIds);
         }
 
-        $this->product = $query->inRandomOrder()->first();
+        // Get total count of eligible products
+        $totalEligible = (clone $baseQuery)->count();
 
-        // If all eligible products are in recent history, allow any eligible product
+        $this->product = null;
+        $percentage = 30;
+
+        // Try with increasing percentage: 30%, 40%, 50%, ... up to 100%
+        while ($percentage <= 100 && ! $this->product) {
+            $limit = (int) ceil($totalEligible * ($percentage / 100));
+
+            if ($limit > 0) {
+                $this->product = (clone $baseQuery)
+                    ->orderByDesc('id')
+                    ->limit($limit)
+                    ->inRandomOrder()
+                    ->first();
+            }
+
+            $percentage += 10;
+        }
+
+        // If still no product found, allow any eligible product as fallback
         if (! $this->product) {
             $this->product = Product::query()
                 ->whereIn('id', $eligibleIds)

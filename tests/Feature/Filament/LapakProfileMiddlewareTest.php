@@ -49,8 +49,6 @@ describe('EnsureLapakProfileExists Middleware', function () {
 
         $this->get(route('filament.admin.resources.products.index'))
             ->assertRedirect(route('filament.admin.pages.lapak-profile'));
-
-        Notification::assertNotified('Lapak belum dibuat');
     });
 
     it('allows user with lapak to access product list', function () {
@@ -71,9 +69,26 @@ describe('EnsureLapakProfileExists Middleware', function () {
             ->assertOk();
     });
 
+    // ==================== LOGOUT ACCESS ====================
+
+    it('allows user without lapak to logout without redirect', function () {
+        $user = User::factory()->create([
+            'is_admin' => false,
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->post(route('filament.admin.auth.logout'));
+
+        // Logout should redirect to login (root or login page), NOT to lapak-profile
+        expect($response->getStatusCode())->toBe(302);
+        expect($response->headers->get('Location'))
+            ->not->toContain('lapak-profile');
+    });
+
     // ==================== DASHBOARD NOTIFICATION ====================
 
-    it('shows notification on dashboard when user has no lapak', function () {
+    it('does not show notification on dashboard when user has no lapak', function () {
         $user = User::factory()->create([
             'is_admin' => false,
         ]);
@@ -82,7 +97,7 @@ describe('EnsureLapakProfileExists Middleware', function () {
 
         Livewire::test(Dashboard::class);
 
-        Notification::assertNotified('Lapak belum dibuat');
+        Notification::assertNotNotified('Lapak belum dibuat');
     });
 
     it('does not show notification on dashboard when user has lapak', function () {

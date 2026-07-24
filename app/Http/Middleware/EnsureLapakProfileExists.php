@@ -34,7 +34,7 @@ class EnsureLapakProfileExists
         $excludedRoutes = [
             'filament.admin.pages.dashboard',
             'filament.admin.pages.lapak-profile',
-            'logout',
+            'filament.admin.auth.logout',
         ];
 
         if (in_array($request->route()?->getName(), $excludedRoutes)) {

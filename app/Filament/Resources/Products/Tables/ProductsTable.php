@@ -115,7 +115,8 @@ class ProductsTable
                             if ($record->created_at->diffInMinutes($record->pushed_at) <= 5) {
                                 $pushedText = '-';
                             } else {
-                                $pushedText = "Diangkat " . $record->pushed_at?->diffForHumans();
+                                $pushedBySystem = $record->pushed_by === 'system';
+                                $pushedText = "Diangkat" . ($pushedBySystem ? ' oleh sistem' : '') . " " . $record->pushed_at?->diffForHumans();
                             }
 
                             return "{$views}x dilihat · {$pushedText}";

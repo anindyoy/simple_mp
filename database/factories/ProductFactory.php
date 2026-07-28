@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\LapakProfile;
+use App\Traits\UsesProductJsonData;
 use App\Traits\AttachesProductImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -15,16 +16,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductFactory extends Factory
 {
     use AttachesProductImages;
+    use UsesProductJsonData;
 
     /** @var array<string, array{min: int, max: int}>|null */
     protected static ?array $priceRanges = null;
 
     public function definition(): array
     {
-        $title = $this->faker->words(3, true);
-
         $category = Category::query()->inRandomOrder()->first()
             ?? Category::factory()->create();
+
+        $this->loadJsonData();
+        [$title, $slug] = $this->makeProductTitle($category->category_name);
 
         return [
             'title' => $title,
@@ -57,7 +60,8 @@ class ProductFactory extends Factory
 
     protected function priceForCategory(?string $categoryName): int
     {
-        $range = self::loadPriceRanges()[mb_strtolower($categoryName ?? '')]
+        $this->loadJsonData();
+        $range = $this->productPrices[mb_strtolower($categoryName ?? '')]
             ?? ['min' => 10_000, 'max' => 2_000_000];
 
         return (int) round($this->faker->numberBetween($range['min'], $range['max']), -3);

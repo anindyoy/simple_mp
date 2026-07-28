@@ -14,7 +14,6 @@
         "Registrasi dan login publik",
         "Wajib verifikasi email sebelum bisa mengakses panel member/admin",
         "Mengelola profil akun (nama, email, password, avatar)",
-        "Mengaktifkan Two-Factor Authentication (2FA) untuk keamanan akun (opsional)",
         "Mengelola profil lapak dan produk milik lapak sendiri",
         "Melakukan report produk/lapak",
         "Fitur token untuk membuat produk baru dan mengangkat produk agar muncul di awal halaman utama",
@@ -171,11 +170,6 @@
           "body": "Atur tampilan lapak sesuka hati dan buat produkmu makin menarik dilihat calon pembeli."
         },
         {
-          "title": "Naikkan Eksistensi Produkmu",
-          "body": "Gunakan token untuk mengangkat produk agar kembali tampil di halaman utama.",
-          "post_link": "https://t.me/lapakwarga/4"
-        },
-        {
           "title": "Produk Lama Bisa Tampil Seperti Baru",
           "body": "Tidak perlu upload ulang. Gunakan token dan produkmu kembali muncul di posisi strategis."
         },
@@ -218,32 +212,8 @@
           "body": "Gunakan foto yang terang dan jelas agar produk lebih diminati."
         },
         {
-          "title": "Tips Lengkapi Deskripsi Produk Anda",
-          "body": "Semakin lengkap informasi produk, semakin mudah calon pembeli mengambil keputusan. Deskripsi yang detail membuat calon pembeli lebih percaya dan mengurangi tanya jawab yang tidak perlu.",
-          "sub_items": [
-            {
-              "title": "Cantumkan Jam Operasional Toko",
-              "body": "Tuliskan jam operasional toko, misalnya: buka Senin–Sabtu pukul 08.00–17.00 WIB. Dengan begitu pembeli tahu kapan bisa menghubungi kamu atau kapan bisa mengambil pesanan langsung."
-            },
-            {
-              "title": "Jelaskan Syarat & Ketentuan Pengantaran",
-              "body": "Cantumkan informasi pengiriman seperti jarak tempuh yang dilayani, minimal pembelian untuk gratis ongkir, estimasi waktu pengiriman (H+1 atau H+2), dan opsi pengambilan langsung (COD atau ambil di tempat) agar tidak ada kesalahpahaman dengan pembeli."
-            },
-            {
-              "title": "Sertakan Metode Pembayaran yang Tersedia",
-              "body": "Tulis metode pembayaran yang kamu terima, misalnya transfer bank, e-wallet (GoPay, OVO, Dana), atau tunai saat COD. Informasi ini membantu transaksi berjalan lebih lancar."
-            }
-          ],
-          "post_link": "https://t.me/lapakwarga/10"
-        },
-        {
           "title": "Rajin Perbarui Produk",
           "body": "Produk yang aktif diperbarui cenderung lebih sering dilihat calon pembeli."
-        },
-        {
-          "title": "Tambahkan Link Toko External di Profil Lapak",
-          "body": "Jika kamu punya toko di Shopee, Tokopedia, Instagram, atau website sendiri, tambahkan link-nya di halaman profil lapak. Calon pembeli bisa melihat portofolio dan reputasi tokomu lebih lengkap, sehingga semakin percaya untuk bertransaksi.",
-          "post_link": "https://t.me/lapakwarga/14"
         }
       ]
     },
@@ -251,17 +221,8 @@
       "theme": "Edukasi Buyer",
       "items": [
         {
-          "title": "Manfaatkan fitur filter",
-          "body": "Gunakan filter produk untuk mencari produk yang anda inginkan.",
-          "post_link": "https://t.me/lapakwarga/6"
-        },
-        {
           "title": "Lihat Profil Lapak Sebelum Membeli",
           "body": "Kenali penjual melalui profil lapaknya dan lihat produk lain yang tersedia."
-        },
-        {
-          "title": "Laporkan Konten yang Tidak Sesuai",
-          "body": "Bantu menjaga kenyamanan marketplace dengan menggunakan fitur pelaporan."
         },
         {
           "title": "Hubungi Admin Jika Ada Masalah",
@@ -320,11 +281,6 @@
           "body": "Mulailah berjualan hari ini. Lapakmu bisa terus berkembang seiring waktu."
         },
         {
-          "title": "Satu Produk Bisa Membuka Banyak Peluang",
-          "body": "Tidak ada yang tahu siapa pelanggan pertamamu jika belum mulai.",
-          "post_link": "https://t.me/lapakwarga/12"
-        },
-        {
           "title": "Setiap Lapak Memiliki Cerita",
           "body": "Bagikan karya dan usahamu kepada komunitas yang siap mendukung."
         }
@@ -348,11 +304,6 @@
         {
           "title": "Marketplace yang Lebih Nyaman",
           "body": "Sistem moderasi dan pelaporan membantu menjaga kualitas konten yang tampil."
-        },
-        {
-          "title": "Ada Masalah? Admin Siap Bantu via WhatsApp",
-          "body": "Jika menemukan kendala atau konten yang tidak sesuai, kamu bisa langsung menghubungi admin melalui fitur 'Hubungi Admin' di sidebar panel member. Tersedia beberapa nomor admin yang aktif dan siap merespons via WhatsApp.",
-          "post_link": "https://t.me/lapakwarga/18"
         }
       ]
     },
@@ -379,8 +330,7 @@
           "title": "5. Laporkan Jika Ada Masalah",
           "body": "Temukan penjual atau produk yang mencurigakan? Gunakan fitur laporkan (report) agar admin dapat menindaklanjuti. Atau jika butuh bantuan lebih lanjut, hubungi admin langsung lewat fitur 'Hubungi Admin' di sidebar panel."
         }
-      ],
-      "post_link": "https://t.me/lapakwarga/8"
+      ]
     },
     {
       "theme": "Call-to-Action Penutup",
@@ -426,45 +376,158 @@
           "title": "Butuh Bantuan? Hubungi Admin via WA",
           "body": "Ada pertanyaan seputar penggunaan atau masalah teknis lainnya? Kamu bisa menghubungi admin dari halaman utama melalui tombol 'Hubungi Kami' di navbar, atau dari dalam panel member lewat menu 'Hubungi Admin' di sidebar. Pilih kontak admin yang tersedia, dan sampaikan masalahmu langsung via WhatsApp. Admin siap membantu."
         }
-      ],
-      "post_link": "https://t.me/lapakwarga/18"
+      ]
+    },
+    {
+      "theme": "Ajakan Sebar Luaskan Website",
+      "items": [
+        {
+          "title": "Kenalkan lapakwarga.my.id ke Tetanggamu",
+          "body": "Punya tetangga yang jualan tapi belum punya lapak online? Kenalkan lapakwarga.my.id, siapa tahu jadi langkah awal usahanya berkembang."
+        },
+        {
+          "title": "Bagikan ke Keluarga dan Teman Terdekat",
+          "body": "Semakin banyak yang tahu, semakin ramai lapakwarga.my.id. Share link ini ke keluarga dan teman agar mereka juga bisa jualan atau belanja produk warga."
+        },
+        {
+          "title": "Satu Share, Banyak Manfaat",
+          "body": "Kirim lapakwarga.my.id ke grup keluarga, grup RT, atau komunitasmu. Bantu tetangga yang punya usaha kecil untuk lebih dikenal."
+        },
+        {
+          "title": "Bantu Sebarkan, Bantu Sesama Warga",
+          "body": "Tidak perlu jadi penjual untuk berkontribusi. Cukup sebarkan lapakwarga.my.id ke orang-orang di sekitarmu, kamu sudah membantu usaha warga bertumbuh."
+        },
+        {
+          "title": "Yuk Ajak Tetangga Gabung",
+          "body": "Ceritakan tentang lapakwarga.my.id ke tetangga sekitar rumahmu. Ajak mereka buka lapak atau sekadar coba belanja produk sesama warga sekitar."
+        },
+        {
+          "title": "Rekomendasikan ke Orang Terdekatmu",
+          "body": "Kalau kamu merasa terbantu dengan lapakwarga.my.id, jangan simpan sendiri. Rekomendasikan juga ke keluarga, teman kerja, atau tetangga."
+        },
+        {
+          "title": "Dari Kamu, Untuk Warga Lainnya",
+          "body": "Sebarkan lapakwarga.my.id ke lingkungan sekitarmu agar makin banyak warga yang merasakan manfaatnya, baik sebagai penjual maupun pembeli."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Belanja & Buka Lapak",
+      "items": [
+        {
+          "title": "Di Sini, Kamu Bisa Jualan dan Belanja Sekaligus",
+          "body": "lapakwarga.my.id bukan cuma tempat jualan, tapi juga destinasi belanja produk warga. Buka lapak untuk jualan, atau jelajahi katalog untuk belanja kebutuhanmu."
+        },
+        {
+          "title": "Satu Platform, Dua Manfaat",
+          "body": "Dapatkan penghasilan dari lapakmu, dan temukan produk unik dari tetangga. Bergabung di lapakwarga.my.id sebagai penjual dan pembeli."
+        },
+        {
+          "title": "Jualan di Sini, Belanja di Sini",
+          "body": "Tidak perlu aplikasi berbeda untuk jualan dan belanja. Di lapakwarga.my.id, kamu bisa buka lapak untuk menjual produk, sekaligus cek katalog untuk membeli kebutuhan."
+        },
+        {
+          "title": "Ekonomi Warga Berputar dari Sini",
+          "body": "Setiap kali kamu jualan, ada warga lain yang belanja. Setiap kali kamu belanja, kamu mendukung usaha warga. Bergabung di lapakwarga.my.id dan jadilah bagian dari siklus ekonomi lokal."
+        },
+        {
+          "title": "Punya Produk? Jual di Sini. Butuh Produk? Cek di Sini",
+          "body": "lapakwarga.my.id adalah tempat yang tepat untuk kedua kebutuhanmu. Upload produk usahamu, atau temukan produk-produk menarik dari pelaku usaha warga sekitar."
+        },
+        {
+          "title": "Dari Penjual ke Pembeli, Semua di Tempat yang Sama",
+          "body": "Tidak perlu berganti-ganti platform. Daftar akun sekali, buka lapak untuk berjualan, dan jelajahi katalog untuk berbelanja — semua di lapakwarga.my.id."
+        },
+        {
+          "title": "Jadi Penjual, Jadi Pembeli, Jadi Bagian Komunitas",
+          "body": "Di lapakwarga.my.id, kamu bisa memiliki dua peran sekaligus. Jual produk usahamu, belanja produk warga, dan bangun jaringan ekonomi yang saling mendukung."
+        },
+        {
+          "title": "Platform Jual-Beli yang Sesuai untuk Warga",
+          "body": "Fokus pada komunitas lokal, lapakwarga.my.id memudahkan kamu menjual produk dan menemukan kebutuhan harian dari warga sekitar."
+        },
+        {
+          "title": "Mulai dari Sini: Jualan dan Belanja Produk Lokal",
+          "body": "Daftar gratis, buat lapak untuk berjualan, dan jelajahi ribuan produk warga untuk dibeli. Semua dimulai dari satu langkah di lapakwarga.my.id."
+        },
+        {
+          "title": "Tempat Usahamu Tumbuh, Tempat Kebutuhanmu Terpenuhi",
+          "body": "Di lapakwarga.my.id, kamu bisa mengembangkan usaha melalui profil lapak, sekaligus memenuhi kebutuhan harian dengan belanja produk lokal dari warga sekitar."
+        }
+      ]
     }
   ],
-  "weekly_content_series": [
+  "created_content": [
     {
-      "day": "Senin",
-      "hashtag": "#MulaiJualanSenin",
-      "theme": "Tips membuka lapak dan promosi UMKM"
+      "theme": "Ajakan Fitur/Token",
+      "items": [
+        {
+          "title": "Naikkan Eksistensi Produkmu",
+          "post_link": "https://t.me/lapakwarga/4"
+        }
+      ]
     },
     {
-      "day": "Selasa",
-      "hashtag": "#ProdukPilihan",
-      "theme": "Highlight produk menarik dari pelapak"
+      "theme": "Edukasi Buyer",
+      "items": [
+        {
+          "title": "Manfaatkan fitur filter",
+          "post_link": "https://t.me/lapakwarga/6"
+        }
+      ]
     },
     {
-      "day": "Rabu",
-      "hashtag": "#KenalanDenganPelapak",
-      "theme": "Cerita singkat profil salah satu penjual"
+      "theme": "Cara Transaksi di lapakwarga.my.id",
+      "post_link": "https://t.me/lapakwarga/8"
     },
     {
-      "day": "Kamis",
-      "hashtag": "#TipsJualan",
-      "theme": "Tips foto produk, deskripsi, harga, pelayanan"
+      "theme": "Edukasi Seller",
+      "items": [
+        {
+          "title": "Tips Lengkapi Deskripsi Produk Anda",
+          "post_link": "https://t.me/lapakwarga/10"
+        }
+      ]
     },
     {
-      "day": "Jumat",
-      "hashtag": "#FiturLapakWarga",
-      "theme": "Edukasi fitur token, boost produk, profil lapak"
+      "theme": "Motivasi UMKM",
+      "items": [
+        {
+          "title": "Satu Produk Bisa Membuka Banyak Peluang",
+          "post_link": "https://t.me/lapakwarga/12"
+        }
+      ]
     },
     {
-      "day": "Sabtu",
-      "hashtag": "#BelanjaLokal",
-      "theme": "Ajakan membeli produk warga sekitar"
+      "theme": "Edukasi Seller",
+      "items": [
+        {
+          "title": "Tambahkan Link Toko External di Profil Lapak",
+          "post_link": "https://t.me/lapakwarga/14"
+        }
+      ]
     },
     {
-      "day": "Minggu",
-      "hashtag": "#CeritaUMKM",
-      "theme": "Kisah inspiratif pelaku usaha atau testimoni pengguna"
+      "theme": "Keunggulan lapakwarga.my.id",
+      "items": [
+        {
+          "title": "Ada Masalah? Admin Siap Bantu via WhatsApp",
+          "post_link": "https://t.me/lapakwarga/18"
+        }
+      ]
+    },
+    {
+      "theme": "Hubungi Admin",
+      "post_link": "https://t.me/lapakwarga/18"
+    },
+    {
+      "theme": "Edukasi Buyer",
+      "items": [
+        {
+          "title": "Laporkan Konten yang Tidak Sesuai",
+          "post_link": "https://t.me/lapakwarga/21"
+        }
+      ]
     }
   ]
 }

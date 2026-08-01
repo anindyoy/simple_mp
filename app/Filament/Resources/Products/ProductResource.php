@@ -36,17 +36,50 @@ class ProductResource extends Resource
 
     public static function canView(Model $record): bool
     {
-        return (int) $record->lapak?->user_id === (int) auth()->id();
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Admin can view in demo mode
+        if ($user->is_admin && config('app.demo_mode')) {
+            return true;
+        }
+
+        return (int) $record->lapak?->user_id === (int) $user->id;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return (int) $record->lapak?->user_id === (int) auth()->id();
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Admin can edit in demo mode
+        if ($user->is_admin && config('app.demo_mode')) {
+            return true;
+        }
+
+        return (int) $record->lapak?->user_id === (int) $user->id;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return (int) $record->lapak?->user_id === (int) auth()->id();
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Admin can delete in demo mode
+        if ($user->is_admin && config('app.demo_mode')) {
+            return true;
+        }
+
+        return (int) $record->lapak?->user_id === (int) $user->id;
     }
 
     public static function getEloquentQuery(): Builder

@@ -112,27 +112,29 @@
                     @endif
                 </div>
 
-                <div class="mt-5 grid grid-cols-3 gap-2 sm:flex sm:items-center sm:justify-between sm:gap-3">
-                    @if (auth()->check() && (auth()->user()->is_admin && config('app.demo_mode') || (int) $product->lapak?->user_id === (int) auth()->id()))
-                        <a href="{{ route('filament.admin.resources.products.edit', $product) }}"
-                            target="_blank"
-                            class="inline-flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-3 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                    <div class="flex items-center gap-2">
+                        @if (auth()->check() && (auth()->user()->is_admin && config('app.demo_mode') || (int) $product->lapak?->user_id === (int) auth()->id()))
+                            <a href="{{ route('filament.admin.resources.products.edit', $product) }}"
+                                target="_blank"
+                                class="inline-flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-3 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                <span>Edit Produk</span>
+                            </a>
+                        @endif
+
+                        <button onclick="copyProductLink()"
+                            class="inline-flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-3 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
-                            <span>Edit Produk</span>
-                        </a>
-                    @endif
-
-                    <button onclick="copyProductLink()"
-                        class="inline-flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-3 sm:py-2.5 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        <span>Bagikan</span>
-                    </button>
+                            <span>Bagikan</span>
+                        </button>
+                    </div>
 
                     @if ($hasReported)
                         <span class="inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm text-gray-400 cursor-not-allowed whitespace-nowrap">

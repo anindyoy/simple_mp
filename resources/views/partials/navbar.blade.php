@@ -22,6 +22,17 @@
                     Peraturan
                 </a>
 
+                @php
+                    $tipsTutorialUrl = \App\Models\Setting::getValue('tips_tutorial_url', '');
+                @endphp
+
+                @if ($tipsTutorialUrl)
+                    <a href="{{ $tipsTutorialUrl }}" target="_blank" rel="noopener noreferrer"
+                        class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
+                        Tips dan Tutorial
+                    </a>
+                @endif
+
                 @if ($adminAgents->count() > 1)
                     <button type="button" data-modal-target="contactAdminModal" data-modal-toggle="contactAdminModal"
                         class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
@@ -79,12 +90,23 @@
     </div>
 
     {{-- Mobile dropdown menu --}}
-    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 space-y-3">
-        <a href="{{ route('rules.index') }}" class="block text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
-            Peraturan
-        </a>
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 space-y-3">
+            <a href="{{ route('rules.index') }}" class="block text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
+                Peraturan
+            </a>
 
-        @if ($adminAgents->count() > 1)
+            @php
+                $tipsTutorialUrl = \App\Models\Setting::getValue('tips_tutorial_url', '');
+            @endphp
+
+            @if ($tipsTutorialUrl)
+                <a href="{{ $tipsTutorialUrl }}" target="_blank" rel="noopener noreferrer"
+                    class="block text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
+                    Tips dan Tutorial
+                </a>
+            @endif
+
+            @if ($adminAgents->count() > 1)
             <button type="button" data-modal-target="contactAdminModal" data-modal-toggle="contactAdminModal"
                 class="block w-full text-left text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition">
                 Hubungi Kami

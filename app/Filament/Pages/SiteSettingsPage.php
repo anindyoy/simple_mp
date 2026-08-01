@@ -75,6 +75,7 @@ class SiteSettingsPage extends Page implements HasForms
             'rules_content' => Setting::getValue('user_rules_content', ''),
             'external_link_labels' => implode("\n", $this->getExternalLinkLabels()),
             'whatsapp_agents' => $this->getWhatsappAgents(),
+            'tips_tutorial_url' => Setting::getValue('tips_tutorial_url', ''),
         ]);
     }
 
@@ -162,7 +163,7 @@ class SiteSettingsPage extends Page implements HasForms
                             ->schema([
                                 Toggle::make('show_visitor_count')
                                     ->label('Tampilkan Jumlah Pengunjung')
-                                    ->default(true)
+                                    ->default(false)
                                     ->helperText('Tampilkan teks jumlah pengunjung 24 jam terakhir di halaman utama, di atas grid produk.'),
 
                                 TextInput::make('visitor_count_min_views')
@@ -354,6 +355,20 @@ class SiteSettingsPage extends Page implements HasForms
                                     ->rows(6)
                                     ->helperText('Default: Website, Shopee, Tokopedia, Tiktok, Instagram, Facebook'),
                             ]),
+
+                        // Kolom Kiri
+                        Section::make('Tips dan Tutorial')
+                            ->collapsible()
+                            ->collapsed()
+                            ->columnSpan(1)
+                            ->description('Atur URL untuk halaman tips dan tutorial yang akan ditampilkan di menu navigasi.')
+                            ->schema([
+                                TextInput::make('tips_tutorial_url')
+                                    ->label('URL Tips dan Tutorial')
+                                    ->url()
+                                    ->placeholder('https://contoh.com/tips-tutorial')
+                                    ->helperText('URL yang akan ditampilkan di menu "Tips dan Tutorial" di halaman depan. Biarkan kosong jika tidak ingin menampilkan menu ini.'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -378,6 +393,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('min_tokens_for_normal_price', (string) max(1, (int) ($data['min_tokens_for_normal_price'] ?? 5)));
         Setting::setValue('token_purchase_whatsapp', $data['token_purchase_whatsapp'] ?? '');
         Setting::setValue('user_rules_content', $data['rules_content'] ?? '');
+        Setting::setValue('tips_tutorial_url', $data['tips_tutorial_url'] ?? '');
 
         // Hapus response cache agar halaman utama langsung mereflekikan perubahan setting
         ResponseCache::clear();

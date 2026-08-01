@@ -159,7 +159,10 @@ class UpdateCatalogSeeder extends Seeder
 
     protected function info(string $message): void
     {
-        fwrite(STDOUT, $message . PHP_EOL);
+        // Only write output in CLI context to avoid errors in web context
+        if (PHP_SAPI === 'cli') {
+            echo $message . PHP_EOL;
+        }
     }
 
     /**

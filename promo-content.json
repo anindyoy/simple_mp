@@ -12,10 +12,10 @@
       ],
       "member": [
         "Registrasi dan login publik",
-        "Wajib verifikasi email sebelum bisa mengakses panel member/admin",
+        "Wajib verifikasi email sebelum bisa mengakses panel member\/admin",
         "Mengelola profil akun (nama, email, password, avatar)",
         "Mengelola profil lapak dan produk milik lapak sendiri",
-        "Melakukan report produk/lapak",
+        "Melakukan report produk\/lapak",
         "Fitur token untuk membuat produk baru dan mengangkat produk agar muncul di awal halaman utama",
         "Membeli token angkat produk (request pembelian + upload bukti transfer)",
         "Melihat riwayat pembelian token beserta status konfirmasi per transaksi"
@@ -69,7 +69,7 @@
       ]
     },
     {
-      "theme": "Ajakan Cek/Belanja Produk (Buyer)",
+      "theme": "Ajakan Cek\/Belanja Produk (Buyer)",
       "items": [
         {
           "title": "Cek Produk Warga di Sekitarmu",
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "theme": "Ajakan Komunitas / Trust",
+      "theme": "Ajakan Komunitas \/ Trust",
       "items": [
         {
           "title": "Marketplace Warga, Milik Bersama",
@@ -150,7 +150,7 @@
         },
         {
           "title": "Ada Masalah? Hubungi Admin Lewat WhatsApp",
-          "body": "Temukan produk atau lapak yang mencurigakan? Punya kendala teknis? Di panel member/admin, kamu bisa langsung menghubungi admin melalui fitur 'Hubungi Admin' di sidebar. Klik, pilih nomor admin yang tersedia, dan chat via WhatsApp — admin siap membantu."
+          "body": "Temukan produk atau lapak yang mencurigakan? Punya kendala teknis? Di panel member\/admin, kamu bisa langsung menghubungi admin melalui fitur 'Hubungi Admin' di sidebar. Klik, pilih nomor admin yang tersedia, dan chat via WhatsApp — admin siap membantu."
         },
         {
           "title": "Konsultasi Langsung dengan Admin via WhatsApp",
@@ -159,7 +159,7 @@
       ]
     },
     {
-      "theme": "Ajakan Fitur/Token",
+      "theme": "Ajakan Fitur\/Token",
       "items": [
         {
           "title": "Token Gratis Tiap Hari untuk Warga Aktif",
@@ -320,7 +320,7 @@
         },
         {
           "title": "3. Hubungi Penjual Langsung",
-          "body": "Gunakan nomor WhatsApp yang tercantum di profil lapak untuk menanyakan ketersediaan, nego harga, serta menyepakati metode pembayaran dan pengiriman/pengambilan barang."
+          "body": "Gunakan nomor WhatsApp yang tercantum di profil lapak untuk menanyakan ketersediaan, nego harga, serta menyepakati metode pembayaran dan pengiriman\/pengambilan barang."
         },
         {
           "title": "4. Transaksi Dilakukan di Luar Aplikasi",
@@ -366,7 +366,7 @@
       "items": [
         {
           "title": "Hubungi Admin dari Halaman Utama atau Panel Member",
-          "body": "Fitur hubungi admin tersedia di dua tempat. Di halaman utama, klik 'Hubungi Kami' di navbar (atas halaman) — jika ada lebih dari satu admin, akan muncul modal berisi daftar admin yang bisa dipilih. Di dalam panel member/admin, klik 'Hubungi Admin' di sidebar sebelah kiri. Keduanya akan menampilkan daftar admin aktif lengkap dengan nama, avatar (pria/wanita), dan nomor telepon — cukup klik salah satu untuk langsung chat via WhatsApp."
+          "body": "Fitur hubungi admin tersedia di dua tempat. Di halaman utama, klik 'Hubungi Kami' di navbar (atas halaman) — jika ada lebih dari satu admin, akan muncul modal berisi daftar admin yang bisa dipilih. Di dalam panel member\/admin, klik 'Hubungi Admin' di sidebar sebelah kiri. Keduanya akan menampilkan daftar admin aktif lengkap dengan nama, avatar (pria\/wanita), dan nomor telepon — cukup klik salah satu untuk langsung chat via WhatsApp."
         },
         {
           "title": "Pilih Admin yang Ingin Dihubungi",
@@ -453,79 +453,6 @@
         {
           "title": "Tempat Usahamu Tumbuh, Tempat Kebutuhanmu Terpenuhi",
           "body": "Di lapakwarga.my.id, kamu bisa mengembangkan usaha melalui profil lapak, sekaligus memenuhi kebutuhan harian dengan belanja produk lokal dari warga sekitar."
-        }
-      ]
-    }
-  ],
-  "created_content": [
-    {
-      "theme": "Ajakan Fitur/Token",
-      "items": [
-        {
-          "title": "Naikkan Eksistensi Produkmu",
-          "post_link": "https://t.me/lapakwarga/4"
-        }
-      ]
-    },
-    {
-      "theme": "Edukasi Buyer",
-      "items": [
-        {
-          "title": "Manfaatkan fitur filter",
-          "post_link": "https://t.me/lapakwarga/6"
-        }
-      ]
-    },
-    {
-      "theme": "Cara Transaksi di lapakwarga.my.id",
-      "post_link": "https://t.me/lapakwarga/8"
-    },
-    {
-      "theme": "Edukasi Seller",
-      "items": [
-        {
-          "title": "Tips Lengkapi Deskripsi Produk Anda",
-          "post_link": "https://t.me/lapakwarga/10"
-        }
-      ]
-    },
-    {
-      "theme": "Motivasi UMKM",
-      "items": [
-        {
-          "title": "Satu Produk Bisa Membuka Banyak Peluang",
-          "post_link": "https://t.me/lapakwarga/12"
-        }
-      ]
-    },
-    {
-      "theme": "Edukasi Seller",
-      "items": [
-        {
-          "title": "Tambahkan Link Toko External di Profil Lapak",
-          "post_link": "https://t.me/lapakwarga/14"
-        }
-      ]
-    },
-    {
-      "theme": "Keunggulan lapakwarga.my.id",
-      "items": [
-        {
-          "title": "Ada Masalah? Admin Siap Bantu via WhatsApp",
-          "post_link": "https://t.me/lapakwarga/18"
-        }
-      ]
-    },
-    {
-      "theme": "Hubungi Admin",
-      "post_link": "https://t.me/lapakwarga/18"
-    },
-    {
-      "theme": "Edukasi Buyer",
-      "items": [
-        {
-          "title": "Laporkan Konten yang Tidak Sesuai",
-          "post_link": "https://t.me/lapakwarga/21"
         }
       ]
     }

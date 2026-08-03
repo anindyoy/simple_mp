@@ -69,6 +69,13 @@ class UsersTable
                     ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('last_login_at')
+                    ->label('Login Terakhir')
+                    ->since()
+                    ->sortable()
+                    ->toggleable()
+                    ->placeholder('Belum pernah login'),
             ])
             ->defaultSort('created_at', 'desc')
             ->filtersFormColumns(3)

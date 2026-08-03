@@ -46,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmailContract, FilamentU
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'push_tokens' => 'integer',

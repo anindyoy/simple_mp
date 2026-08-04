@@ -443,16 +443,102 @@
           "body": "Di lapakwarga.my.id, kamu bisa memiliki dua peran sekaligus. Jual produk usahamu, belanja produk warga, dan bangun jaringan ekonomi yang saling mendukung."
         },
         {
-          "title": "Platform Jual-Beli yang Sesuai untuk Warga",
-          "body": "Fokus pada komunitas lokal, lapakwarga.my.id memudahkan kamu menjual produk dan menemukan kebutuhan harian dari warga sekitar."
-        },
-        {
           "title": "Mulai dari Sini: Jualan dan Belanja Produk Lokal",
           "body": "Daftar gratis, buat lapak untuk berjualan, dan jelajahi ribuan produk warga untuk dibeli. Semua dimulai dari satu langkah di lapakwarga.my.id."
         },
         {
           "title": "Tempat Usahamu Tumbuh, Tempat Kebutuhanmu Terpenuhi",
           "body": "Di lapakwarga.my.id, kamu bisa mengembangkan usaha melalui profil lapak, sekaligus memenuhi kebutuhan harian dengan belanja produk lokal dari warga sekitar."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Tawarkan Jasa (Service Provider)",
+      "items": [
+        {
+          "title": "Punya Keahlian? Saatnya Tawarkan Jasa!",
+          "body": "Punya keahlian desain grafis, pembuatan website, fotografi wedding/event, renovasi rumah, service AC, cleaning service, les privat (tutoring), pembuatan konten digital, service elektronik, atau jasa pembuatan makanan untuk acara? Tawarkan jasaumu di lapakwarga.my.id dan jangkau warga yang membutuhkan."
+        },
+        {
+          "title": "Jasa Profesional, Tetap Dekat dengan Komunitas",
+          "body": "Tidak perlu platform mahal untuk promosi jasa. Buat profil lapak di lapakwarga.my.id dan tunjukkan keahlianmu kepada warga sekitar."
+        },
+        {
+          "title": "Dari Freelancer ke Warga Terpercaya",
+          "body": "Bangun reputasi sebagai penyedia jasa terpercaya di lingkunganmu. Setiap review positif akan menambah kepercayaan warga lain."
+        },
+        {
+          "title": "Jasa Rumah Tangga, Jasa Kreatif, Semua Bisa",
+          "body": "Les privat (tutoring) semua mata pelajaran, desain grafis dan logo, jahitan dan tailoring, service elektronik (TV, AC, kulkas), pembuatan konten dan video editing, jasa catering untuk acara, makeup artist, atau jasa perbaikan rumah — semua bisa ditawarkan di lapakwarga.my.id."
+        },
+        {
+          "title": "Jadikan lapakwarga.my.id sebagai etalase untuk menampilkan keahlianmu",
+          "body": "Di sekitar kita selalu ada warga yang membutuhkan jasa profesional: desain grafis, service elektronik, renovasi rumah, les privat, service elektronik, dll."
+        },
+        {
+          "title": "Tanpa Biaya Iklan, Tetap Bisa Dikenal",
+          "body": "Daftar gratis, buat profil lapak, dan tunjukkan portofolio atau testimoni. Warga akan menemukan jasaumu secara organik."
+        },
+        {
+          "title": "Modal Keahlian, Bisa Hasilkan Penghasilan",
+          "body": "Tidak perlu modal besar untuk memulai. Cukup daftar akun, buat profil lapak, dan mulailah menawarkan jasa ke komunitas."
+        },
+        {
+          "title": "Bangun Portofolio dari Komunitas",
+          "body": "Setiap proyek yang diselesaikan adalah bukti keahlianmu. Kumpulkan review dan testimoni dari warga untuk meningkatkan kredibilitas."
+        },
+        {
+          "title": "Jasa Lokal, Solusi Tepat",
+          "body": "Warga lebih memilih jasa dari orang sekitar yang mereka kenal. Dengan profil lapak yang jelas, warga akan lebih nyaman memilih jasaumu."
+        },
+        {
+          "title": "Koneksi Langsung dengan Calon Klien",
+          "body": "Tidak perlu perantara. Warga bisa langsung menghubungimu melalui WhatsApp yang tercantum di profil lapak untuk diskusi kebutuhan jasa."
+        },
+        {
+          "title": "Fleksibel: Jual Produk dan Jasa Sekaligus",
+          "body": "Di lapakwarga.my.id, kamu bisa menjual produk sekaligus menawarkan jasa dalam satu profil lapak. Misalnya: jualan bahan bangunan sekaligus jasa renovasi."
+        },
+        {
+          "title": "Promosikan Jasa dengan Token",
+          "body": "Gunakan token untuk mengangkat profil atau listing jasaumu ke posisi teratas, agar lebih banyak warga yang melihat dan menghubungimu."
+        },
+        {
+          "title": "Jasa Design? Jasa Service? Semua Bisa Diiklankan",
+          "body": "Tidak ada batasan jenis jasa yang bisa ditawarkan. Yang penting adalah kejelasan deskripsi, harga, dan cara kontak di profil lapak."
+        },
+        {
+          "title": "Dari Hobi jadi Usaha Jasa",
+          "body": "Punya hobi yang bisa dijadikan jasa? Mulai dari photography (pre-wedding, family portrait), desain logo dan banner, editing video untuk konten, jasa desain rumah, jasa penulisan konten, atau jasa pembuatan media sosial — warga mungkin sedang mencari keahlianmu."
+        },
+        {
+          "title": "Layanan Khusus Warga, Harga Bersahabat",
+          "body": "Berikan harga kompetitif untuk warga sekitar. Di lapakwarga.my.id, kamu bisa menentukan harga sendiri dan langsung deal dengan calon klien."
+        }
+      ]
+    },
+    {
+      "theme": "Ajakan Tawarkan Jasa & Produk",
+      "items": [
+        {
+          "title": "Jualan dan Jasa dalam Satu Tempat",
+          "body": "Di lapakwarga.my.id, kamu bisa menjual produk sekaligus menawarkan jasa dalam satu profil lapak. Misalnya: jualan hasil usaha kuliner sekaligus jasa catering untuk acara."
+        },
+        {
+          "title": "Kombinasi Produk dan Jasa = Peluang Lebih Banyak",
+          "body": "Tunggu apalagi? Gabungkan penjualan produk dan jasa di lapakwarga.my.id untuk meningkatkan peluang penghasilan."
+        },
+        {
+          "title": "Satu Lapak, Banyak Sumber Pendapatan",
+          "body": "Upload foto produk jualanmu, dan tambahkan deskripsi jasa yang bisa kamu tawarkan. Semua dalam satu profil yang mudah diakses warga."
+        },
+        {
+          "title": "Contoh: Jualan Bahan + Jasa Pembuatan",
+          "body": "Jualan kain sekaligus jasa menjahit, jualan tanaman hias sekaligus jasa landscaping, atau jualan peralatan rumah tangga sekaligus jasa perbaikan. Semua bisa di lapakwarga.my.id."
+        },
+        {
+          "title": "Fleksibilitas Penuh untuk Usahamu",
+          "body": "Tidak ada batasan. Kamu bebas menentukan kombinasi produk dan jasa apa yang ingin ditawarkan sesuai keahlian dan kebutuhan."
         }
       ]
     }

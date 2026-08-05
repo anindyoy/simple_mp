@@ -37,6 +37,7 @@
                 @endif
             </span>
         @endif
+
     </button>
 
     @if ($search || $categoryId || $condition || $deliverable)
@@ -48,6 +49,99 @@
         </button>
     @endif
 </div>
+
+{{-- Quick category filter buttons --}}
+@if ($quickCategories->isNotEmpty())
+    <div
+        x-data="{
+            canScrollLeft: false,
+            canScrollRight: false,
+            updateScroll() {
+                const el = this.$refs.scroll;
+                this.canScrollLeft = el.scrollLeft > 0;
+                this.canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
+            },
+            scrollByDir(dir) {
+                this.$refs.scroll.scrollBy({ left: dir * 200, behavior: 'smooth' });
+            }
+        }"
+        x-init="$nextTick(() => updateScroll())"
+        @resize.window="updateScroll()"
+        class="mb-4 flex items-center gap-1.5">
+
+        {{-- Left arrow --}}
+        <button
+            x-show="canScrollLeft"
+            x-cloak
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 scale-75"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-100"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-75"
+            @click="scrollByDir(-1)"
+            type="button"
+            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer"
+            style="border-color: #79C9C5; color: #3F9AAE;"
+            onmouseover="this.style.backgroundColor='#FFE2AF';"
+            onmouseout="this.style.backgroundColor='#fff';"
+            aria-label="Scroll kiri">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+
+        {{-- Scrollable container --}}
+        <div
+            x-ref="scroll"
+            @scroll="updateScroll()"
+            class="flex gap-2 flex-nowrap overflow-x-auto pb-1 flex-1 min-w-0 scrollbar-hide">
+            @foreach ($quickCategories as $quickCategory)
+                @php
+                    $isActive = (string) $quickCategory['id'] === (string) $categoryId;
+                    $buttonStyle = $isActive
+                        ? 'background-color: #3F9AAE; border-color: #3F9AAE; color: #fff;'
+                        : 'background-color: #fff; border-color: #79C9C5; color: #3F9AAE;';
+                    $countStyle = $isActive ? 'color: #FFE2AF;' : 'color: #79C9C5;';
+                    $hoverAttrs = $isActive ? '' : ' onmouseover="this.style.backgroundColor=\'#FFE2AF\'; this.style.borderColor=\'#FFE2AF\';" onmouseout="this.style.backgroundColor=\'#fff\'; this.style.borderColor=\'#79C9C5\';"';
+                @endphp
+                <button
+                    type="button"
+                    wire:click="$set('categoryId', '{{ $quickCategory['id'] }}')"
+                    style="{{ $buttonStyle }}"
+                    {!! $hoverAttrs !!}
+                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm transition shrink-0 whitespace-nowrap cursor-pointer">
+                    <span>{{ $quickCategory['category_name'] }}</span>
+                    <span class="text-xs font-semibold" style="{{ $countStyle }}">
+                        {{ number_format($quickCategory['product_count']) }}
+                    </span>
+                </button>
+            @endforeach
+        </div>
+
+        {{-- Right arrow --}}
+        <button
+            x-show="canScrollRight"
+            x-cloak
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 scale-75"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-100"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-75"
+            @click="scrollByDir(1)"
+            type="button"
+            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer"
+            style="border-color: #79C9C5; color: #3F9AAE;"
+            onmouseover="this.style.backgroundColor='#FFE2AF';"
+            onmouseout="this.style.backgroundColor='#fff';"
+            aria-label="Scroll kanan">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+@endif
 
 {{-- Modal --}}
 <div

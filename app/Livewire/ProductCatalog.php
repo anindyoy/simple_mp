@@ -38,6 +38,8 @@ class ProductCatalog extends Component
 
     public function updatedCategoryId($value): void
     {
+        $this->resetPage();
+
         if ($value === '' || $value === null) {
             $this->supportsCondition = true;
 
@@ -50,6 +52,11 @@ class ProductCatalog extends Component
         if (! $this->supportsCondition) {
             $this->condition = '';
         }
+    }
+
+    public function setCategory(string $categoryId): void
+    {
+        $this->categoryId = $categoryId;
     }
 
     public function render()
@@ -84,6 +91,16 @@ class ProductCatalog extends Component
             ->groupBy('category_id')
             ->pluck('aggregate', 'category_id');
 
+        $quickCategories = $categories
+            ->map(fn(Category $category) => [
+                'id'            => $category->id,
+                'category_name' => $category->category_name,
+                'product_count' => $categoryProductCounts->get($category->id, 0),
+            ])
+            ->filter(fn(array $category) => $category['product_count'] > 0)
+            ->sortByDesc('product_count')
+            ->values();
+
         $showVisitorCount = filter_var(Setting::getValue('show_visitor_count', '1'), FILTER_VALIDATE_BOOLEAN);
 
         // Ensure supportsCondition is in sync with the current categoryId on every render
@@ -95,6 +112,7 @@ class ProductCatalog extends Component
             'products'              => $products,
             'categories'            => $categories,
             'categoryProductCounts' => $categoryProductCounts,
+            'quickCategories'       => $quickCategories,
             'showVisitorCount'      => $showVisitorCount,
             'visitorCount24h'       => $showVisitorCount ? VisitorStatsService::getCached() : null,
             'supportsCondition'     => $this->supportsCondition,

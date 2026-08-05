@@ -166,6 +166,78 @@ describe('ProductController@index', function () {
 
         expect(Cache::has('categories_list'))->toBeTrue();
     });
+
+    it('menampilkan quick category filter diurutkan berdasarkan jumlah produk terbanyak', function () {
+        Setting::setValue('product_schedule_delay_hours', '0');
+
+        $categoryA = Category::factory()->create(['category_name' => 'Elektronik']);
+        $categoryB = Category::factory()->create(['category_name' => 'Fashion']);
+        $categoryC = Category::factory()->create(['category_name' => 'Otomotif']);
+        $lapak = LapakProfile::factory()->create();
+
+        // categoryA: 3 produk, categoryB: 1 produk, categoryC: 0 produk
+        foreach (range(1, 3) as $i) {
+            Product::factory()->withoutImages()->create([
+                'title' => "Produk Elektronik {$i}",
+                'category_id' => $categoryA->id,
+                'lapak_id' => $lapak->id,
+                'pushed_at' => null,
+                'created_at' => now()->subHours(10),
+            ]);
+        }
+
+        Product::factory()->withoutImages()->create([
+            'title' => 'Produk Fashion',
+            'category_id' => $categoryB->id,
+            'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(9),
+        ]);
+
+        ProductScheduleService::rebuild($lapak->id);
+
+        $quickCategories = Livewire::test(ProductCatalog::class)
+            ->viewData('quickCategories');
+
+        expect($quickCategories->pluck('category_name')->all())
+            ->toBe(['Elektronik', 'Fashion'])
+            ->and($quickCategories->pluck('product_count')->all())
+            ->toBe([3, 1]);
+    });
+
+    it('dapat memfilter produk melalui quick category button', function () {
+        Setting::setValue('product_schedule_delay_hours', '0');
+
+        $categoryA = Category::factory()->create(['category_name' => 'Elektronik']);
+        $categoryB = Category::factory()->create(['category_name' => 'Fashion']);
+        $lapak = LapakProfile::factory()->create();
+
+        Product::factory()->withoutImages()->create([
+            'title' => 'Laptop',
+            'category_id' => $categoryA->id,
+            'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(10),
+        ]);
+
+        Product::factory()->withoutImages()->create([
+            'title' => 'Baju',
+            'category_id' => $categoryB->id,
+            'lapak_id' => $lapak->id,
+            'pushed_at' => null,
+            'created_at' => now()->subHours(9),
+        ]);
+
+        ProductScheduleService::rebuild($lapak->id);
+
+        $titles = Livewire::test(ProductCatalog::class)
+            ->call('setCategory', (string) $categoryA->id)
+            ->viewData('products')
+            ->pluck('title');
+
+        expect($titles)->toContain('Laptop');
+        expect($titles)->not->toContain('Baju');
+    });
 });
 
 describe('ProductController@show', function () {

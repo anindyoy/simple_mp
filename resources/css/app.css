@@ -25,6 +25,15 @@
     --color-other: #f96e5b;
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
 /* Custom styles */
 .modal-backdrop {
     transition: opacity 300ms ease;

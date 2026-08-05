@@ -119,21 +119,13 @@
                 </div>
 
                 {{-- Kondisi --}}
-                <div class="flex flex-col gap-1"
-                    x-data="{ supportsCondition: {{ !$categoryId || $categories->firstWhere('id', $categoryId)?->supportsCondition() ? 'true' : 'false' }} }"
-                    x-init="$watch('$wire.categoryId', value => {
-                        const noCategory = !value || value === '';
-                        const supported = {{ $categories->map(fn($c) => ['id' => (string) $c->id, 'supports' => $c->supportsCondition()])->keyBy('id')->toJson() }};
-                        supportsCondition = noCategory || (supported[value]?.supports ?? false);
-                        if (!supportsCondition) $wire.condition = '';
-                    })">
+                <div class="flex flex-col gap-1">
                     <label for="condition" class="text-sm font-medium text-gray-700">Kondisi</label>
                     <select
                         id="condition"
                         wire:model="condition"
-                        :disabled="!supportsCondition"
-                        :class="!supportsCondition ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white'"
-                        class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        {{ $supportsCondition ? '' : 'disabled' }}
+                        class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 {{ $supportsCondition ? 'bg-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
                         <option value="">Semua Kondisi</option>
                         <option value="baru">Baru</option>
                         <option value="seken">Bekas</option>

@@ -7,6 +7,7 @@
         'categoryId' => $categoryId,
         'condition' => $condition,
         'deliverable' => $deliverable,
+        'supportsCondition' => $supportsCondition,
     ])
 
     @if($showVisitorCount)

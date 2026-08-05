@@ -28,10 +28,28 @@ class ProductCatalog extends Component
     #[Url(as: 'deliverable', except: false)]
     public bool $deliverable = false;
 
+    public bool $supportsCondition = true;
+
     public function resetFilters(): void
     {
         $this->reset(['search', 'categoryId', 'condition', 'deliverable']);
         $this->resetPage();
+    }
+
+    public function updatedCategoryId($value): void
+    {
+        if ($value === '' || $value === null) {
+            $this->supportsCondition = true;
+
+            return;
+        }
+
+        $category = Category::find($value);
+        $this->supportsCondition = $category?->supportsCondition() ?? false;
+
+        if (! $this->supportsCondition) {
+            $this->condition = '';
+        }
     }
 
     public function render()
@@ -68,12 +86,18 @@ class ProductCatalog extends Component
 
         $showVisitorCount = filter_var(Setting::getValue('show_visitor_count', '1'), FILTER_VALIDATE_BOOLEAN);
 
+        // Ensure supportsCondition is in sync with the current categoryId on every render
+        $this->supportsCondition = ! $this->categoryId
+            ? true
+            : ($categories->firstWhere('id', $this->categoryId)?->supportsCondition() ?? false);
+
         return view('livewire.product-catalog', [
             'products'              => $products,
             'categories'            => $categories,
             'categoryProductCounts' => $categoryProductCounts,
             'showVisitorCount'      => $showVisitorCount,
             'visitorCount24h'       => $showVisitorCount ? VisitorStatsService::getCached() : null,
+            'supportsCondition'     => $this->supportsCondition,
         ]);
     }
 

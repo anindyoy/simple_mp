@@ -384,7 +384,7 @@ class SiteSettingsPage extends Page implements HasForms
         Setting::setValue('site_region', $data['site_region'] ?? '');
         Setting::setValue('product_schedule_delay_hours', (string) max(1, (int) ($data['product_schedule_delay_hours'] ?? 4)));
         Setting::setValue('product_view_guard_hours', (string) max(1, (int) ($data['product_view_guard_hours'] ?? 6)));
-        Setting::setValue('show_visitor_count', filter_var($data['show_visitor_count'] ?? true, FILTER_VALIDATE_BOOLEAN) ? '1' : '0');
+        Setting::setValue('show_visitor_count', filter_var($data['show_visitor_count'], FILTER_VALIDATE_BOOLEAN));
         Setting::setValue('visitor_count_min_views', (string) max(0, (int) ($data['visitor_count_min_views'] ?? 0)));
         Setting::setValue('daily_minimum_push_tokens', (string) max(0, (int) ($data['daily_minimum_push_tokens'] ?? 2)));
         Setting::setValue('weekly_minimum_push_tokens', (string) max(0, (int) ($data['weekly_minimum_push_tokens'] ?? 3)));

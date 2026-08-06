@@ -75,8 +75,11 @@
             </div>
 
             <div>
-                <h1 class="text-4xl font-extrabold text-gray-900">{{ $product->title }}</h1>
-                <p class="text-2xl font-bold text-blue-600 mt-2">Rp {{ number_format($product->price) }}</p>
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2">{{ $product->title }}</h1>
+                @if($product->category->category_name === 'Jasa')
+                    <p class="text-s text-gray-500 dark:text-gray-400">Mulai dari</p>
+                @endif
+                <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($product->price) }}</p>
                 <div class="mt-2 flex flex-wrap gap-2">
                     @if ($product->hasCondition())
                         <span

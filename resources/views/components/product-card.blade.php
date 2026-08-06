@@ -41,6 +41,9 @@
             {{ $product->title }}
         </h5>
 
+        @if($product->category->category_name === 'Jasa')
+            <p class="text-[12px] text-gray-500 dark:text-gray-400">Mulai dari</p>
+        @endif
         <p class="text-lg font-black text-blue-700 dark:text-blue-400 mb-1">
             Rp {{ number_format($product->price) }}
         </p>

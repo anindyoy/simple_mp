@@ -83,7 +83,7 @@
             "Jasa Las"
         ],
         "sifat": ["Profesional", "Cepat", "Ramah", "Terpercaya", "Rapi"],
-        "harga": { "min": 20000, "max": 1500000 }
+        "harga": { "min": 20000, "max": 150000 }
     },
     "Properti": {
         "nama": ["Rumah", "Kontrakan", "Tanah Kavling", "Ruko", "Kios"],

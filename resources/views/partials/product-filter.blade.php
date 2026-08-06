@@ -1,3 +1,5 @@
+<div x-data="{ open: false }">
+
 {{-- Trigger button --}}
 <div class="mb-2 flex items-center gap-2">
     <button
@@ -51,40 +53,22 @@
 </div>
 
 {{-- Quick category filter buttons --}}
-@if ($quickCategories->isNotEmpty())
-    <div
-        x-data="{
-            canScrollLeft: false,
-            canScrollRight: false,
-            updateScroll() {
-                const el = this.$refs.scroll;
-                this.canScrollLeft = el.scrollLeft > 0;
-                this.canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
-            },
-            scrollByDir(dir) {
-                this.$refs.scroll.scrollBy({ left: dir * 200, behavior: 'smooth' });
-            }
-        }"
-        x-init="$nextTick(() => updateScroll())"
-        @resize.window="updateScroll()"
-        class="mb-4 flex items-center gap-1.5">
+@php
+    $displayCategories = $quickCategories->isNotEmpty()
+        ? $quickCategories
+        : $categories->filter(fn($cat) => ($categoryProductCounts->get($cat->id, 0) ?? 0) > 0)
+            ->sortByDesc(fn($cat) => $categoryProductCounts->get($cat->id, 0))
+            ->values();
+@endphp
 
+@if ($displayCategories->isNotEmpty())
+    <div class="mb-4 flex items-center gap-1.5">
         {{-- Left arrow --}}
         <button
-            x-show="canScrollLeft"
-            x-cloak
-            x-transition:enter="transition ease-out duration-150"
-            x-transition:enter-start="opacity-0 scale-75"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-100"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-75"
-            @click="scrollByDir(-1)"
             type="button"
-            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer"
+            onclick="this.nextElementSibling.scrollBy({left: -200, behavior: 'smooth'})"
+            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer hover:bg-[#FFE2AF]"
             style="border-color: #79C9C5; color: #3F9AAE;"
-            onmouseover="this.style.backgroundColor='#FFE2AF';"
-            onmouseout="this.style.backgroundColor='#fff';"
             aria-label="Scroll kiri">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -93,27 +77,27 @@
 
         {{-- Scrollable container --}}
         <div
-            x-ref="scroll"
-            @scroll="updateScroll()"
             class="flex gap-2 flex-nowrap overflow-x-auto pb-1 flex-1 min-w-0 scrollbar-hide">
-            @foreach ($quickCategories as $quickCategory)
+            @foreach ($displayCategories as $quickCategory)
                 @php
-                    $isActive = (string) $quickCategory['id'] === (string) $categoryId;
-                    $buttonStyle = $isActive
-                        ? 'background-color: #3F9AAE; border-color: #3F9AAE; color: #fff;'
-                        : 'background-color: #fff; border-color: #79C9C5; color: #3F9AAE;';
-                    $countStyle = $isActive ? 'color: #FFE2AF;' : 'color: #79C9C5;';
-                    $hoverAttrs = $isActive ? '' : ' onmouseover="this.style.backgroundColor=\'#FFE2AF\'; this.style.borderColor=\'#FFE2AF\';" onmouseout="this.style.backgroundColor=\'#fff\'; this.style.borderColor=\'#79C9C5\';"';
+                    $catId = is_array($quickCategory) ? $quickCategory['id'] : $quickCategory->id;
+                    $catName = is_array($quickCategory) ? $quickCategory['category_name'] : $quickCategory->category_name;
+                    $productCount = is_array($quickCategory)
+                        ? $quickCategory['product_count']
+                        : ($categoryProductCounts->get($quickCategory->id, 0) ?? 0);
+                    $isActive = (string) $catId === (string) $categoryId;
                 @endphp
                 <button
                     type="button"
-                    wire:click="$set('categoryId', '{{ $quickCategory['id'] }}')"
-                    style="{{ $buttonStyle }}"
-                    {!! $hoverAttrs !!}
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm transition shrink-0 whitespace-nowrap cursor-pointer">
-                    <span>{{ $quickCategory['category_name'] }}</span>
-                    <span class="text-xs font-semibold" style="{{ $countStyle }}">
-                        {{ number_format($quickCategory['product_count']) }}
+                    wire:click="setCategory('{{ $catId }}')"
+                    @class([
+                        'inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm transition shrink-0 whitespace-nowrap cursor-pointer',
+                        'bg-[#3F9AAE] border-[#3F9AAE] text-white hover:bg-[#2d7a8c]' => $isActive,
+                        'bg-white border-[#79C9C5] text-[#3F9AAE] hover:bg-[#FFE2AF] hover:border-[#FFE2AF]' => !$isActive,
+                    ])>
+                    <span>{{ $catName }}</span>
+                    <span class="text-xs font-semibold {{ $isActive ? 'text-[#FFE2AF]' : 'text-[#79C9C5]' }}">
+                        {{ number_format($productCount) }}
                     </span>
                 </button>
             @endforeach
@@ -121,20 +105,10 @@
 
         {{-- Right arrow --}}
         <button
-            x-show="canScrollRight"
-            x-cloak
-            x-transition:enter="transition ease-out duration-150"
-            x-transition:enter-start="opacity-0 scale-75"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-100"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-75"
-            @click="scrollByDir(1)"
             type="button"
-            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer"
+            onclick="this.previousElementSibling.scrollBy({left: 200, behavior: 'smooth'})"
+            class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer hover:bg-[#FFE2AF]"
             style="border-color: #79C9C5; color: #3F9AAE;"
-            onmouseover="this.style.backgroundColor='#FFE2AF';"
-            onmouseout="this.style.backgroundColor='#fff';"
             aria-label="Scroll kanan">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -259,4 +233,6 @@
             </div>
         </form>
     </div>
+</div>
+
 </div>

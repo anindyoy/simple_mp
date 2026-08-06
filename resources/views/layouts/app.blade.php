@@ -16,6 +16,7 @@
     {{-- @include('whatsapp-widget::whatsapp-widget-head') --}}
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -41,6 +42,8 @@
     {{-- @include('whatsapp-widget::whatsapp-widget-body') --}}
 
     @stack('scripts')
+
+    @livewireScripts
 
     @if (! app()->environment('local') && filled(config('services.turnstile.site_key')))
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>

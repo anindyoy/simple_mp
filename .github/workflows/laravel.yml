@@ -137,7 +137,7 @@ jobs:
 
         PAYLOAD=$(jq -n \
           --arg chat_id "${TELEGRAM_CHAT_ID}" \
-          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\nDurasi: <code>%s</code>\n\n%s' \
+          --arg text "$(printf '❌ <b>CI Failed</b>\nRepo: <a href="https://github.com/%s">%s</a>\nBranch: <code>%s</code>\nCommit: <a href="https://github.com/%s/commit/%s"><code>%s</code></a>\nRuntime: <code>%s</code>\n\n%s' \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REPOSITORY}" \
             "${GITHUB_REF_NAME}" \

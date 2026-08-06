@@ -1,5 +1,4 @@
-<div x-data="{ open: false }">
-
+<div id="product-catalog-root">
     @include('partials.product-filter', [
         'categories' => $categories,
         'categoryProductCounts' => $categoryProductCounts,

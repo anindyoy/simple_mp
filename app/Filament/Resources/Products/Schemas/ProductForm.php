@@ -8,6 +8,8 @@ use Filament\Schemas\Schema;
 use App\Models\CategoryRequest;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\RichEditor;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action as FormAction;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
@@ -19,18 +21,17 @@ class ProductForm
             ->components([
                 Section::make('Informasi Produk')
                     ->schema([
-                        // Forms\Components\Select::make('lapak_id')
-                        //     ->label('Lapak / Toko')
-                        //     ->relationship(
-                        //         'lapak',
-                        //         'name',
-                        //         modifyQueryUsing: fn(Builder $query) =>
-                        //         $query->where('user_id', auth()->id())
-                        //     )
-                        //     ->default(fn() => auth()->user()?->lapak?->id)
-                        //     ->searchable()
-                        //     ->preload()
-                        //     ->required(),
+                        Forms\Components\Select::make('lapak_id')
+                            ->label('Lapak / Toko')
+                            ->relationship(
+                                'lapak',
+                                'name',
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->visible(fn() => auth()->user()?->is_admin)
+                            ->disabled(),
 
                         Forms\Components\Select::make('category_id')
                             ->label('Kategori')
@@ -69,41 +70,61 @@ class ProductForm
                             ),
 
                         Forms\Components\TextInput::make('title')
-                            ->label('Judul Produk')
+                            ->label('Nama Produk')
                             ->required()
                             ->maxLength(255),
 
-                        Forms\Components\Textarea::make('description')
-                            ->label('Deskripsi')
-                            ->rows(5)
-                            ->required(),
+                        Section::make('')
+                            ->schema([
+                                Forms\Components\TextInput::make('price')
+                                    ->label(fn($get) => $get('category_id') && Category::find($get('category_id'))?->category_name === 'Jasa' ? 'Harga mulai dari' : 'Harga')
+                                    ->numeric()
+                                    ->prefix('Rp')
+                                    ->required(),
 
-                        Forms\Components\TextInput::make('price')
-                            ->label('Harga')
-                            ->numeric()
-                            ->prefix('Rp')
-                            ->required(),
+                                Forms\Components\Select::make('condition')
+                                    ->label('Kondisi')
+                                    ->options([
+                                        'baru' => 'Baru',
+                                        'seken' => 'Seken',
+                                    ])
+                                    ->visible(
+                                        fn($get) => ($get('category_id') && Category::find($get('category_id'))?->supportsCondition()) || false
+                                    )
+                                    ->required(),
 
-                        Forms\Components\Select::make('condition')
-                            ->label('Kondisi')
-                            ->options([
-                                'baru' => 'Baru',
-                                'seken' => 'Seken',
+                                Forms\Components\Toggle::make('can_be_delivered')
+                                    ->label('Bisa Diantar')
+                                    ->helperText('Centang jika produk ini bisa diantarkan ke pembeli')
+                                    ->default(fn() => auth()->user()?->lapak?->can_be_delivered ?? false),
+
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label('Aktifkan Produk')
+                                    ->disabled(fn($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
+                                    ->default(true),
+
                             ])
-                            ->visible(
-                                fn($get) => ($get('category_id') && Category::find($get('category_id'))?->supportsCondition()) || false
-                            )
-                            ->required(),
+                            ->columns(4)
+                            ->columnSpanFull(),
 
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Aktifkan Produk')
-                            ->disabled(fn($record) => ! auth()->user()?->is_admin && $record && ! $record->is_active)
-                            ->default(true),
-
-                        Forms\Components\Toggle::make('can_be_delivered')
-                            ->label('Bisa Diantar')
-                            ->helperText('Centang jika produk ini bisa diantarkan ke pembeli')
-                            ->default(fn() => auth()->user()?->lapak?->can_be_delivered ?? false),
+                        Forms\Components\RichEditor::make('description')
+                            ->label('Deskripsi')
+                            ->required()
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'strike',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                                'h2',
+                                'h3',
+                                'blockquote',
+                                'undo',
+                                'redo',
+                                'link',
+                            ]),
                     ])
                     ->columns(2),
 

@@ -8,7 +8,6 @@ use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Livewire as LivewireComponent;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
@@ -85,20 +84,18 @@ class GrowthReportPage extends Page
                 Section::make('Grafik Pertumbuhan')
                     ->collapsible()
                     ->schema([
-                        Grid::make(2)->schema([
-                            $this->makeWidgetComponent(LapakGrowthChartWidget::class),
-                            $this->makeWidgetComponent(ProductGrowthChartWidget::class),
-                        ]),
-                    ]),
+                        $this->makeWidgetComponent(LapakGrowthChartWidget::class),
+                        $this->makeWidgetComponent(ProductGrowthChartWidget::class),
+                    ])
+                    ->columns(2),
 
                 Section::make('Tabel Pertumbuhan')
                     ->collapsible()
                     ->schema([
-                        Grid::make(2)->schema([
-                            $this->makeWidgetComponent(LapakGrowthTableWidget::class),
-                            $this->makeWidgetComponent(ProductGrowthTableWidget::class),
-                        ]),
-                    ]),
+                        $this->makeWidgetComponent(LapakGrowthTableWidget::class),
+                        $this->makeWidgetComponent(ProductGrowthTableWidget::class),
+                    ])
+                    ->columns(2),
             ]);
     }
 

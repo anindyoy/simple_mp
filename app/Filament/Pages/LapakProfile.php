@@ -10,7 +10,6 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -155,86 +154,90 @@ class LapakProfile extends Page implements HasForms
                             ->content('Pengajuan aktivasi ulang sedang menunggu moderasi.'),
                     ]),
 
-                Grid::make(2)->schema([
-                    TextInput::make('name')
-                        ->label('Nama Lapak')
-                        ->required()
-                        ->maxLength(100)
-                        ->helperText(function () {
-                            if ($this->lapak && $this->lapak->exists) {
-                                return '';
-                            }
+                Section::make('Informasi Lapak')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nama Lapak')
+                            ->required()
+                            ->maxLength(100)
+                            ->helperText(function () {
+                                if ($this->lapak && $this->lapak->exists) {
+                                    return '';
+                                }
 
-                            $suggestions = $this->getLapakNameSuggestions();
-                            return 'Contoh: ' . implode(', ', $suggestions);
-                        }),
+                                $suggestions = $this->getLapakNameSuggestions();
+                                return 'Contoh: ' . implode(', ', $suggestions);
+                            }),
 
-                    Textarea::make('address_raw')
-                        ->label('Alamat')
-                        ->required(),
+                        Textarea::make('address_raw')
+                            ->label('Alamat')
+                            ->required(),
 
-                    TextInput::make('whatsapp_number')
-                        ->label('Nomor WhatsApp')
-                        ->unique(
-                            table: ModelLapakProfile::class,
-                            column: 'whatsapp_number',
-                            ignoreRecord: true
-                        )
-                        ->required(),
+                        TextInput::make('whatsapp_number')
+                            ->label('Nomor WhatsApp')
+                            ->unique(
+                                table: ModelLapakProfile::class,
+                                column: 'whatsapp_number',
+                                ignoreRecord: true
+                            )
+                            ->required(),
 
-                    TextInput::make('telegram_username')
-                        ->label('Username Telegram')
-                        ->unique(
-                            table: ModelLapakProfile::class,
-                            column: 'telegram_username',
-                            ignoreRecord: true
-                        )
-                        ->prefix('@'),
+                        TextInput::make('telegram_username')
+                            ->label('Username Telegram')
+                            ->unique(
+                                table: ModelLapakProfile::class,
+                                column: 'telegram_username',
+                                ignoreRecord: true
+                            )
+                            ->prefix('@'),
 
-                    Toggle::make('can_be_delivered')
-                        ->label('Bisa Antar')
-                        ->helperText('Aktifkan jika lapak Anda menyediakan layanan antar ke pembeli')
-                        ->default(false),
+                        Toggle::make('can_be_delivered')
+                            ->label('Bisa Antar')
+                            ->helperText('Aktifkan jika lapak Anda menyediakan layanan antar ke pembeli')
+                            ->default(false),
 
-                    FileUpload::make('profile_image')
-                        ->label('Foto Lapak')
-                        ->image()
-                        ->disk('public')
-                        ->directory('lapak-profiles')
-                        ->imagePreviewHeight('150')
-                        ->maxSize(2048),
+                        FileUpload::make('profile_image')
+                            ->label('Foto Lapak')
+                            ->image()
+                            ->disk('public')
+                            ->directory('lapak-profiles')
+                            ->imagePreviewHeight('150')
+                            ->maxSize(2048),
 
-                    Repeater::make('external_links')
-                        ->label('Link External Toko')
-                        ->schema([
-                            Grid::make(2)->schema([
-                                Select::make('label')
-                                    ->label('Jenis Link')
-                                    ->options($this->getExternalLinkLabelOptions())
-                                    ->placeholder('Pilih atau kosongkan')
-                                    ->searchable()
-                                    ->reactive()
-                                    ->afterStateUpdated(function (callable $set, $state) {
-                                        if ($state) {
-                                            $set('custom_label', $state);
-                                        }
-                                    }),
-                                TextInput::make('link')
-                                    ->label('Link')
-                                    ->required()
-                                    ->url()
-                                    ->maxLength(2048),
-                            ]),
-                            TextInput::make('custom_label')
-                                ->label('Label (opsional)')
-                                ->placeholder('Kosongkan untuk menggunakan label dari jenis link terpilih')
-                                ->maxLength(100),
-                        ])
-                        ->columns(1)
-                        ->default([])
-                        ->reorderable(false)
-                        ->addActionLabel('Tambah Link'),
-                ]),
+                        Repeater::make('external_links')
+                            ->label('Link External Toko')
+                            ->schema([
+                                Section::make('')
+                                    ->schema([
+                                        Select::make('label')
+                                            ->label('Jenis Link')
+                                            ->options($this->getExternalLinkLabelOptions())
+                                            ->placeholder('Pilih atau kosongkan')
+                                            ->searchable()
+                                            ->reactive()
+                                            ->afterStateUpdated(function (callable $set, $state) {
+                                                if ($state) {
+                                                    $set('custom_label', $state);
+                                                }
+                                            }),
+                                        TextInput::make('link')
+                                            ->label('Link')
+                                            ->required()
+                                            ->url()
+                                            ->maxLength(2048),
+                                    ])
+                                    ->columns(2),
+                                TextInput::make('custom_label')
+                                    ->label('Label (opsional)')
+                                    ->placeholder('Kosongkan untuk menggunakan label dari jenis link terpilih')
+                                    ->maxLength(100),
+                            ])
+                            ->columns(1)
+                            ->default([])
+                            ->reorderable(false)
+                            ->addActionLabel('Tambah Link'),
+                    ])
+                    ->columns(2),
             ])
             ->model($this->lapak)
             ->statePath('data');

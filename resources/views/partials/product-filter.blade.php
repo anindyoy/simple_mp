@@ -62,11 +62,22 @@
 @endphp
 
 @if ($displayCategories->isNotEmpty())
-    <div class="mb-4 flex items-center gap-1.5">
+    <div x-data="{
+        canScrollLeft: false,
+        canScrollRight: false,
+        checkScroll() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                this.canScrollLeft = container.scrollLeft > 0;
+                this.canScrollRight = container.scrollLeft < (container.scrollWidth - container.clientWidth - 1);
+            }
+        }
+    }" x-init="checkScroll()" class="mb-4 flex items-center gap-1.5">
         {{-- Left arrow --}}
         <button
+            x-show="canScrollLeft"
             type="button"
-            onclick="this.nextElementSibling.scrollBy({left: -200, behavior: 'smooth'})"
+            @click="$refs.scrollContainer.scrollBy({left: -200, behavior: 'smooth'})"
             class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer hover:bg-[#FFE2AF]"
             style="border-color: #79C9C5; color: #3F9AAE;"
             aria-label="Scroll kiri">
@@ -77,6 +88,8 @@
 
         {{-- Scrollable container --}}
         <div
+            x-ref="scrollContainer"
+            @scroll.debounce.100ms="checkScroll()"
             class="flex gap-2 flex-nowrap overflow-x-auto pb-1 flex-1 min-w-0 scrollbar-hide">
             @foreach ($displayCategories as $quickCategory)
                 @php
@@ -105,8 +118,9 @@
 
         {{-- Right arrow --}}
         <button
+            x-show="canScrollRight"
             type="button"
-            onclick="this.previousElementSibling.scrollBy({left: 200, behavior: 'smooth'})"
+            @click="$refs.scrollContainer.scrollBy({left: 200, behavior: 'smooth'})"
             class="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-white shadow-md border transition cursor-pointer hover:bg-[#FFE2AF]"
             style="border-color: #79C9C5; color: #3F9AAE;"
             aria-label="Scroll kanan">
